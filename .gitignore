@@ -1,0 +1,25 @@
+# Sistema / editores
+.DS_Store
+**/.DS_Store
+.vscode/
+.idea/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.ipynb_checkpoints/
+
+# Segredos (chaves de API da extração com IA etc.)
+.env
+.env.*
+!.env.example
+
+# Configuração local de agentes
+.claude/settings.local.json
+
+# Camadas geradas pelos scripts — rode scripts/ para recriar
+dados/prata/*
+dados/ouro/*
+!dados/prata/.gitkeep
+!dados/ouro/.gitkeep

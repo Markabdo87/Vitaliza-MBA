@@ -1,0 +1,644 @@
+resposta_id,user_id,respondido_em,motivo_principal,comentario
+q_00000,u_e2e082a4,2026-06-01,preco,era só até a formatura
+q_00001,u_85aa5059,2026-06-01,outro,"já fiz a viagem pro nordeste, agora não preciso mais"
+q_00002,u_9756618e,2026-06-01,preco,
+q_00003,u_7ade5616,2026-06-01,preco,era só ate a prova
+q_00004,u_929883e3,2026-06-01,outro,"mudei de vida, sem tempo"
+q_00005,u_a1e24795,2026-06-01,outro,"ja fiz a prova, agora nao preciso mais"
+q_00006,u_04b3bf76,2026-06-01,problema_tecnico,app bugado depois da atualização
+q_00007,u_0d68b93c,2026-06-02,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00008,u_83955a9d,2026-06-02,outro,"ja fiz a prova, agora nao preciso mais"
+q_00009,u_3892ef33,2026-06-02,outro,"já fiz a prova, agora não preciso mais"
+q_00010,u_ef8ae867,2026-06-02,preco,
+q_00011,u_a21f428b,2026-06-03,outro_app,"já fiz o mochilão, agora não preciso mais"
+q_00012,u_8cfd939f,2026-06-03,outro,
+q_00013,u_e6e21b56,2026-06-03,preco,vou dar um tempo
+q_00014,u_1d943a25,2026-06-03,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00015,u_4ba807e2,2026-06-03,preco,"já fiz a festa de fim de ano da firma, agora não preciso mais"
+q_00016,u_9fcc587f,2026-06-03,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00017,u_c91ac093,2026-06-03,preco,vou dar um tempo
+q_00018,u_f6266e86,2026-06-03,problema_tecnico,app bugado depois da atualização
+q_00019,u_5b90e216,2026-06-03,preco,
+q_00020,u_edcc4778,2026-06-03,outro,era só até meu aniversário de 40
+q_00021,u_771d29fd,2026-06-03,outro,"já fiz a formatura, agora não preciso mais"
+q_00022,u_45e02629,2026-06-03,problema_tecnico,o gps não funciona no meu celular
+q_00023,u_7235eff5,2026-06-04,preco,"treinei pra apresentação pros investidores e consegui, objetivo cumprido"
+q_00024,u_2c9fbc9d,2026-06-04,outro,era só até a prova
+q_00025,u_329fb1bd,2026-06-04,outro,"treinei pro casamento e consegui, objetivo cumprido"
+q_00026,u_5ce665e5,2026-06-04,nao_uso,virou rotina chata
+q_00027,u_72308f4e,2026-06-05,outro,"treinei pro casamento da minha irmã e consegui, objetivo cumprido"
+q_00028,u_d3414ec2,2026-06-05,outro,
+q_00029,u_7e6ac850,2026-06-05,outro,
+q_00030,u_0ba1df21,2026-06-05,preco,o gps não funciona no meu celular
+q_00031,u_1da17945,2026-06-05,preco,
+q_00032,u_27cc1c37,2026-06-05,outro_app,o GPS não funciona no meu celular
+q_00033,u_e5c0e815,2026-06-05,outro,
+q_00034,u_25d89ddf,2026-06-06,preco,vou passar uns meses fora
+q_00035,u_5785169e,2026-06-06,outro,
+q_00036,u_16bb81d8,2026-06-06,preco,"treinei pra convenção da empresa e consegui, objetivo cumprido"
+q_00037,u_0d8158e6,2026-06-06,nao_uso,
+q_00038,u_ccd96f8f,2026-06-06,outro_app,o GPS não funciona no meu celular
+q_00039,u_98f51b50,2026-06-07,preco,"já fiz a prova, agora não preciso mais"
+q_00040,u_237649ca,2026-06-07,outro,"já fiz a prova, agora não preciso mais"
+q_00041,u_3906b373,2026-06-07,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00042,u_364be44b,2026-06-07,preco,app bugado depois da atualizacao
+q_00043,u_dc75d26e,2026-06-07,outro_app,naoe stou usando
+q_00044,u_e74eb830,2026-06-08,preco,
+q_00045,u_d66c4290,2026-06-08,preco,app bugado depois da atualização
+q_00046,u_f39a3eac,2026-06-08,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00047,u_d21c5157,2026-06-08,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00048,u_5114136c,2026-06-08,preco,
+q_00049,u_da0f2041,2026-06-09,outro,
+q_00050,u_741cf867,2026-06-09,preco,"já fiz a prova, agora não preciso mais"
+q_00051,u_4271bc18,2026-06-09,preco,
+q_00052,u_49ae86ce,2026-06-09,preco,era só até a prova
+q_00053,u_61806bca,2026-06-10,saude,"lesao, fisioterapia por meses"
+q_00054,u_999a5421,2026-06-10,outro,
+q_00055,u_0c197961,2026-06-10,outro,
+q_00056,u_55eed065,2026-06-10,preco,"mudei de vida, sem tempo"
+q_00057,u_0a260e56,2026-06-10,nao_uso,
+q_00058,u_e5aa67b5,2026-06-10,problema_tecnico,
+q_00059,u_78981718,2026-06-11,outro,"já fiz o casamento, agora não preciso mais"
+q_00060,u_c962a112,2026-06-11,outro_app,
+q_00061,u_fd754dc9,2026-06-11,preco,era só até meu casamento
+q_00062,u_608eb85d,2026-06-11,problema_tecnico,o gps não funciona no meu celular
+q_00063,u_3b0b9161,2026-06-11,outro,
+q_00064,u_34a38b96,2026-06-11,outro,
+q_00065,u_e6284053,2026-06-11,problema_tecnico,o GPS não funciona no mue celular
+q_00066,u_e0e635ae,2026-06-11,problema_tecnico,app bugado depois da atualização
+q_00067,u_279435c5,2026-06-11,problema_tecnico,app bugado depois da atualização
+q_00068,u_69c1cf61,2026-06-11,preco,vou dar um etmpo
+q_00069,u_bb6d61a0,2026-06-12,preco,"já fiz a festa de fim de ano da firma, agora não preciso mais"
+q_00070,u_f00b6bf7,2026-06-12,preco,
+q_00071,u_0883dd00,2026-06-12,outro,"já fiz a festa, agora ãno preciso mais"
+q_00072,u_49085363,2026-06-12,preco,o GPS não funciona no meu celular
+q_00073,u_45acfebc,2026-06-12,outro,
+q_00074,u_9be8a54b,2026-06-12,preco,
+q_00075,u_c7d5de89,2026-06-12,outro,era só aét a prova
+q_00076,u_c401777b,2026-06-12,outro,
+q_00077,u_6cad1f2d,2026-06-12,preco,o GPS não funciona no meu celular
+q_00078,u_49c54109,2026-06-12,preco,
+q_00079,u_da1964e0,2026-06-12,preco,"treinei pra festa e consegui, objetivo cumprido"
+q_00080,u_2bed52de,2026-06-13,preco,app bugado depois da atualização
+q_00081,u_9e7101a5,2026-06-13,outro,era só até a prova
+q_00082,u_e0b6b7b7,2026-06-13,outro,
+q_00083,u_ad2e84d5,2026-06-13,outro,
+q_00084,u_205a5eee,2026-06-13,saude,parado por causa do joelho
+q_00085,u_eb06a654,2026-06-13,preco,cansei de fazer sempre a mesma coisa
+q_00086,u_b96e070b,2026-06-13,outro,app bugado depois da atualização
+q_00087,u_b9116208,2026-06-13,preco,nasceu meu filho
+q_00088,u_48f1a134,2026-06-13,problema_tecnico,app bugado depois da atualização
+q_00089,u_3c428de1,2026-06-14,outro,
+q_00090,u_2b349262,2026-06-14,outro,era só até minha formatura
+q_00091,u_35418978,2026-06-14,outro,
+q_00092,u_507a6eb7,2026-06-14,outro,nasceu meu filho
+q_00093,u_18263f77,2026-06-14,preco,"mudei de vida, sem tempo"
+q_00094,u_3b63ef8b,2026-06-14,preco,"já fiz a prova, agora não preciso mais"
+q_00095,u_4b69e99a,2026-06-14,problema_tecnico,o GPS não funciona no meu celular
+q_00096,u_36a06498,2026-06-14,preco,
+q_00097,u_7e615ac3,2026-06-15,outro,"treinei pr aviagem pro nordeste e consegui, objetivo cumprido"
+q_00098,u_a94ac046,2026-06-15,preco,app bugado depois da atualização
+q_00099,u_6479f91e,2026-06-15,preco,"treinei pra festa de fim de ano da firma e consegui, objetivo cumprido"
+q_00100,u_bfac3c0a,2026-06-15,preco,o gps não funciona no meu celular
+q_00101,u_e67f5237,2026-06-15,preco,app bugado depois da atualização
+q_00102,u_73a75fe9,2026-06-15,preco,app bugado depois da atualização
+q_00103,u_e55f29c0,2026-06-16,problema_tecnico,app bugado depois da atualização
+q_00104,u_48d38f74,2026-06-16,preco,
+q_00105,u_3d1ecb20,2026-06-16,preco,era só até a prova
+q_00106,u_31424413,2026-06-16,outro,
+q_00107,u_fb6f5373,2026-06-16,preco,
+q_00108,u_7c3c5143,2026-06-16,outro,"treinei pra viagem com as amigas e conseugi, objetivo cumprido"
+q_00109,u_658acb0e,2026-06-16,problema_tecnico,o GPS não funciona no meu celular
+q_00110,u_0f868e7d,2026-06-16,preco,app bugado depois da atualização
+q_00111,u_6b2985fa,2026-06-17,nao_uso,"sei lá, perdi a vontade"
+q_00112,u_19851ce9,2026-06-17,outro,"já fzi a viagem com as amigas, agora não preciso mais"
+q_00113,u_e48e8437,2026-06-17,preco,
+q_00114,u_d26d3b42,2026-06-17,preco,"já fiz meu aniversário, agoran ão preciso mais"
+q_00115,u_84494960,2026-06-17,outro,"treinei pra meu casamento e consegui, objetivo cumprido"
+q_00116,u_97fcd939,2026-06-17,preco,"cobrança errada, suporte não responde"
+q_00117,u_bf23167e,2026-06-18,preco,"enjoei, sempre o mesmo treino"
+q_00118,u_627bc8e9,2026-06-18,outro,"já fiz a prova, agora não preciso mais"
+q_00119,u_d7ecd91f,2026-06-18,outro,"treinei pro reveillon e consegui, objetivo cumprido"
+q_00120,u_f7254004,2026-06-18,preco,
+q_00121,u_826403c8,2026-06-18,preco,o gps não funciona no meu celular
+q_00122,u_35dde235,2026-06-18,problema_tecnico,app ubgado depois da atualização
+q_00123,u_9255dbe7,2026-06-19,preco,
+q_00124,u_781d9e0e,2026-06-19,preco,"já fiz a viagem pra praia, agora não preciso mais"
+q_00125,u_a7dd1957,2026-06-19,preco,
+q_00126,u_c4a8a215,2026-06-19,outro,"já fiz a prova, agora não preciso mais"
+q_00127,u_947c98c6,2026-06-19,outro,"treinei pra meu aniversário e consegui, objetivo cumprido"
+q_00128,u_eaafc48e,2026-06-19,outro,
+q_00129,u_0fe5a035,2026-06-19,outro,"treinei pra convenção da empresa e consegui, objetivo cumprido"
+q_00130,u_92aa43a9,2026-06-19,preco,nasceu meu filho
+q_00131,u_80e8327c,2026-06-19,outro,
+q_00132,u_b1698814,2026-06-19,preco,vou dar um tempo
+q_00133,u_23286ef2,2026-06-19,preco,app bugado depois da atualização
+q_00134,u_5e5fc195,2026-06-20,preco,"já fiz a prova, agora não preciso mais"
+q_00135,u_a78bfc59,2026-06-20,outro,era só até a apresentação pros investidores
+q_00136,u_3639bba4,2026-06-20,problema_tecnico,app bugado deposi da atualizacao
+q_00137,u_76d35133,2026-06-20,preco,o GPS não funciona no meu celular
+q_00138,u_ab082530,2026-06-20,preco,
+q_00139,u_94eacef0,2026-06-21,outro,era só até a prova
+q_00140,u_24c8e352,2026-06-21,outro,
+q_00141,u_fbd826d6,2026-06-21,outro,"treinei pra convenção da empresa e consegui, objetivo cumprido"
+q_00142,u_c88bfbbc,2026-06-21,preco,
+q_00143,u_50bbac8b,2026-06-22,outro,era só até a prova
+q_00144,u_1054b0bc,2026-06-22,outro,era só até a ofrmatura
+q_00145,u_1e50bca9,2026-06-22,saude,
+q_00146,u_fac7cfe1,2026-06-22,preco,me machuquei (ombro) e nãov ou conseguir treinar
+q_00147,u_16012b4b,2026-06-22,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00148,u_1fb7c7b8,2026-06-22,nao_uso,"já fiz a prova, agora não preciso mais"
+q_00149,u_0f29b3ce,2026-06-22,preco,"treinei pra apresentação pros investidores e consegui, objetivo cumprido"
+q_00150,u_16eedb47,2026-06-22,preco,era só até a festa de fim de ano da firma
+q_00151,u_9ff895ab,2026-06-22,problema_tecnico,app bugado depois da atualização
+q_00152,u_2d286b65,2026-06-22,preco,app bugado depois da atualização
+q_00153,u_dd8f1651,2026-06-23,preco,"sei lá, perdi a vontade"
+q_00154,u_a78b321e,2026-06-23,outro_app,
+q_00155,u_6dbdad92,2026-06-23,preco,o GPS não funciona no meu celular
+q_00156,u_7e826faa,2026-06-23,preco,
+q_00157,u_525388a5,2026-06-23,preco,cansei de fazer sempre a mesma coisa
+q_00158,u_615b71d0,2026-06-24,outro,"treinei pra minha viagem de férias e consegui, objetivo cumprido"
+q_00159,u_3a5f9b6b,2026-06-24,outro,
+q_00160,u_b797cfd5,2026-06-24,outro,
+q_00161,u_3428fc98,2026-06-24,preco,o GPS não funciona no meu celular
+q_00162,u_c046aed2,2026-06-24,preco,
+q_00163,u_3b6dd714,2026-06-24,outro,
+q_00164,u_cfbca754,2026-06-24,preco,era só até a viagem com as amigas
+q_00165,u_d3e98879,2026-06-24,preco,app bugado depois da atualização
+q_00166,u_0e6047ba,2026-06-24,outro,
+q_00167,u_4d186578,2026-06-25,preco,"treinei pro casamento e consegui, objetivo cumprido"
+q_00168,u_2ac64aa8,2026-06-25,preco,"já fiz a convenção da empresa, agora não preciso mais"
+q_00169,u_21d45100,2026-06-26,outro,
+q_00170,u_f02058a6,2026-06-26,outro,"já fiz a prova, agora não preciso mais"
+q_00171,u_873e7c77,2026-06-26,preco,
+q_00172,u_398f30d5,2026-06-26,preco,"trabalho novo, não dá"
+q_00173,u_fd5aded5,2026-06-26,problema_tecnico,app bugado depois da atualização
+q_00174,u_477a6f1b,2026-06-26,problema_tecnico,app bugado depois da atualizçaão
+q_00175,u_a19278f4,2026-06-26,preco,app bugado depois da atualização
+q_00176,u_3504dba9,2026-06-27,nao_uso,o gps não funciona no meu celular
+q_00177,u_506ae373,2026-06-27,preco,"já fiz a viagem pra praia, agora não preciso mais"
+q_00178,u_474d15c3,2026-06-27,nao_uso,
+q_00179,u_fb2ac1d4,2026-06-27,preco,era só ate a festa de fim de ano da firma
+q_00180,u_7c0cc411,2026-06-27,outro,
+q_00181,u_7a1ee173,2026-06-27,problema_tecnico,app bguado depois da atualização
+q_00182,u_21265474,2026-06-27,preco,"já fiz a prova, agora não preciso mais"
+q_00183,u_3389e998,2026-06-27,outro,"treinei pra meus 30 anos e consegui, objetivo cumprido"
+q_00184,u_c08e61c5,2026-06-27,preco,
+q_00185,u_afe28d9c,2026-06-27,preco,virou rotina chata
+q_00186,u_1ac67f5d,2026-06-27,problema_tecnico,
+q_00187,u_c37734fc,2026-06-28,nao_uso,não estou usando
+q_00188,u_40d9538f,2026-06-28,saude,me machuquei (pé (fascite)) e não vou conseguir treinar
+q_00189,u_dd4587de,2026-06-28,outro_app,
+q_00190,u_298e87c8,2026-06-28,preco,era só ate o reveillon
+q_00191,u_03fb9572,2026-06-28,outro,
+q_00192,u_c19a343f,2026-06-28,preco,
+q_00193,u_c684abd2,2026-06-28,outro,"já fzi o casamento, agora não preciso mais"
+q_00194,u_112e9399,2026-06-28,preco,não estou usando
+q_00195,u_5b1254e4,2026-06-29,outro,
+q_00196,u_9a062176,2026-06-29,outro,era só até o mochilão
+q_00197,u_1c8a9e90,2026-06-29,preco,"sei la, perdi a vontade"
+q_00198,u_3b2ec67f,2026-06-29,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00199,u_b4edfac3,2026-06-29,outro_app,
+q_00200,u_5d280af9,2026-06-29,preco,"sei lá, perdi a vontade"
+q_00201,u_f7c8e5ed,2026-06-30,preco,
+q_00202,u_0a9d9cbb,2026-06-30,outro,
+q_00203,u_3db2921c,2026-06-30,outro,"treinei pra festa e consegui, objetivo cumprido"
+q_00204,u_9f14c4c5,2026-06-30,outro,
+q_00205,u_e8207bed,2026-06-30,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00206,u_f78aecce,2026-06-30,outro,era só ate a rpova
+q_00207,u_0466da6f,2026-06-30,preco,o GPS não funciona no meu celular
+q_00208,u_c631f517,2026-06-30,nao_uso,app bugado depois da atualização
+q_00209,u_b97570d5,2026-06-30,preco,app bugado depois ad atualização
+q_00210,u_3eb5143f,2026-07-01,problema_tecnico,o GPS não funciona no meu celular
+q_00211,u_89161343,2026-07-01,nao_uso,
+q_00212,u_f08343e4,2026-07-01,preco,"treinei pra viagem com as amigas e consegui, objetivo cumprido"
+q_00213,u_9e53e8c5,2026-07-01,preco,
+q_00214,u_657e07e8,2026-07-01,preco,
+q_00215,u_964cabc9,2026-07-01,outro_app,"treinei pra minha viagem de férias e consegui, objetivo cumprido"
+q_00216,u_6ac95b61,2026-07-01,outro_app,
+q_00217,u_d002563e,2026-07-01,preco,"ja fiz meu aniversario de 40, agora nao preciso mais"
+q_00218,u_e65b6172,2026-07-01,outro,"lesão, fisioterapia por meses"
+q_00219,u_d87502c3,2026-07-02,outro,
+q_00220,u_93a8081b,2026-07-02,outro,
+q_00221,u_b278fcaa,2026-07-02,preco,"já fiz a prova, agora não perciso mais"
+q_00222,u_35dae3cb,2026-07-02,preco,app bugado depois da atualização
+q_00223,u_f825ab29,2026-07-02,outro,
+q_00224,u_0fcf4246,2026-07-02,nao_uso,
+q_00225,u_dc34a417,2026-07-02,outro,"treinei pro casamento do meu melhor amigo e consegui, objetivo cumprido"
+q_00226,u_73fdf723,2026-07-02,outro,
+q_00227,u_bd9b4888,2026-07-03,outro,era só ate o casamento da minha irma
+q_00228,u_790a9fe1,2026-07-03,nao_uso,"ja fiz a festa de fim de ano da firma, agora nao preciso mais"
+q_00229,u_612ca2c0,2026-07-03,preco,"sei lá, perdi a vontade"
+q_00230,u_05dfd33d,2026-07-04,preco,"ja fiz a viagem pra praia, agora nao preciso mais"
+q_00231,u_fcfa5cf5,2026-07-04,preco,
+q_00232,u_63d2025a,2026-07-04,preco,
+q_00233,u_a7c5b7d3,2026-07-04,outro,nasceu meu filho
+q_00234,u_d54c8203,2026-07-04,preco,"já fiz a prova, agora não preciso mais"
+q_00235,u_b891b673,2026-07-04,preco,"treinei pra viagem pra praia e consegui, objetivo cumprido"
+q_00236,u_6b180360,2026-07-05,outro,"treinei pro casamento e consegui, objetivo cumprido"
+q_00237,u_63a85549,2026-07-05,outro,"treinei pra formatura e consegui, objetivo cumprido"
+q_00238,u_f5161449,2026-07-05,outro,"ja fiz a prova, agora nao preciso mais"
+q_00239,u_c7a1ea6c,2026-07-05,outro,
+q_00240,u_346e25ce,2026-07-05,nao_uso,
+q_00241,u_035034b5,2026-07-05,nao_uso,
+q_00242,u_72096073,2026-07-05,outro,era só até a festa
+q_00243,u_9818d054,2026-07-05,preco,"enjoei, sempre o mesmo treino"
+q_00244,u_0d2e813a,2026-07-05,preco,"já fiz a prova, agora não preciso mais"
+q_00245,u_61320df0,2026-07-05,outro,era só ate a prova
+q_00246,u_84494960,2026-07-05,outro,era só ate meu casamento
+q_00247,u_c8cf5a55,2026-07-05,preco,vou passar uns meses fora
+q_00248,u_f234d864,2026-07-05,problema_tecnico,o GPS não funciona no meu celular
+q_00249,u_19e5a70c,2026-07-06,problema_tecnico,o gps não funciona no meu celular
+q_00250,u_4e64d487,2026-07-06,outro,
+q_00251,u_1ffb3fb4,2026-07-06,problema_tecnico,o gps nao funciona no meu celular
+q_00252,u_d17c4054,2026-07-06,problema_tecnico,
+q_00253,u_fb7554c2,2026-07-06,problema_tecnico,app bugado depois da atualização
+q_00254,u_7c5b4785,2026-07-06,outro_app,vou dar um tempo
+q_00255,u_17418d60,2026-07-07,outro,"treinei pra meu aniversário de 40 e consegui, objetivo cumprido"
+q_00256,u_be508477,2026-07-07,problema_tecnico,o gps não funciona no meu celular
+q_00257,u_d12ec9ee,2026-07-07,outro_app,app bugado depois da atualização
+q_00258,u_9ae5dda3,2026-07-07,outro,eras ó até a prova
+q_00259,u_90826313,2026-07-07,outro,"já fiz minha viagem de férias, agora não preciso mais"
+q_00260,u_e6f0ec94,2026-07-08,preco,"treinei pro evento da empresa e consegui, objetivo cumprido"
+q_00261,u_414ba481,2026-07-08,preco,
+q_00262,u_0a764499,2026-07-08,preco,
+q_00263,u_af1ebd6e,2026-07-08,outro,
+q_00264,u_e1a3fe3a,2026-07-08,outro_app,"treinei pra viagem pro nordeste e consegui, objetivo cumprido"
+q_00265,u_5c1eb43c,2026-07-08,outro_app,
+q_00266,u_07bce1f0,2026-07-08,outro,"ja fiz minha viagem de ferias, agora nao preciso mais"
+q_00267,u_e0f0b37a,2026-07-08,preco,
+q_00268,u_1b453109,2026-07-08,preco,
+q_00269,u_d43bf814,2026-07-08,nao_uso,
+q_00270,u_ae818869,2026-07-09,outro,era só ate o casamento
+q_00271,u_9aa8bdfb,2026-07-09,outro,"treinei pra festa e consegui, objetivo cumprido"
+q_00272,u_94ed115e,2026-07-09,preco,era só até a prova
+q_00273,u_7f7eae73,2026-07-09,outro,"já fiz a viagem com as amigas, agora não preciso mais"
+q_00274,u_8b4445cc,2026-07-09,outro,"treinei pro réveillon e consegui, objetivo cumprido"
+q_00275,u_4df3ae6a,2026-07-09,nao_uso,
+q_00276,u_e7976852,2026-07-09,nao_uso,
+q_00277,u_dda07e7e,2026-07-10,outro_app,"enjoei, sempre o mesmo treino"
+q_00278,u_b2fafe98,2026-07-10,outro,
+q_00279,u_1dd570ed,2026-07-10,outro,"treinei pra apresentação pros investidores e consegui, objetivo cumprido"
+q_00280,u_caac9c81,2026-07-11,preco,"trabalho novo, não dá"
+q_00281,u_5b0c52b7,2026-07-11,preco,"ja fiz meus 30 anos, agora nao preciso mais"
+q_00282,u_f64a47e5,2026-07-11,preco,
+q_00283,u_2a88a866,2026-07-11,outro,"treinei pro casamento do meu melhor amigo e consegui, objetivo cumprido"
+q_00284,u_d853b8de,2026-07-12,outro,"treinei pra minha viagem de ferias e consegui, objetivo cumprido"
+q_00285,u_44fdedba,2026-07-12,outro_app,"cobrança errada, suporte não responde"
+q_00286,u_5883f066,2026-07-12,outro,era só até a prova
+q_00287,u_d5e8f13c,2026-07-12,outro,"já fiz a viagem pro nordeste, agora não preciso mais"
+q_00288,u_67c3bfe6,2026-07-12,saude,"lesão, fisioterapia por meses"
+q_00289,u_bc192284,2026-07-12,preco,"trabalho novo, não dá"
+q_00290,u_f233bce8,2026-07-12,preco,vou dar um tempo
+q_00291,u_331a276a,2026-07-12,preco,
+q_00292,u_eed9542f,2026-07-12,outro,"trabalho novo ,não dá"
+q_00293,u_d67593cc,2026-07-13,outro,
+q_00294,u_eb6c2b77,2026-07-13,preco,era só até o casamento da minha irmã
+q_00295,u_e37b1da7,2026-07-13,preco,"já fiz a prova, agora não preciso mais"
+q_00296,u_7f693fcf,2026-07-13,saude,parado por causa da lombar
+q_00297,u_4b17beaa,2026-07-13,nao_uso,vou dar um tempo
+q_00298,u_e43597a2,2026-07-13,outro,"já fiz a prova, agora noã preciso mais"
+q_00299,u_5e2037fd,2026-07-13,nao_uso,"sei la, perdi a vontade"
+q_00300,u_b9c00fb7,2026-07-14,preco,nasceu meu filho
+q_00301,u_89751a5e,2026-07-14,outro_app,"já fiz meu casamento, agora não preciso mais"
+q_00302,u_2b167ca8,2026-07-14,saude,parado por causa do joelho
+q_00303,u_7eaca3af,2026-07-14,preco,
+q_00304,u_7052a80c,2026-07-14,preco,"treinei pra meus 30 anos e consegui, objetivo cumprido"
+q_00305,u_33a5e305,2026-07-14,nao_uso,
+q_00306,u_2a6f8dd8,2026-07-15,preco,
+q_00307,u_eb36d2c9,2026-07-16,preco,era só até meu casamento
+q_00308,u_449288f0,2026-07-16,nao_uso,"treinei pro casamento do meu melhor amigo e consegui, objetivo cumprido"
+q_00309,u_38184693,2026-07-16,preco,virou rotina chata
+q_00310,u_4e75f8d7,2026-07-17,outro,cansei de fazer sempre a mesma coisa
+q_00311,u_9b3f81b0,2026-07-17,nao_uso,não estou usando
+q_00312,u_531fdc8e,2026-07-17,nao_uso,vou dar um tempo
+q_00313,u_e97510df,2026-07-17,nao_uso,vou dar um tempo
+q_00314,u_c0fad147,2026-07-18,outro,
+q_00315,u_0e5fb84e,2026-07-18,preco,não estou usando
+q_00316,u_eb1321ec,2026-07-18,nao_uso,"sei la, perdi a vontade"
+q_00317,u_2a2821fc,2026-07-18,preco,
+q_00318,u_54858d29,2026-07-18,preco,
+q_00319,u_eb010a8e,2026-07-18,preco,vou dar um tempo
+q_00320,u_79083a42,2026-07-18,nao_uso,vou dar um tempo
+q_00321,u_5bcb4070,2026-07-18,preco,
+q_00322,u_c4de4f4b,2026-07-19,outro,"treinei pra minha formatura e consegui, objetivo cumprido"
+q_00323,u_2ae8a648,2026-07-19,nao_uso,
+q_00324,u_b5900840,2026-07-19,preco,virou rotina chata
+q_00325,u_90967bf2,2026-07-19,nao_uso,virou rotina chata
+q_00326,u_d66f5012,2026-07-19,nao_uso,"enjoei, sempre o mesmo treino"
+q_00327,u_bd4d2fff,2026-07-20,outro_app,
+q_00328,u_9462a022,2026-07-20,outro,
+q_00329,u_a1a63cbf,2026-07-20,preco,
+q_00330,u_5b30a6ac,2026-07-20,nao_uso,
+q_00331,u_c966df43,2026-07-20,nao_uso,vou dar um tempo
+q_00332,u_1abd40fb,2026-07-20,preco,"lesão, fisioterapia por meses"
+q_00333,u_ac355028,2026-07-21,outro,"treinei pra meu casamento e consegui, objetivo cumprido"
+q_00334,u_22128a6e,2026-07-21,nao_uso,
+q_00335,u_ee53580c,2026-07-21,preco,não estou usando
+q_00336,u_f195525d,2026-07-21,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00337,u_eeaa6450,2026-07-21,nao_uso,"sei lá, perdi a vontade"
+q_00338,u_ff6bf580,2026-07-22,outro,"já fiz meu aniversário, agora não preciso mais"
+q_00339,u_eff04fe2,2026-07-22,preco,
+q_00340,u_6cb37d41,2026-07-22,preco,
+q_00341,u_82362e45,2026-07-22,preco,"treinei pra prova e consegui, objetvio cumprido"
+q_00342,u_8c36912c,2026-07-22,preco,"treinei pra festa e consegui, objetivo cumprido"
+q_00343,u_215b53cb,2026-07-22,nao_uso,
+q_00344,u_fb5b2e05,2026-07-22,preco,
+q_00345,u_615b71d0,2026-07-23,preco,
+q_00346,u_e36afe4b,2026-07-23,outro,"mudei de vida, sem tempo"
+q_00347,u_6723c584,2026-07-23,preco,"já fiz a viagem com as amigas, agora não preciso mais"
+q_00348,u_580aa2eb,2026-07-23,saude,
+q_00349,u_7743dd70,2026-07-23,preco,
+q_00350,u_490fddcd,2026-07-23,outro,"treinei pra apresentação pros investidores e consegui, objetivo cumprido"
+q_00351,u_a3e64b8c,2026-07-23,preco,era só até a prova
+q_00352,u_620a527b,2026-07-23,preco,"já fiz a prova, agora não preciso mais"
+q_00353,u_ff0ce114,2026-07-23,outro,
+q_00354,u_4e182f1c,2026-07-23,nao_uso,
+q_00355,u_abf07c57,2026-07-24,preco,não estou usando
+q_00356,u_f926774a,2026-07-24,nao_uso,virou rotina chata
+q_00357,u_199b28bc,2026-07-24,outro,"treinei pro casamento da minha irmã e consegui, objetivo cumprido"
+q_00358,u_b394194c,2026-07-24,preco,cansei de fazer sempre a mesma coisa
+q_00359,u_799d427f,2026-07-25,outro_app,"já fiz o evento da empresa, agora não preciso mais"
+q_00360,u_61fe8c4e,2026-07-25,outro,
+q_00361,u_b7e650d5,2026-07-25,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00362,u_7d984582,2026-07-25,nao_uso,
+q_00363,u_36bd24ac,2026-07-25,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00364,u_12f431d9,2026-07-25,outro,era só ate a prova
+q_00365,u_f05930ea,2026-07-25,problema_tecnico,
+q_00366,u_9685475d,2026-07-25,nao_uso,não estou usando
+q_00367,u_d4584ba2,2026-07-26,nao_uso,"enjoei, sempre o mesmo treino"
+q_00368,u_8543b884,2026-07-26,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00369,u_85362c09,2026-07-26,outro,"treinei pra minha viagem de férias e consegui, objetivo cumprido"
+q_00370,u_a3ec24f1,2026-07-26,nao_uso,cansei de fazer sempre a mesma coisa
+q_00371,u_e9f5a937,2026-07-27,outro,"trabalho novo, não dá"
+q_00372,u_d3beb94d,2026-07-28,outro,eu treinava com uma amiga e ela saiu
+q_00373,u_e1b4a623,2026-07-28,preco,"já fiz a apresentação pros investidores, agora não preciso mais"
+q_00374,u_ac30d700,2026-07-28,preco,era só até a prova
+q_00375,u_cd47c33f,2026-07-28,preco,"enjoei, sempre o mesmo treino"
+q_00376,u_d29963c1,2026-07-28,outro,virou rotina chata
+q_00377,u_88b5c70c,2026-07-28,nao_uso,vou dar um tempo
+q_00378,u_41985bbd,2026-07-28,outro,vou dar um tempo
+q_00379,u_94b64fcd,2026-07-29,preco,era só até a prova
+q_00380,u_ecdfd027,2026-07-29,outro,"treinei pro evento da empresa e consegui, objetivo cumprido"
+q_00381,u_4f6565ce,2026-07-29,outro,
+q_00382,u_83e09287,2026-07-29,nao_uso,virou rotina chata
+q_00383,u_ada6d50a,2026-07-29,preco,"cobrança errada, suporte não responde"
+q_00384,u_5192be1b,2026-07-30,outro,
+q_00385,u_f480212b,2026-07-30,preco,
+q_00386,u_87ac71d4,2026-07-30,outro,vou passar uns meses fora
+q_00387,u_5b58c108,2026-07-31,preco,
+q_00388,u_31bb9188,2026-07-31,preco,
+q_00389,u_b5323e3b,2026-07-31,preco,"treinei pra convenção da empreas e consegui, objetivo cumprido"
+q_00390,u_b77e0cdc,2026-07-31,preco,"lesão, fisioterapia por meses"
+q_00391,u_4c55e09a,2026-07-31,outro,virou rotina chata
+q_00392,u_d1b4bbf3,2026-08-01,preco,"treinei pro casamento e consegui, objetivo cumprido"
+q_00393,u_6f4cf4e6,2026-08-01,outro,era só até a apresentação pros investidores
+q_00394,u_924aed76,2026-08-01,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00395,u_852c06bb,2026-08-01,outro_app,virou rotina chata
+q_00396,u_4f9bdee1,2026-08-01,outro,era só até o réveillon
+q_00397,u_5d25e59a,2026-08-02,outro,era só até a festa de fim de ano da firma
+q_00398,u_18ad514f,2026-08-02,outro,era só até a prova
+q_00399,u_5e0e18b4,2026-08-02,preco,"treinei pro casamento e consegui, objetivo cumprido"
+q_00400,u_d6877125,2026-08-02,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00401,u_d069ef10,2026-08-02,nao_uso,
+q_00402,u_22d55320,2026-08-02,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00403,u_a4e64ede,2026-08-03,outro,"já fiz a prova, agora não preciso mais"
+q_00404,u_2195b637,2026-08-03,preco,"já fiz a prova, agora noã preciso mais"
+q_00405,u_090b2723,2026-08-03,outro_app,virou rotina chata
+q_00406,u_ee5c11ce,2026-08-03,nao_uso,"sei lá, perdi a vontade"
+q_00407,u_6ca3a5be,2026-08-03,outro,"já fiz a festa de fim de ano da firma, agora não preciso mais"
+q_00408,u_0e38efb7,2026-08-03,preco,"treinei pra convenção da empresa e consegui, objetivo cumprido"
+q_00409,u_0de7bf07,2026-08-04,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00410,u_d96afca3,2026-08-04,nao_uso,
+q_00411,u_d2903220,2026-08-04,preco,"ja fiz a prova, agora nao preciso mais"
+q_00412,u_725e3c9e,2026-08-04,preco,era só até a prova
+q_00413,u_9def8c54,2026-08-04,outro,era só até a viagem pro nordeste
+q_00414,u_f46a399d,2026-08-04,preco,
+q_00415,u_c631892f,2026-08-04,outro_app,
+q_00416,u_49999031,2026-08-04,nao_uso,
+q_00417,u_0fb23064,2026-08-05,saude,parado por causa do pé (fascite)
+q_00418,u_95b73911,2026-08-05,preco,"treinei pra meu casamento e consegui, objetivo cumprido"
+q_00419,u_8c21d22a,2026-08-05,preco,
+q_00420,u_6357bc39,2026-08-05,preco,era só até o réveillon
+q_00421,u_146223c7,2026-08-06,outro,"trabalho novo, não dá"
+q_00422,u_665ff61a,2026-08-06,preco,
+q_00423,u_00dc9c86,2026-08-07,outro,
+q_00424,u_0574d527,2026-08-07,outro,vou passar uns meses fora
+q_00425,u_f03e5d7b,2026-08-07,saude,"lesao, fisioterapia por meses"
+q_00426,u_afba4fab,2026-08-07,outro,
+q_00427,u_69fecf1e,2026-08-07,preco,
+q_00428,u_1ef92cf3,2026-08-07,outro,era só até meus 30 anos
+q_00429,u_7a8fb7e7,2026-08-07,outro,vou passar uns meses fora
+q_00430,u_3cedb2f4,2026-08-08,nao_uso,vou dar um tempo
+q_00431,u_91ef0ab3,2026-08-08,preco,era só tae meu casamento
+q_00432,u_371a8975,2026-08-08,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00433,u_04f17eb1,2026-08-08,preco,
+q_00434,u_0faa62f0,2026-08-08,nao_uso,
+q_00435,u_2ad7ea4b,2026-08-08,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00436,u_b5a1d7ec,2026-08-09,preco,
+q_00437,u_b6ed826d,2026-08-09,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00438,u_d702ff77,2026-08-09,saude,parado por causa da lombar
+q_00439,u_7cfaf6d5,2026-08-10,nao_uso,não estou usando
+q_00440,u_9617e8a7,2026-08-10,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00441,u_3b9b1f99,2026-08-10,outro,era só ate a formatura
+q_00442,u_d84d6c89,2026-08-11,preco,era só até a prova
+q_00443,u_f984afc8,2026-08-11,outro,"já fiz o casamento da minha irmã, agora não preciso mais"
+q_00444,u_240ad045,2026-08-11,outro_app,vou dar um tempo
+q_00445,u_6809797b,2026-08-11,preco,"treinei pro reveillon e consegui, objetivo cumprido"
+q_00446,u_6e608ef9,2026-08-11,outro,"já fiz a viagem com as amigas, agora nãop reciso mais"
+q_00447,u_2f1203b2,2026-08-11,nao_uso,"sei lá, perdi a vontade"
+q_00448,u_3af912f2,2026-08-12,outro_app,parado por causa da lombar
+q_00449,u_dcef60e3,2026-08-12,nao_uso,"já fiz a prova, agora não preciso mais"
+q_00450,u_6dad9397,2026-08-12,preco,não estou usando
+q_00451,u_ff8c797c,2026-08-13,nao_uso,não estou usando
+q_00452,u_e69f197c,2026-08-13,outro,
+q_00453,u_94f3613f,2026-08-13,outro,"já fiz a viagem pro nordeste, agora não preciso mais"
+q_00454,u_2a5dd072,2026-08-13,outro,era só até a viagem com as amigas
+q_00455,u_e264bc7b,2026-08-13,outro,"treinei pra festa de fim de ano da fimra e consegui, objetivo cumprido"
+q_00456,u_dc662af3,2026-08-13,nao_uso,não estou usando
+q_00457,u_1dea1ff7,2026-08-13,nao_uso,cansei de fazer sempre a mesma coisa
+q_00458,u_4e340d68,2026-08-13,nao_uso,cansei de fazer sempre a mesma coisa
+q_00459,u_9ac860b9,2026-08-14,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00460,u_5db74cc1,2026-08-14,preco,
+q_00461,u_5709db96,2026-08-14,nao_uso,nao estou usando
+q_00462,u_55b0088e,2026-08-15,saude,"lesão, fisioterapia por meses"
+q_00463,u_50a53d83,2026-08-15,preco,
+q_00464,u_6c73b617,2026-08-15,nao_uso,virou rotina chata
+q_00465,u_e9ccad2b,2026-08-15,preco,vou dar um tempo
+q_00466,u_f1e2a397,2026-08-15,nao_uso,
+q_00467,u_dde4aad4,2026-08-15,outro,
+q_00468,u_28b9f5ba,2026-08-15,outro,"já fiz o mochilão, agora não preciso mais"
+q_00469,u_a66891a8,2026-08-15,preco,"sei lá, perdi a vontade"
+q_00470,u_af1c2b46,2026-08-17,nao_uso,vou dar u mtempo
+q_00471,u_f8cad2ce,2026-08-17,nao_uso,
+q_00472,u_ea7c17dc,2026-08-17,outro_app,vou dar um tempo
+q_00473,u_3ad8ec9f,2026-08-17,preco,era só até minha formatura
+q_00474,u_d319a0ce,2026-08-18,outro,"já fiz meu aniversário, agora não preciso mais"
+q_00475,u_34a20c86,2026-08-18,preco,era só até a convenção da empresa
+q_00476,u_29c5e2b0,2026-08-18,preco,era só até a prova
+q_00477,u_38ed2e43,2026-08-18,preco,"enjoei, sempre o mesmo treino"
+q_00478,u_c6a6bccf,2026-08-18,preco,vou dar um tempo
+q_00479,u_33889a62,2026-08-18,preco,
+q_00480,u_186a025b,2026-08-19,preco,era só ate a apresentacao pros investidores
+q_00481,u_4d7b75b0,2026-08-19,preco,"já fiz o casamento do meu melhor amigo, agora não preciso mais"
+q_00482,u_4920018c,2026-08-19,outro,"já fiz a prova, agora não preciso mais"
+q_00483,u_71ade5d1,2026-08-19,outro_app,não estou usando
+q_00484,u_350ec10d,2026-08-20,preco,vou dar um tempo
+q_00485,u_9d1ccbe6,2026-08-20,nao_uso,
+q_00486,u_6cdacd43,2026-08-20,preco,
+q_00487,u_c0298dd1,2026-08-20,preco,era só até o casamento do meu melhor amigo
+q_00488,u_1a2c298e,2026-08-20,preco,nasceu meu filho
+q_00489,u_013018f6,2026-08-21,preco,
+q_00490,u_1f00b74d,2026-08-21,preco,era só até a festa
+q_00491,u_717ca05b,2026-08-21,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00492,u_c794c58f,2026-08-21,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00493,u_874498db,2026-08-21,outro_app,"treinei pro casamento da minha irmã e consegui, objetivo cumprido"
+q_00494,u_e334d9b7,2026-08-21,preco,
+q_00495,u_76e0a1b6,2026-08-22,outro,
+q_00496,u_51e5b15c,2026-08-22,preco,vou dar um tempo
+q_00497,u_22a05b6c,2026-08-22,outro,
+q_00498,u_4fa42ee8,2026-08-23,nao_uso,vou dar um tempo
+q_00499,u_b75ac0e1,2026-08-23,preco,
+q_00500,u_818e85e7,2026-08-23,nao_uso,não estou usando
+q_00501,u_ed66867a,2026-08-23,outro,"já fiz a formatura, agora não preciso mais"
+q_00502,u_545e7c4d,2026-08-23,outro,era só até a prova
+q_00503,u_b3b00f3d,2026-08-23,outro,
+q_00504,u_3775faab,2026-08-23,nao_uso,"sei lá, perdi a vontade"
+q_00505,u_d9796fbf,2026-08-24,preco,"já fiz o mochilão, agora não preciso mais"
+q_00506,u_8e319ae4,2026-08-24,outro,"já fiz o mochilão, agora não preciso mais"
+q_00507,u_d539757f,2026-08-24,preco,"já fiz a prova, agora não preciso mais"
+q_00508,u_750824c0,2026-08-24,saude,me machuquei (quadril) e não vou conseguir treinar
+q_00509,u_33f1cea0,2026-08-25,preco,parado por causa da lombar
+q_00510,u_5284b9bf,2026-08-25,nao_uso,viro urotina chata
+q_00511,u_c916105b,2026-08-25,outro,"treinei pra festa de fim de ano da firma e consegui, objetivo cumprido"
+q_00512,u_f9de0fcd,2026-08-26,outro,"já fiz a apresentação pros investidores, agora não preciso mais"
+q_00513,u_c07be8bc,2026-08-26,outro_app,vou dar um tempo
+q_00514,u_200ca089,2026-08-26,outro,"treinei pra viagem pro nordeste e consegui, objetivo cumprido"
+q_00515,u_287d6414,2026-08-26,outro,"trabalho noov, nao da"
+q_00516,u_e366b3c4,2026-08-26,outro,era só até a prova
+q_00517,u_543345f4,2026-08-26,outro,era só até a apresentação pros investidores
+q_00518,u_3bfd2cd5,2026-08-26,preco,"sei lá, perdi a vontade"
+q_00519,u_794dc59e,2026-08-27,outro,
+q_00520,u_980eeaa4,2026-08-27,outro,"treinei pra meu aniversario e consegui, objetivo cumprido"
+q_00521,u_113efe86,2026-08-27,nao_uso,
+q_00522,u_adc7b700,2026-08-27,outro,era só ate a viagem pro nordeste
+q_00523,u_13de9b71,2026-08-27,preco,
+q_00524,u_06ba31e2,2026-08-28,outro,"já fiz o casamento, agora não preciso mais"
+q_00525,u_88ca990f,2026-08-28,nao_uso,"treinei pra meu casamento e consegui, objetivo cumprido"
+q_00526,u_bc7084a3,2026-08-28,outro,"já fiz o mochilão, agora não preciso mais"
+q_00527,u_7c6741fe,2026-08-28,preco,era só até o casamento
+q_00528,u_40c58b71,2026-08-28,outro,era só ate a prova
+q_00529,u_59a0d532,2026-08-28,preco,"treinei pra viagem pra praia e consegui, objetivo cumprido"
+q_00530,u_be07fc4f,2026-08-28,nao_uso,cansei de fazer sempre a mesma coisa
+q_00531,u_b7a64a16,2026-08-29,nao_uso,
+q_00532,u_3caa4ce2,2026-08-29,preco,"já fiz meu aniversário, agora não preciso mais"
+q_00533,u_94a4f396,2026-08-29,outro,era só até a prova
+q_00534,u_cc4e7fdb,2026-08-29,outro,
+q_00535,u_a2d68e09,2026-08-29,outro,era só até a prova
+q_00536,u_d22add54,2026-08-29,nao_uso,virou rotina chata
+q_00537,u_bf977f4d,2026-08-29,preco,
+q_00538,u_747ee06c,2026-08-29,preco,era só até o casamento
+q_00539,u_c4bfa6ba,2026-08-29,preco,"treinei pro casamento da minha irmã e consegui, objetivo cumprido"
+q_00540,u_294c141b,2026-08-30,outro,"ja fiz a viagem pro nordeste, agora nao preciso mais"
+q_00541,u_56fda7f0,2026-08-30,preco,era só até a prova
+q_00542,u_06819bfe,2026-08-30,preco,"já fiz a prova, agora não preciso mais"
+q_00543,u_5c8a0c2c,2026-08-31,preco,"ja fiz a apresentacao pros investidores, agora nao preciso mais"
+q_00544,u_dabde8cb,2026-08-31,preco,"já fiz meus 30 anos, agora não preciso mais"
+q_00545,u_bfa61e3c,2026-08-31,preco,
+q_00546,u_2097039b,2026-09-01,preco,"treinei pro omchilão e consegui, objetivo cumprido"
+q_00547,u_ea691d6d,2026-09-01,outro,vou passar uns meses fora
+q_00548,u_b4bdb11a,2026-09-01,outro,era só até a prova
+q_00549,u_7640747e,2026-09-01,preco,"treinei pra viagem pra praia e conseugi, objetivo cumprido"
+q_00550,u_321b3159,2026-09-02,preco,"sei lá, perdi a vontade"
+q_00551,u_a8e27dbd,2026-09-02,outro,era só até o mochilão
+q_00552,u_3394ff28,2026-09-03,preco,
+q_00553,u_42d5009a,2026-09-03,outro,
+q_00554,u_4f63d146,2026-09-04,outro,era só até a prova
+q_00555,u_5a78fb4b,2026-09-04,outro,era só até a prova
+q_00556,u_ace41e1f,2026-09-04,outro,"mudei de vida, sem tempo"
+q_00557,u_c04502d3,2026-09-04,outro,"treinei pra apresentação pros investidores e consegui, objetivo cumprido"
+q_00558,u_1ae47d98,2026-09-04,outro,"mudei de vida, sem tempo"
+q_00559,u_cd5ca752,2026-09-04,preco,
+q_00560,u_bc4f23ee,2026-09-04,preco,virou rotina chata
+q_00561,u_9f588eef,2026-09-05,outro,"já fiz a prova, agora não preciso mais"
+q_00562,u_5b16f827,2026-09-05,preco,"já fiz a festa de fim de ano da firma, agora não preciso mais"
+q_00563,u_b42597ca,2026-09-05,outro,era só até a prova
+q_00564,u_b9b76260,2026-09-05,preco,
+q_00565,u_97ae5ee6,2026-09-06,preco,
+q_00566,u_730f4e61,2026-09-06,preco,"enjoei, sempre o mesmo treino"
+q_00567,u_76c04243,2026-09-07,outro,"já fiz a prova, agora não preciso mais"
+q_00568,u_84d6cb7c,2026-09-07,outro,era ós até a formatura
+q_00569,u_c7a62459,2026-09-08,outro,"treinei pro evento da empresa e consegui, objetivo cumprido"
+q_00570,u_d10020a7,2026-09-08,outro,era só até o mochilão
+q_00571,u_c890f631,2026-09-09,outro,
+q_00572,u_79e5f943,2026-09-09,outro,era só até a viagem pro nordeste
+q_00573,u_cba6979b,2026-09-09,nao_uso,
+q_00574,u_662ff9f5,2026-09-09,nao_uso,virou rotina chata
+q_00575,u_f0c048ac,2026-09-10,nao_uso,não estou usando
+q_00576,u_7a14f637,2026-09-10,preco,não estou usando
+q_00577,u_73fde7ee,2026-09-10,preco,nasceu meu filho
+q_00578,u_4475741b,2026-09-11,outro,"trabalho novo, não dá"
+q_00579,u_944a934f,2026-09-12,preco,"já fiz minha formatura, agora nã opreciso mais"
+q_00580,u_6a442156,2026-09-12,preco,
+q_00581,u_e9c61e84,2026-09-13,outro_app,"sei lá, perdi a vontade"
+q_00582,u_591c1aa1,2026-09-13,preco,"já fiz a prova, agora não preciso mais"
+q_00583,u_3a4cd8fe,2026-09-13,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00584,u_7fc18b28,2026-09-13,preco,"já fiz a prova, agora não preciso mais"
+q_00585,u_f4560d34,2026-09-13,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00586,u_85ac78e1,2026-09-14,outro_app,
+q_00587,u_17e9346d,2026-09-14,outro,era só ate o evento da empresa
+q_00588,u_faf5ada8,2026-09-14,preco,"treinei pra prova e consegui, objetivo cumprido"
+q_00589,u_8614471a,2026-09-15,preco,"já fiz a festa, agora não preciso mais"
+q_00590,u_973889bd,2026-09-15,preco,era só até a viagem pra praia
+q_00591,u_993ac935,2026-09-15,preco,
+q_00592,u_456f1498,2026-09-16,nao_uso,"sei lá, perdi a vontade"
+q_00593,u_0d555adf,2026-09-16,outro,
+q_00594,u_188440b4,2026-09-16,preco,
+q_00595,u_4aab08a9,2026-09-16,preco,
+q_00596,u_327d9d34,2026-09-17,outro,"treinei pra prova e consegui, objetivo cumprido"
+q_00597,u_88e72d31,2026-09-17,outro,"já fiz o casamento do meu melhor amigo, agora não preciso mais"
+q_00598,u_c7f8c178,2026-09-17,outro,"já fiz o casamento, agora não preciso mais"
+q_00599,u_f9ff191e,2026-09-17,nao_uso,"treinei pra meu aniversário de 40 e consegui, objetivo cumprido"
+q_00600,u_91e74af5,2026-09-17,preco,"enjoei, sempre o mesmo treino"
+q_00601,u_ab37f985,2026-09-18,outro,"trabalho novo, não dá"
+q_00602,u_20dfe64d,2026-09-18,outro,era só até a prova
+q_00603,u_49f82bcc,2026-09-18,preco,"já fiz o réveillon, agora não preciso mais"
+q_00604,u_bb409a18,2026-09-19,preco,
+q_00605,u_e964cd77,2026-09-19,outro,"treinei pra convenção da empresa e consegui, objetivo cumprido"
+q_00606,u_3e03deba,2026-09-19,preco,"treinei pra viagem pro nordeste e consegui, objetivo cumprido"
+q_00607,u_2991e8a5,2026-09-19,preco,"já fiz a prova, agora não preciso mais"
+q_00608,u_df705319,2026-09-19,outro,"já fiz a prova, agora não preciso mais"
+q_00609,u_fd4444bd,2026-09-19,preco,cansei de fazer sempre a mesma coisa
+q_00610,u_e9434bbb,2026-09-20,outro,"trabalho novo, não dá"
+q_00611,u_bc87e52b,2026-09-20,preco,"já fiz o mochilão, agora não preciso mais"
+q_00612,u_68083911,2026-09-20,nao_uso,
+q_00613,u_d4bdadf9,2026-09-21,outro_app,parado por causa da lombar
+q_00614,u_59fcf680,2026-09-22,outro,"já fiz a prova, agora não preciso mais"
+q_00615,u_284ff733,2026-09-22,outro_app,me machuquei (quadril) e nao vou conseguir treinar
+q_00616,u_4158cc42,2026-09-22,outro,era só até o casamento do meu melhor amigo
+q_00617,u_044302b5,2026-09-23,preco,"treinei pra apresentação pros investidores e consegui, objetivo cumprido"
+q_00618,u_7e723376,2026-09-23,nao_uso,era só até a apresentação pros nivestidores
+q_00619,u_7bb566b6,2026-09-23,outro,
+q_00620,u_3dd0af16,2026-09-23,preco,era só ate minha formatura
+q_00621,u_bbe0c05b,2026-09-23,nao_uso,"sei lá, perdi a vontade"
+q_00622,u_9f4ef62c,2026-09-24,outro,nasceu meu filho
+q_00623,u_755e9de9,2026-09-24,preco,"treinei pra meu aniversário de 40 e consegui, objetivo cumprido"
+q_00624,u_f5ce4e05,2026-09-25,preco,
+q_00625,u_292530ac,2026-09-25,outro,"já fiz meu aniversário, agora não preciso mais"
+q_00626,u_bd22a177,2026-09-25,preco,
+q_00627,u_f424541e,2026-09-26,preco,era só até a apresentação pros investidores
+q_00628,u_717f86a3,2026-09-26,outro,
+q_00629,u_67a7a2af,2026-09-26,outro,"já fiz a formatura, agora não preciso mais"
+q_00630,u_6c1ff3dd,2026-09-26,preco,
+q_00631,u_379a6dc5,2026-09-26,outro_app,"sei lá, perdi a vontade"
+q_00632,u_31d7eba8,2026-09-27,preco,vou dar um tempo
+q_00633,u_24ef127c,2026-09-27,preco,"sei ál, perdi a vontade"
+q_00634,u_0173254b,2026-09-28,nao_uso,
+q_00635,u_8919a7c1,2026-09-28,outro_app,
+q_00636,u_4c54d591,2026-09-28,outro,"trabalho novo, não dá"
+q_00637,u_328e0fc6,2026-09-28,preco,parado por causa do joelho
+q_00638,u_3e2799f2,2026-09-28,nao_uso,
+q_00639,u_66865726,2026-09-28,preco,"sei lá, perdi a vontade"
+q_00640,u_92cdac54,2026-09-29,saude,"lesao, fisioterapia por meses"
+q_00641,u_827bbe2d,2026-09-30,outro,
+q_00642,u_2518a144,2026-09-30,nao_uso,não estou usando
