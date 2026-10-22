@@ -19,7 +19,7 @@ __pycache__/
 .claude/settings.local.json
 
 # Camadas geradas pelos scripts — rode scripts/ para recriar
-dados/prata/*
-dados/ouro/*
-!dados/prata/.gitkeep
-!dados/ouro/.gitkeep
+dados/2.prata/*
+dados/3.ouro/*
+!dados/2.prata/README.md
+!dados/3.ouro/README.md

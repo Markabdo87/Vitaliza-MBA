@@ -17,10 +17,10 @@ O enunciado e o dicionário de dados estão na raiz, em PDF. Corte dos dados: 30
 ├── Vitaliza - Enunciado do case.pdf
 ├── Vitaliza - Dicionário de dados.pdf
 ├── dados/
-│   ├── bronze/   # arquivos originais do curso (não editar)
-│   ├── prata/    # bronze limpo — gerado pelos scripts, fora do git
-│   └── ouro/     # tabelas de análise — gerado pelos scripts, fora do git
-└── scripts/      # um script por tabela: <arquivo>_<camada>.py
+│   ├── 1.bronze/   # arquivos originais do curso (não editar)
+│   ├── 2.prata/    # bronze limpo — gerado pelos scripts, fora do git
+│   └── 3.ouro/     # tabelas de análise — gerado pelos scripts, fora do git
+└── scripts/        # um script por tabela: <arquivo>_<camada>.py
 ```
 
 ## Como rodar
@@ -38,7 +38,7 @@ para gerar as tabelas.
 
 | Tabela | Script | O que tem |
 |---|---|---|
-| `dados/prata/pagamentos.csv` | `scripts/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
+| `dados/2.prata/pagamentos.csv` | `scripts/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
 
 As regras de limpeza de cada tabela estão no cabeçalho do script correspondente.
 

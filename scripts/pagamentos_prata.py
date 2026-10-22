@@ -24,8 +24,8 @@ from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 BASE = Path(__file__).resolve().parent.parent / "dados"
-ENTRADA = BASE / "bronze" / "pagamentos.csv"
-SAIDA = BASE / "prata" / "pagamentos.csv"
+ENTRADA = BASE / "1.bronze" / "pagamentos.csv"
+SAIDA = BASE / "2.prata" / "pagamentos.csv"
 
 TAXA = {"app_store": 0.15, "google_play": 0.15, "cartao": 0.035, "pix_automatico": 0.0099}
 CANAL = {"app_store": "loja", "google_play": "loja", "cartao": "site", "pix_automatico": "site"}
