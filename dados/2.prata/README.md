@@ -4,11 +4,11 @@ A bronze corrigida, **uma tabela por arquivo de origem e na mesma granularidade*
 cobrança continua sendo uma linha, um evento continua sendo uma linha). Aqui não se agrega
 nem se cruza tabela: isso é trabalho da ouro.
 
-Os CSVs desta pasta não vão para o git. Eles são gerados pelos scripts em `scripts/`
-(`<arquivo>_prata.py`) e recriados rodando o script de novo:
+Os CSVs desta pasta não vão para o git. Eles são gerados pelos notebooks em `notebooks/`
+(`<arquivo>_prata.py`) e recriados rodando o notebook de novo:
 
 ```bash
-python3 scripts/pagamentos_prata.py
+python3 notebooks/pagamentos_prata.py
 ```
 
 O que a prata faz:
@@ -17,8 +17,8 @@ O que a prata faz:
 - corrige valores errados, guardando o original numa coluna `<coluna>_bronze`;
 - **marca** o que é suspeito com colunas `flag_*`, sem apagar a linha.
 
-As regras de cada tabela ficam no cabeçalho do script que a gera.
+As regras de cada tabela ficam no cabeçalho do notebook que a gera.
 
-| Tabela | Script |
+| Tabela | Notebook |
 |---|---|
-| `pagamentos.csv` | `scripts/pagamentos_prata.py` |
+| `pagamentos.csv` | `notebooks/pagamentos_prata.py` |

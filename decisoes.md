@@ -1,8 +1,21 @@
 # Decisões e premissas
 
-Cada problema encontrado nos dados tem três saídas: **corrigir**, **remover** ou **marcar**.
-Toda escolha entra aqui com o motivo e o efeito na contagem. A regra executável de cada
-decisão está no script indicado; se mudar o script, atualize esta página.
+Fonte da verdade do grupo: o log de **toda decisão e premissa que muda um número**, seja
+limpeza de dado, premissa de negócio, definição de métrica ou escolha de análise. Se não
+está aqui, o grupo não decidiu.
+
+Como funciona:
+- Cada problema encontrado nos dados tem três saídas: **corrigir**, **remover** ou
+  **marcar** (`flag_*`), além de **manter**. Toda escolha entra com o motivo e o efeito
+  na contagem (linhas e R$).
+- A regra executável de cada decisão está no notebook indicado. Notebook e esta página
+  mudam juntos, no mesmo commit.
+- IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `P` pagamentos.
+- Decisão revista não se apaga: risque a antiga e aponte para a nova.
+- "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
+  metade deixa uma linha lá.
+
+Passo a passo em `.claude/skills/registrar-decisao/SKILL.md`.
 
 ## Premissas gerais
 
@@ -17,7 +30,7 @@ decisão está no script indicado; se mudar o script, atualize esta página.
 
 ## Pagamentos (`1.bronze/pagamentos.csv` → `2.prata/pagamentos.csv`)
 
-Script: `scripts/pagamentos_prata.py`. Bronze: 165.548 linhas · prata: 163.607 linhas.
+Notebook: `notebooks/pagamentos_prata.py`. Bronze: 165.548 linhas · prata: 163.607 linhas.
 
 | # | Problema | Decisão | Motivo | Efeito na contagem |
 |---|---|---|---|---|

@@ -1,7 +1,7 @@
 # Bronze — dados originais
 
 Os arquivos exatamente como o curso entregou, com corte em 30/09/2026. **Não edite nada aqui**:
-toda correção é feita por um script em `scripts/` que lê a bronze e grava na prata.
+toda correção é feita por um notebook em `notebooks/` que lê a bronze e grava na prata.
 
 Nenhum arquivo foi limpo antes da entrega. Formatos de data, fusos, maiúsculas e nomes de
 categoria variam entre arquivos (ver "Armadilhas conhecidas" no `AGENTS.md`). O `user_id`

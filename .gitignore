@@ -18,7 +18,7 @@ __pycache__/
 # Configuração local de agentes
 .claude/settings.local.json
 
-# Camadas geradas pelos scripts — rode scripts/ para recriar
+# Camadas geradas pelos notebooks — rode notebooks/ para recriar
 dados/2.prata/*
 dados/3.ouro/*
 !dados/2.prata/README.md

@@ -18,29 +18,29 @@ O enunciado e o dicionário de dados estão na raiz, em PDF. Corte dos dados: 30
 ├── Vitaliza - Dicionário de dados.pdf
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
-│   ├── 2.prata/    # bronze limpo — gerado pelos scripts, fora do git
-│   └── 3.ouro/     # tabelas de análise — gerado pelos scripts, fora do git
-└── scripts/        # um script por tabela: <arquivo>_<camada>.py
+│   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
+│   └── 3.ouro/     # tabelas de análise — gerado pelos notebooks, fora do git
+└── notebooks/        # um notebook por tabela: <arquivo>_<camada>.py
 ```
 
 ## Como rodar
 
-Requer Python 3 (os scripts atuais usam só a biblioteca padrão). A partir da raiz:
+Requer Python 3 (os notebooks atuais usam só a biblioteca padrão). A partir da raiz:
 
 ```bash
-python3 scripts/pagamentos_prata.py
+python3 notebooks/pagamentos_prata.py
 ```
 
-Prata e ouro não são versionados: depois de clonar ou de atualizar um script, rode os scripts
+Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
 para gerar as tabelas.
 
 ## Tabelas
 
-| Tabela | Script | O que tem |
+| Tabela | Notebook | O que tem |
 |---|---|---|
-| `dados/2.prata/pagamentos.csv` | `scripts/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
+| `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
 
-As regras de limpeza de cada tabela estão no cabeçalho do script correspondente. O porquê de
+As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
 cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).
 
 ## Para agentes de IA

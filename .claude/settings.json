@@ -1,0 +1,67 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git log*)",
+      "Bash(git diff*)",
+      "Bash(git show*)",
+      "Bash(git fetch*)",
+      "Bash(git branch*)",
+      "Bash(git pull --rebase*)",
+      "Bash(python3 notebooks/*)"
+    ],
+    "ask": [
+      "Bash(git push*)",
+      "Bash(git rebase*)",
+      "Bash(git merge*)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore *)",
+      "Bash(git stash drop*)"
+    ],
+    "deny": [
+      "Edit(/dados/1.bronze/**)",
+      "Read(/.env)",
+      "Read(/.env.*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(git branch -D*)",
+      "Bash(git remote remove*)",
+      "Bash(git remote set-url*)",
+      "Bash(rm *dados/1.bronze*)",
+      "Bash(mv *dados/1.bronze*)",
+      "Bash(cat *.env*)"
+    ]
+  },
+  "autoMode": {
+    "soft_deny": [
+      "$defaults",
+      "Enviar (git push) para o origin sem que a pessoa tenha pedido ou aprovado o push nesta sessão.",
+      "Apagar ou sobrescrever arquivos em dados/2.prata ou dados/3.ouro que não sejam saída do notebook que acabou de rodar.",
+      "Reescrever histórico do git (rebase de commits já enviados, amend de commit já enviado)."
+    ],
+    "hard_deny": [
+      "$defaults",
+      "Alterar, mover ou apagar qualquer arquivo em dados/1.bronze.",
+      "Ler, imprimir ou commitar o conteúdo de .env ou de qualquer chave de API.",
+      "git push --force, git reset --hard ou git clean neste repositório compartilhado."
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/git_inicio.py\"",
+            "timeout": 30,
+            "statusMessage": "Conferindo o repo do grupo..."
+          }
+        ]
+      }
+    ]
+  }
+}
