@@ -74,6 +74,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | Tabela | Script | Grão | Observações |
 |---|---|---|---|
 | `dados/2.prata/pagamentos.csv` | `scripts/pagamentos_prata.py` | uma cobrança | inclui recusados; para faturamento filtre `status != 'recusado'` e some `valor` (bruto) ou `valor_liquido` (após taxas) |
+| `dados/3.ouro/pagamentos_mensal.csv` | `scripts/pagamentos_mensal_ouro.py` | mês × meio de pagamento | aprovadas, devoluções (no mês do lançamento) e recusadas; `valor_bruto` = aprovado − devolvido |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas.
