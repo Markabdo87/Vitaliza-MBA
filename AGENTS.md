@@ -40,6 +40,8 @@ Regras das camadas:
   duplicata comprovada e **marca** suspeitas com colunas `flag_*` em vez de apagar.
   Guarde o valor original em `<coluna>_bronze` quando corrigir um valor.
 - Ao criar uma tabela nova, registre-a na seção "Tabelas prontas" abaixo.
+- Toda decisão de limpeza (corrigir, remover ou marcar) entra em `decisoes.md`, com o
+  motivo e o efeito na contagem. Premissas de negócio usadas nas contas também.
 
 Rodar (a partir da raiz do repo):
 ```bash

@@ -40,7 +40,8 @@ para gerar as tabelas.
 |---|---|---|
 | `dados/2.prata/pagamentos.csv` | `scripts/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
 
-As regras de limpeza de cada tabela estão no cabeçalho do script correspondente.
+As regras de limpeza de cada tabela estão no cabeçalho do script correspondente. O porquê de
+cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).
 
 ## Para agentes de IA
 
