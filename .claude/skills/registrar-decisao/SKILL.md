@@ -17,6 +17,9 @@ um número e não está lá, para o grupo ela não existe. Notebook diz *como*; 
   (seção do enunciado ou do dicionário). Se o enunciado não diz, é uma premissa **do grupo**
   e isso tem que estar escrito.
 - **Definição de métrica**: o que conta como churn, como assinante ativo, janela, corte.
+  Antes de registrar, confira o glossário e o texto do enunciado: métrica com definição
+  oficial usa a definição e o nome oficiais (cite a fonte na coluna "Motivo"); variação do
+  grupo ganha nome próprio e diz em que difere da oficial.
 - **Escolha de análise/modelo**: filtro de população, variáveis excluídas, limiar de
   decisão. Tudo o que outra pessoa precisaria saber para chegar no mesmo número.
 

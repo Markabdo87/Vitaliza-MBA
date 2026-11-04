@@ -72,7 +72,7 @@ Quatro pessoas, um repo (`origin` = `github.com/Markabdo87/Vitaliza-MBA`), ramo 
 A palavra-chave é **verificável**: qualquer número tem que poder ser refeito por outra
 pessoa a partir da bronze, rodando os notebooks e lendo o `decisoes.md`.
 
-Três peças, cada uma com uma skill em `.claude/skills/` (outros agentes: leiam o `SKILL.md`
+Quatro peças, cada uma com uma skill em `.claude/skills/` (outros agentes: leiam o `SKILL.md`
 correspondente quando a situação aparecer):
 
 | Peça | Regra curta | Skill |
@@ -80,6 +80,7 @@ correspondente quando a situação aparecer):
 | **Git** | Ao abrir a sessão, puxe o que o grupo subiu. Ao fechar, commit + `pull --rebase` + push (com confirmação) + handoff na seção "Em aberto" do `decisoes.md` | `git-do-grupo` |
 | **`decisoes.md`** | Log de toda decisão e premissa que muda um número: limpeza, premissa de negócio, definição de métrica, escolha de análise. ID, motivo e efeito numérico. Não se apaga linha antiga, risca e aponta para a nova | `registrar-decisao` |
 | **Camadas** | bronze (imutável) → prata (limpa, mesmo grão) → ouro (cruzada/agregada). Cada tabela tem um notebook que a gera do zero | `camadas-de-dados` |
+| **Análise** | Uma etapa por vez: confere a métrica no glossário, gera ouro + página em `artefatos/`, confere com o enunciado, mostra, discute, registra e só então segue | `etapa-de-analise` |
 
 Ciclo de uma limpeza: perfila a bronze → decide cada problema → escreve
 `notebooks/<arquivo>_prata.py` com as regras na docstring → roda e mede → registra no
@@ -94,6 +95,7 @@ O `.claude/settings.json` bloqueia edição da bronze, leitura de `.env`, `push 
 ```
 documentos/        # fontes oficiais do curso em PDF: enunciado, dicionário, guia de entregas
 estudos-analises/  # estudos e relatórios do grupo (não oficiais)
+artefatos/         # páginas HTML com os gráficos do ouro, geradas pelos notebooks (vão para o git)
 dados/
 ├── 1.bronze/   # arquivos como vieram do curso. NUNCA editar.
 ├── 2.prata/    # bronze limpa, uma tabela por arquivo de origem, mesma granularidade
@@ -113,14 +115,20 @@ Regras das camadas:
 - Cada notebook gera sua tabela do zero, roda da raiz e documenta as regras na docstring.
   Pode ser `.py` ou Jupyter (`.ipynb`), a gosto de quem escreve: o que importa é rodar do zero.
 - Ao criar uma tabela nova, registre-a em "Tabelas prontas" abaixo.
+- Ouro com gráfico gera também uma página em `artefatos/NN_<tabela>.html` (helper
+  `notebooks/_artefato.py`). As páginas vão para o git, para o grupo abrir sem rodar nada;
+  só têm agregados. A análise anda uma etapa por vez: gera, discute com o grupo, registra
+  no `decisoes.md`, e só então parte para a próxima.
 
 Rodar (a partir da raiz do repo):
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # toda a prata
+for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # ouro + artefatos
 ```
-Os notebooks usam a biblioteca padrão do Python 3, menos `atividades_prata.py`, que lê
-parquet e precisa do `pyarrow` (em `requirements.txt`). Dependência nova entra no
+Os notebooks de prata usam a biblioteca padrão do Python 3, menos `atividades_prata.py`, que
+lê parquet e precisa do `pyarrow`. Os de ouro usam `pandas` e `plotly` e rodam com o venv
+(`.venv/bin/python notebooks/<tabela>_ouro.py`); todos em `requirements.txt`. Dependência nova entra no
 `requirements.txt` com versão fixada.
 
 ## Armadilhas conhecidas dos dados
@@ -193,6 +201,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/2.prata/feed_posts.csv` | `notebooks/feed_posts_prata.py` | um post | texto original em `texto_bronze`; post removido tem `texto` nulo e `flag_post_removido = 1`; para modelo filtre `flag_apos_corte = 0` |
 | `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | uma resposta | 643 respostas de 641 contas, só de quem cancelou pelo site, 01/06–30/09/2026; `comentario` é texto bruto para a extração com IA; `motivo_principal` diverge do comentário em 220 de 452 casos com tema (Q7); `flag_resposta_repetida` marca 2 contas com duas respostas |
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | um chamado | 4.422 chamados de 3.989 contas, 01/07/2025–30/09/2026, `aberto_em` em Brasília; `texto_cliente` é texto bruto para a extração com IA; `categoria_atendente` diverge do texto em 33,6% (S9); para variável de modelo trate `flag_resolvido_pos_corte = 1` como aberto; `flag_aberto_antigo` marca chamados abandonados |
+| `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | mês × recorte × segmento | ago/24–set/26; churn = perdas ÷ ativos no dia 1 (G1), reproduz o enunciado; recortes total, plano, canal, plano_canal, metodo; gera `artefatos/01_churn_mensal.html` |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas.

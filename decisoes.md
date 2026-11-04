@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte.
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -290,6 +290,25 @@ Notebook: `notebooks/tickets_suporte_prata.py`. Bronze: 4.422 linhas · prata: 4
 | S10 | Conta com mais de um chamado; 16 pares com o mesmo texto | **Manter** | Os pares de mesmo texto estão de 21 a 169 dias um do outro; nenhuma conta tem dois chamados no mesmo minuto (2 casos no mesmo dia, textos diferentes). Reincidência é sinal, não duplicata | 401 contas com 2+ chamados · 3.989 contas · 0 linhas removidas |
 | S11 | `ticket_id` começa em `t_000368` | **Manter** | Sequência contínua até `t_004789`, sem buraco; os IDs anteriores são de antes de 01/07/2025 | nenhuma |
 
+## Churn mensal (ouro) (`2.prata/assinaturas.csv` → `3.ouro/churn_mensal.csv`)
+
+Notebook: `notebooks/churn_mensal_ouro.py`. Grão: mês × recorte (total, plano, canal,
+plano × canal, método) × segmento; ago/2024–set/2026, 338 linhas. Artefato:
+`artefatos/01_churn_mensal.html`.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| G1 | Definição de churn mensal | **Definir**: perdas no mês ÷ ativos no dia 1 do mês. Ativo no dia 1 = `inicio` antes do dia 1 e `data_fim` vazia ou no dia 1 ou depois. Perda = `data_fim` no mês **e** ativo no dia 1 | É a métrica que a empresa acompanha (enunciado, seção 01). Quem assina e sai no mesmo mês fica fora da base e das perdas: só assim os números do enunciado batem (abr/26: 1.154 perdas; contando todos os fins seriam 1.158) | 8.540 ativos em jan/25 · abr/26 8,1% (1.154 ÷ 14.237) · 14.319 ativos em set/26 · média 5,68% em 2025 e 6,67% em jan–set/26, iguais ao enunciado. O notebook para se algum desses números não bater |
+| G2 | Cortesias internas | **Remover** da base paga (`flag_cortesia = 1`) | Não pagam; são as 60 contas de teste (A3, U13) | −60 assinaturas, todas ativas no período |
+| G3 | Jul/2024 incompleto | **Remover** o mês da série; começa em ago/2024 | O log de fins começa em 07/07/2024: jul/24 sai com 2,0%, artefato do corte do histórico. Ago–dez/24 seguem com viés de sobrevivência (A5) e não servem de referência de "normal" | −1 mês |
+| G4 | Plano e canal por mês | **Usar** `plano_atual` e `canal` da prata como fixos | Ninguém troca de plano nem de canal no log (E4) | nenhuma linha alterada |
+
+### Resultado de referência
+
+Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 p.p.); anual
+2,63% → 3,33% (+0,70 p.p.); loja 5,38% → 6,34%; site 6,15% → 7,26%; Google Play 5,35% →
+6,71% (+1,36 p.p.) contra App Store 5,40% → 5,98% (+0,57 p.p.).
+
 ## Em aberto
 
 ### Usuários
@@ -410,3 +429,12 @@ Notebook: `notebooks/tickets_suporte_prata.py`. Bronze: 4.422 linhas · prata: 4
   chamado não atendido; confirmar antes de usar como variável.
 - S5: na base de modelagem (ouro), recalcular `status` no corte: `resolvido` com
   `flag_resolvido_pos_corte = 1` vira `aberto`.
+
+### Churn mensal (ouro)
+
+- Separar a perda voluntária (renovação desligada, cancelamento) da involuntária (falha de
+  pagamento, carência) e da devolução (chargeback, reembolso), usando os eventos anteriores
+  ao fim (E5, E8).
+- Anual: medir a taxa de não renovação (venceu no mês e não renovou). A taxa mensal sobre
+  toda a base anual dilui o efeito.
+- Janeiro alto nos dois anos (6,4% e 7,4%): conferir se é vencimento de anuais.

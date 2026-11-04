@@ -31,8 +31,9 @@ Todo código que gera tabela mora em `notebooks/`, um arquivo por tabela:
   nunca absolutos da máquina de alguém.
 - **Docstring no topo** com as regras aplicadas, em lista numerada, e o comando de uso. A
   docstring e o `decisoes.md` têm que descrever a mesma regra.
-- Biblioteca padrão quando der. Se precisar de pandas e afins, crie `requirements.txt` e use
-  venv (`python3 -m venv .venv`); avise o grupo no handoff.
+- Prata: biblioteca padrão quando der. Ouro: `pandas` e `plotly`, pelo venv
+  (`.venv/bin/python`). Dependência nova entra no `requirements.txt` com versão fixada;
+  avise o grupo no handoff.
 - `.py` ou Jupyter (`.ipynb`), a gosto de quem escreve. Num `.ipynb`, as regras vão na
   primeira célula (markdown) e ele tem que rodar inteiro ("Run all") sem erro.
 
@@ -56,6 +57,8 @@ Todo código que gera tabela mora em `notebooks/`, um arquivo por tabela:
 
 Para ouro é o mesmo fluxo, com uma diferença: em vez de "problemas" você registra as
 definições (o que é churn, ativo, janela, filtro de população) e o número de referência.
+O ciclo completo de uma análise de ouro (conferir o glossário, gerar a página em
+`artefatos/`, apresentar e esperar a discussão) está na skill `etapa-de-analise`.
 
 ## Antes de dizer que terminou
 

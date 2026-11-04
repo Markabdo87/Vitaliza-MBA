@@ -28,6 +28,7 @@ e completa no guia em `documentos/`.
 ```
 ├── documentos/          # PDFs oficiais: enunciado, dicionário de dados, guia de entregas do M2
 ├── estudos-analises/    # estudos e relatórios do grupo (não oficiais)
+├── artefatos/           # páginas HTML com os gráficos do ouro (abra no navegador)
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
 │   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
@@ -37,12 +38,12 @@ e completa no guia em `documentos/`.
 
 ## Como rodar
 
-Requer Python 3. Os notebooks usam a biblioteca padrão, menos `atividades_prata.py`, que
-lê parquet com `pyarrow`. A partir da raiz:
+Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly). A partir da raiz:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # gera toda a prata
+for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ouro e os artefatos
 ```
 
 Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
@@ -64,6 +65,7 @@ para gerar as tabelas.
 | `dados/2.prata/feed_posts.csv` | `notebooks/feed_posts_prata.py` | posts com texto limpo, posts removidos e posts depois do corte marcados |
 | `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | respostas de saída com comentário bruto para a extração com IA |
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | chamados com tempo de resolução, resolvidos depois do corte e abandonados marcados |
+| `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | churn mensal por plano, canal e método, ago/24–set/26, conferido com o enunciado · gráficos em `artefatos/01_churn_mensal.html` |
 
 As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
 cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).
