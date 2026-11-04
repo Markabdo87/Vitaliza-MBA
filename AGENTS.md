@@ -15,12 +15,56 @@ medir a base, explicar a subida, segmentar, prever quem sai em 60 dias (até 29/
 extrair variáveis de texto/imagem com IA, decidir quem contatar (uplift, campanha de ago/26),
 calcular o retorno em R$ e escrever a mensagem.
 
-Fontes oficiais, na raiz:
+Fontes oficiais, em `documentos/`:
 - `Vitaliza - Enunciado do case.pdf` — objetivos (seção 02) e premissas de negócio (seção 03:
   preços, taxas, custos, CAC, limites do CRM). Toda conta de R$ parte da seção 03.
 - `Vitaliza - Dicionário de dados.pdf` — colunas de cada arquivo. Corte dos dados: 30/09/2026.
+- `[Inteli MBA] Guia Aluno - Entrega de Artefatos - Módulo 2 (2026.2B).pdf` — o que se
+  entrega, quando e a rubrica (resumo abaixo).
 
 Na dúvida sobre um número ou regra de negócio, confira no PDF; não invente premissa.
+
+`estudos-analises/` guarda estudos do grupo que **não são fonte oficial**. Hoje há o
+`Vitaliza - Relatorio final do case.pdf` (25/10/2026, Marcos), uma primeira versão das
+respostas aos oito objetivos. Os números dele ainda não são gerados pelos notebooks do repo:
+use como hipótese a conferir, não como referência.
+
+## Entregas (guia do Módulo 2)
+
+Duas entregas, cada uma com um artefato de **Negócios** e um de **Tecnologia**. O formato é
+livre (PDF, PPT, planilha, documento…). Entrega-se uma pasta no Google Drive **com
+compartilhamento público** (pasta e arquivos), e o link vai na Adalove: turma Módulo 2 →
+"Atividades por unidade" → semana da entrega. **A submissão é individual**: cada um dos quatro
+envia o link.
+
+| Semana | Prazo | Negócios | Tecnologia |
+|---|---|---|---|
+| 5 | **15/11/2026, 23:59** | **Customer Segmentation Report**: relatório executivo com 3–4 segmentos em cartões de persona; hipóteses de driver de churn por segmento; priorização preliminar (ação imediata × monitoramento); visualizações vindas da EDA; seção de limitações | **EDA** em código + visualizações: carrega, limpa e visualiza a base; acha padrões e correlações com churn; gera os gráficos do relatório; sustenta a segmentação; conta a história num **mini deck** |
+| 10 | **20/12/2026, 23:59** | **Plano de Intervenção de Risco (Churn)**: quais segmentos de risco (vindos do modelo) recebem intervenção, a oferta/comunicação de cada um e o ROI esperado | **App web preditivo-generativo**: protótipo que (1) roda o modelo de churn treinado em Python e mostra o risco de um usuário e (2) chama uma API de IA generativa para escrever um texto de retenção personalizado |
+
+Ferramentas sugeridas: Python (EDA, modelo e integração), **Marimo** (protótipo do app) e uma
+API generativa (Gemini, GPT, Claude).
+
+A semana 5 **não tem nota**: só um feedback do professor/mentor para orientar a semana 10.
+Correção da semana 10 em até 2 semanas após o prazo, com devolutiva na Adalove.
+
+Rubrica da semana 10 (proficiente 7–8,9 · excepcional 9–10 · abaixo de 7):
+
+| Trilha | Critério | Peso | O que separa o excepcional | O que derruba |
+|---|---|---|---|---|
+| Negócios | Segmentação e estratégia de intervenção | 40% | Estratégia personalizada por segmento, hipótese clara de driver e teste/aprendizado embutido | Segmentos genéricos ou desconectados do modelo; oferta única para todos |
+| Negócios | Racional financeiro (ROI da retenção) | 40% | Modelo realista com LTV, custo da intervenção, conversão esperada, **custo de IA (tokens, infraestrutura)** e KPIs (taxa de retenção, uplift, payback) | ROI vago, sem premissas, conversão de 100% ou sem custo da intervenção |
+| Negócios | Alinhamento ambidestro | 20% | Os segmentos alimentam o briefing da GenAI e a leitura do modelo | Plano desconectado do modelo e do app |
+| Tecnologia | Modelo preditivo de churn | 40% | Interpretação crítica (importância de variáveis, análise de erros) e escolha justificada entre precisão e recall para retenção | Modelo sem avaliação, ou métricas sem interpretação |
+| Tecnologia | Integração preditivo-generativa | 40% | O prompt usa dinamicamente segmento, score de risco e variáveis do cliente | Integração quebrada ou texto genérico que ignora o modelo |
+| Tecnologia | Adequação ao problema | 20% | Código organizado e documentado; interface que mostra viabilidade de escala (UX, desempenho, manutenção) | App desconectado do churn ou que não navega |
+
+Consequências para o trabalho no repo:
+- O que entra no relatório e no deck da semana 5 sai de notebooks que rodam do zero (a rubrica
+  pede "código + visualizações").
+- Segmentos, modelo, plano e mensagem precisam ser **a mesma linha**: segmento → risco →
+  oferta → prompt. A rubrica pune peças desconectadas em três critérios.
+- A conta de ROI usa as premissas da seção 03 do enunciado **mais** o custo de tokens da API.
 
 ## Como o grupo trabalha
 
@@ -48,6 +92,8 @@ O `.claude/settings.json` bloqueia edição da bronze, leitura de `.env`, `push 
 ## Estrutura
 
 ```
+documentos/        # fontes oficiais do curso em PDF: enunciado, dicionário, guia de entregas
+estudos-analises/  # estudos e relatórios do grupo (não oficiais)
 dados/
 ├── 1.bronze/   # arquivos como vieram do curso. NUNCA editar.
 ├── 2.prata/    # bronze limpa, uma tabela por arquivo de origem, mesma granularidade

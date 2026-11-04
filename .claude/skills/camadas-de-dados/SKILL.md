@@ -38,7 +38,7 @@ Todo código que gera tabela mora em `notebooks/`, um arquivo por tabela:
 
 ## Fluxo para uma tabela nova de prata
 
-1. **Leia a fonte**: a seção do arquivo no `Vitaliza - Dicionário de dados.pdf` e as
+1. **Leia a fonte**: a seção do arquivo no `documentos/Vitaliza - Dicionário de dados.pdf` e as
    "Armadilhas conhecidas" do `AGENTS.md`.
 2. **Perfile a bronze** antes de corrigir: contagem de linhas, nulos, duplicatas, formatos
    de data/valor, categorias distintas, fuso. Anote o que estranhar.

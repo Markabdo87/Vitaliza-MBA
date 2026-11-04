@@ -9,13 +9,25 @@ pede para medir a base, explicar a subida, segmentar os assinantes, prever quem 
 dias seguintes ao corte, decidir quem contatar e com qual mensagem, e calcular quanto a ação
 rende em reais.
 
-O enunciado e o dicionário de dados estão na raiz, em PDF. Corte dos dados: 30/09/2026.
+O enunciado, o dicionário de dados e o guia de entregas estão em `documentos/`, em PDF.
+Corte dos dados: 30/09/2026.
+
+## Entregas
+
+| Semana | Prazo | Negócios | Tecnologia |
+|---|---|---|---|
+| 5 | **15/11/2026, 23:59** (sem nota, só feedback) | Customer Segmentation Report: 3–4 segmentos em cartões de persona, hipóteses de driver de churn, priorização (imediata × monitoramento), gráficos da EDA, limitações | EDA em código + visualizações, com um mini deck contando a história |
+| 10 | **20/12/2026, 23:59** (com nota) | Plano de Intervenção de Risco: segmentos de risco do modelo, oferta/comunicação de cada um, ROI esperado | App web (sugestão: Marimo) que mostra o risco de churn de um usuário e gera com IA um texto de retenção personalizado |
+
+Formato livre. Cada um entrega na Adalove o link de uma pasta do Google Drive pública (a
+submissão é individual). A rubrica da semana 10 está resumida no [`AGENTS.md`](AGENTS.md#entregas-guia-do-módulo-2)
+e completa no guia em `documentos/`.
 
 ## Estrutura
 
 ```
-├── Vitaliza - Enunciado do case.pdf
-├── Vitaliza - Dicionário de dados.pdf
+├── documentos/          # PDFs oficiais: enunciado, dicionário de dados, guia de entregas do M2
+├── estudos-analises/    # estudos e relatórios do grupo (não oficiais)
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
 │   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
