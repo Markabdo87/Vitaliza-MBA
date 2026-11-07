@@ -38,12 +38,13 @@ e completa no guia em `documentos/`.
 
 ## Como rodar
 
-Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly). A partir da raiz:
+Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly, openpyxl). A partir da raiz:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # gera toda a prata
 for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ouro e os artefatos
+.venv/bin/python notebooks/conferencias.py                             # confere contagens e números de referência
 ```
 
 Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
@@ -56,7 +57,7 @@ para gerar as tabelas.
 | `dados/2.prata/usuarios.csv` | `notebooks/usuarios_prata.py` | contas sem duplicatas, cidade/sexo/sistema padronizados, idade no corte, contas de teste marcadas |
 | `dados/2.prata/assinaturas.csv` | `notebooks/assinaturas_prata.py` | retrato de cada assinatura no corte, com `canal`/`metodo` nos rótulos de pagamentos e cortesias marcadas |
 | `dados/2.prata/eventos_assinatura.csv` | `notebooks/eventos_assinatura_prata.py` | log de eventos em horário de Brasília, ordenado por usuário, com fase trial/assinatura e sequências estranhas marcadas |
-| `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
+| `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, recusados com valor zero, tentativa reconstruída, taxa e valor líquido |
 | `dados/2.prata/uso_mensal.csv` | `notebooks/uso_mensal_prata.py` | uso por usuário e mês, valores intactos, com flags para mês sem treino e mudança de contagem de sessões |
 | `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | treinos em horário de Brasília (Garmin corrigido), tipo em português, sem cópias relógio+app, distância e duração corrigidas |
 | `dados/2.prata/amizades.csv` | `notebooks/amizades_prata.py` | relações de seguir com `reciproco` e relações depois do corte marcadas |
@@ -66,6 +67,7 @@ para gerar as tabelas.
 | `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | respostas de saída com comentário bruto para a extração com IA |
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | chamados com tempo de resolução, resolvidos depois do corte e abandonados marcados |
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | churn mensal por plano, canal e método, ago/24–set/26, conferido com o enunciado · gráficos em `artefatos/01_churn_mensal.html` |
+| `dados/3.ouro/recusas_cobranca.csv` (+ `.xlsx`) | `notebooks/recusas_cobranca_ouro.py` | histórico de cada cobrança recusada e seu desfecho (recuperada, perdida, em aberto), jul/24–set/26 · gráficos em `artefatos/02_recusas_cobranca.html` |
 
 As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
 cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).

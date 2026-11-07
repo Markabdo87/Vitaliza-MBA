@@ -15,4 +15,9 @@ Como na prata, os CSVs não vão para o git: cada tabela tem um notebook em `not
 (`<tabela>_ouro.py`) que a recria. Registre cada tabela nova no `AGENTS.md`, em
 "Tabelas prontas", com o grão e a regra principal.
 
-Nenhuma tabela criada ainda.
+Tabelas:
+
+| Tabela | Notebook | Grão |
+|---|---|---|
+| `churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | mês × recorte × segmento |
+| `recusas_cobranca.csv` e `recusas_cobranca.xlsx` | `notebooks/recusas_cobranca_ouro.py` | uma cobrança recusada |

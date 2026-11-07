@@ -12,7 +12,8 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) ·
+  `R` recusas de cobrança (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -127,16 +128,17 @@ Notebook: `notebooks/pagamentos_prata.py`. Bronze: 165.548 linhas · prata: 163.
 | P3 | Lojas gravam em UTC (`...Z`); site em horário de Brasília | **Corrigir**: lojas −3h; tudo em `data_hora_brt`. Origem guardada em `fuso_origem` | Cortar por dia ou mês com fusos misturados joga cobranças no período errado | 110.824 linhas convertidas · 12.709 mudam de dia · 453 mudam de mês · set/26: −R$ 100,90 |
 | P4 | Estornos e chargebacks lançados pelo preço de tabela, não pelo valor cobrado | **Corrigir**: valor = −(última cobrança aprovada do usuário antes da devolução). Original em `valor_bronze`; cobrança de referência em `pagamento_id_original` | Devolver mais do que o cliente pagou distorce a receita líquida | 179 devoluções: 138 de −39,90 → −34,90 e 41 de −299,90 → −239,90 · +R$ 3.150,00 no total · set/26: +R$ 360,00 |
 | P5 | Coluna `tentativa` não registra retentativa: recusa seguida de nova cobrança volta a `1`, e `2` aparece em renovações normais | **Corrigir** em coluna nova `tentativa_real`; original em `tentativa_bronze` | Sem isso não se separa quem saiu por cobrança falha. Regra: cobrança até 16 dias depois de uma recusa do mesmo usuário é retentativa (o maior intervalo observado foi 15 dias) | 6.585 linhas com tentativa diferente da bronze · retentativas aprovadas: 4.812 (bronze) → 1.881 (prata) · devoluções ficam sem tentativa |
-| P6 | Cobranças recusadas | **Manter** (não entram no faturamento) | São a base da análise de churn involuntário | 3.250 linhas · R$ 191.935,00 tentados e não recebidos · para faturar, filtrar `status != 'recusado'` |
+| ~~P6~~ | ~~Cobranças recusadas~~ | ~~**Manter** (não entram no faturamento)~~ → ver P12 | São a base da análise de churn involuntário | 3.250 linhas · R$ 191.935,00 tentados e não recebidos · para faturar, filtrar `status != 'recusado'` |
 | P7 | Duas cobranças aprovadas do mesmo usuário com menos de 20 dias entre elas | **Marcar** `flag_intervalo_curto = 1` | Pode ser ciclo reiniciado depois de retentativa ou cobrança em dobro; sem cruzar com `eventos_assinatura.csv` não dá para afirmar erro | 223 linhas · nenhum valor removido |
 | P8 | Mensal de R$ 34,90 aprovado depois do reajuste de 01/03/2026 | **Marcar** `flag_preco_antigo = 1` | Concentradas nos primeiros dias de março: provável cobrança atrasada do ciclo de fevereiro | 16 linhas · nenhum valor removido |
 | P9 | Meio de pagamento com nomes diferentes entre arquivos (`cartao`/`pix_automatico` aqui, `web_cartao`/`web_pix` em `assinaturas.csv`) | **Corrigir** só no cruzamento; coluna nova `canal` (`loja`/`site`) | Mesmo conceito com rótulo diferente; o valor original de `metodo` fica intacto | nenhuma linha alterada |
 | P10 | 48 cobranças no cartão de assinantes cadastrados como `web_pix` | **Manter** | Troca de meio de pagamento é plausível; `assinaturas` guarda só a situação atual | nenhuma |
 | P11 | Taxa sobre devoluções | **Premissa**: a taxa é devolvida junto (`valor_liquido` da devolução também desconta a taxa) | O enunciado não diz se loja e operadora devolvem a taxa | ≈ R$ 400 em set/26 |
+| P12 | Cobranças recusadas com `valor` e `valor_liquido` preenchidos (o valor tentado): somar a coluna sem filtrar `status` contava dinheiro que não entrou | **Manter** as linhas e **corrigir** `valor` e `valor_liquido` para 0; valor tentado em `valor_bronze` | Recusa não gera receita. Com zero, a soma da coluna já é o faturamento, com ou sem filtro; as linhas continuam servindo ao churn involuntário (ver R1–R5) | 3.250 linhas zeradas · R$ 191.935,00 tentados (R$ 178.450,30 líquidos) saem da soma sem filtro · set/26 sem filtro: R$ 503.015,90 → R$ 489.873,50 bruto e R$ 446.246,38 → R$ 434.056,93 líquido · faturamento com filtro inalterado |
 
 ### Resultado de referência
 
-Faturamento com a prata (`status != 'recusado'`):
+Faturamento com a prata (soma de `valor` e `valor_liquido`; desde P12 o filtro `status != 'recusado'` não muda o resultado):
 
 | Recorte | Bruto | Líquido de taxas |
 |---|---:|---:|
@@ -148,7 +150,7 @@ Conciliação de set/2026, do valor puro ao final:
 | Etapa | Faturamento | Efeito |
 |---|---:|---:|
 | Soma de todas as linhas com data de setembro | R$ 509.587,50 | — |
-| − recusados (P6) | R$ 496.445,10 | −13.142,40 |
+| − recusados (P6, P12) | R$ 496.445,10 | −13.142,40 |
 | + fuso (P3) | R$ 496.344,20 | −100,90 |
 | − duplicatas (P1) | R$ 489.513,50 | −6.830,70 |
 | devoluções pelo valor cobrado (P4) | R$ 489.873,50 | +360,00 |
@@ -309,6 +311,38 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 2,63% → 3,33% (+0,70 p.p.); loja 5,38% → 6,34%; site 6,15% → 7,26%; Google Play 5,35% →
 6,71% (+1,36 p.p.) contra App Store 5,40% → 5,98% (+0,57 p.p.).
 
+## Recusas de cobrança (ouro) (`2.prata/pagamentos.csv` + `2.prata/assinaturas.csv` → `3.ouro/recusas_cobranca.csv`)
+
+Notebook: `notebooks/recusas_cobranca_ouro.py`. Grão: uma cobrança recusada; jul/2024–set/2026,
+3.250 linhas de 3.013 assinantes. Saídas: `dados/3.ouro/recusas_cobranca.csv`, a planilha
+`dados/3.ouro/recusas_cobranca.xlsx` (abas `recusas`, `resumo_mensal`, `resumo_canal`,
+`regras`) e o artefato `artefatos/02_recusas_cobranca.html`.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| R1 | O que é um caso de recusa | **Definir**: uma linha por cobrança com `status = 'recusado'`; a retentativa é a cobrança seguinte do mesmo usuário com `tentativa_real = 2` (até 16 dias, P5) | Nos dados cada recusa tem no máximo uma retentativa: nenhuma cobrança tem `tentativa_real` 3 | 3.250 recusas · 3.013 assinantes · 1.881 retentativas, todas aprovadas |
+| R2 | Desfecho de cada recusa | **Definir**: `recuperada` = retentativa aprovada; `perdida` = sem retentativa aprovada e a assinatura terminou depois da recusa; `em_aberto` = sem retentativa aprovada e assinatura ativa em 30/09/2026 | Separa o que a retentativa salva do que vira churn involuntário. O notebook para se alguma recusa não cair em um dos três | 1.881 recuperadas · 1.321 perdidas · 48 em aberto (recusas de 16 a 30/09/2026) |
+| R3 | Perdida = `motivo_fim = falha_pagamento` | **Conferir** no notebook | As 1.321 perdidas são exatamente as 1.321 assinaturas com `falha_pagamento` em `assinaturas`, uma recusa por assinatura | 0 divergências |
+| R4 | Taxa de recuperação | **Definir**: recuperadas ÷ (recuperadas + perdidas); em aberto fica fora | Recusa em aberto ainda não tem desfecho | 58,7% (1.881 ÷ 3.202) |
+| R5 | Valores | **Usar** `valor_bronze` como valor tentado (P12) e a taxa do método (enunciado, seção 03); valor recuperado = valor da retentativa aprovada | Mesmas premissas do faturamento | R$ 191.935,00 tentados · R$ 110.186,90 recuperados (R$ 102.610,77 líquidos) |
+
+### Resultado de referência
+
+3.250 recusas: 1.881 recuperadas, 1.321 perdidas, 48 em aberto; recuperação de 58,7%. Sem
+retentativa aprovada, a assinatura expira **7 dias** depois da recusa no site (cartão e Pix) e
+**16 dias** na loja (App Store e Google Play), sem exceção. Recuperação por método e plano:
+de 42,4% (App Store anual, 33 recusas) a 63,6% (Pix anual, 11); no volume, cartão mensal
+60,3% (1.488 recusas) e Google Play mensal 58,8% (645).
+
+## Conferências (`notebooks/conferencias.py`)
+
+Não gera tabela: confere de uma vez as contagens de cada tabela (bronze = dicionário, prata =
+"Visão geral da prata"), os números de referência (faturamento de set/26, 14.753 ativos, 717 e
+3.389 expirações), os cruzamentos entre tabelas (nenhum `user_id` órfão; cada cobrança
+aprovada com início/renovação no mesmo dia; nenhuma cobrança fora da vida da assinatura;
+só os preços do enunciado; P12) e o ouro já gerado (5,6% e 6,6%; R3). Sai com erro se algo
+quebrar. Rode depois de mexer em qualquer notebook.
+
 ## Em aberto
 
 ### Usuários
@@ -341,7 +375,7 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 
 - P7 e P8: conferidos com `eventos_assinatura.csv` (ver "Eventos de assinatura" acima): os
   dois casos têm renovação registrada no log, então não são erro. Falta o grupo decidir se
-  passam de marcar para manter (riscar P7/P8 e abrir P12/P13); as flags continuam na prata.
+  passam de marcar para manter (riscar P7/P8 e abrir P13/P14); as flags continuam na prata.
 
 ### Uso mensal
 
