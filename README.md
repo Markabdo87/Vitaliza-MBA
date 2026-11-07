@@ -28,7 +28,7 @@ e completa no guia em `documentos/`.
 ```
 ├── documentos/          # PDFs oficiais: enunciado, dicionário de dados, guia de entregas do M2
 ├── estudos-analises/    # estudos e relatórios do grupo (não oficiais)
-├── artefatos/           # páginas HTML com os gráficos do ouro (abra no navegador)
+├── artefatos/           # páginas HTML com os gráficos do ouro; comece por 00_historia_da_eda.html
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
 │   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
@@ -46,6 +46,7 @@ Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # gera toda a prata
 for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ouro e os artefatos
+.venv/bin/python notebooks/eda_historia.py                            # página-resumo da EDA (00)
 ```
 
 Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
