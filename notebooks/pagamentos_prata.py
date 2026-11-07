@@ -15,7 +15,7 @@ casos suspeitos e não confirmados viram flag:
   flag_intervalo_curto  aprovado <20 dias depois de outro aprovado do mesmo usuário
   flag_preco_antigo     mensal de 34,90 aprovado a partir de 01/03/2026
 
-Uso: python3 scripts/pagamentos_prata.py  (a partir da raiz do repo)
+Uso: python3 notebooks/pagamentos_prata.py  (a partir da raiz do repo)
 """
 import csv
 from collections import defaultdict

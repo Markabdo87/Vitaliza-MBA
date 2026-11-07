@@ -11,7 +11,7 @@ Regras:
   - valor_bruto = valor_aprovado + valor_devolvido; valor_liquido idem, após a taxa de
     cada meio (15% loja, 3,5% cartão, 0,99% Pix).
 
-Uso: python3 scripts/pagamentos_prata.py && python3 scripts/pagamentos_mensal_ouro.py
+Uso: python3 notebooks/pagamentos_mensal_ouro.py  (a partir da raiz, depois de pagamentos_prata.py)
 """
 import csv
 from collections import defaultdict

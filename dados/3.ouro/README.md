@@ -11,7 +11,7 @@ morar aqui:
   60 dias (até 29/11/2026), sem informação posterior a 30/09/2026;
 - segmentos, scores de risco e a lista de contato do CRM.
 
-Como na prata, os CSVs não vão para o git: cada tabela tem um script em `scripts/`
+Como na prata, os CSVs não vão para o git: cada tabela tem um notebook em `notebooks/`
 (`<tabela>_ouro.py`) que a recria. Registre cada tabela nova no `AGENTS.md`, em
 "Tabelas prontas", com o grão e a regra principal.
 

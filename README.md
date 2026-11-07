@@ -9,38 +9,66 @@ pede para medir a base, explicar a subida, segmentar os assinantes, prever quem 
 dias seguintes ao corte, decidir quem contatar e com qual mensagem, e calcular quanto a ação
 rende em reais.
 
-O enunciado e o dicionário de dados estão na raiz, em PDF. Corte dos dados: 30/09/2026.
+O enunciado, o dicionário de dados e o guia de entregas estão em `documentos/`, em PDF.
+Corte dos dados: 30/09/2026.
+
+## Entregas
+
+| Semana | Prazo | Negócios | Tecnologia |
+|---|---|---|---|
+| 5 | **15/11/2026, 23:59** (sem nota, só feedback) | Customer Segmentation Report: 3–4 segmentos em cartões de persona, hipóteses de driver de churn, priorização (imediata × monitoramento), gráficos da EDA, limitações | EDA em código + visualizações, com um mini deck contando a história |
+| 10 | **20/12/2026, 23:59** (com nota) | Plano de Intervenção de Risco: segmentos de risco do modelo, oferta/comunicação de cada um, ROI esperado | App web (sugestão: Marimo) que mostra o risco de churn de um usuário e gera com IA um texto de retenção personalizado |
+
+Formato livre. Cada um entrega na Adalove o link de uma pasta do Google Drive pública (a
+submissão é individual). A rubrica da semana 10 está resumida no [`AGENTS.md`](AGENTS.md#entregas-guia-do-módulo-2)
+e completa no guia em `documentos/`.
 
 ## Estrutura
 
 ```
-├── Vitaliza - Enunciado do case.pdf
-├── Vitaliza - Dicionário de dados.pdf
+├── documentos/          # PDFs oficiais: enunciado, dicionário de dados, guia de entregas do M2
+├── estudos-analises/    # estudos e relatórios do grupo (não oficiais)
+├── artefatos/           # páginas HTML com os gráficos do ouro (abra no navegador)
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
-│   ├── 2.prata/    # bronze limpo — gerado pelos scripts, fora do git
-│   └── 3.ouro/     # tabelas de análise — gerado pelos scripts, fora do git
-└── scripts/        # um script por tabela: <arquivo>_<camada>.py
+│   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
+│   └── 3.ouro/     # tabelas de análise — gerado pelos notebooks, fora do git
+└── notebooks/        # um notebook por tabela: <arquivo>_<camada>.py
 ```
 
 ## Como rodar
 
-Requer Python 3 (os scripts atuais usam só a biblioteca padrão). A partir da raiz:
+Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly). A partir da raiz:
 
 ```bash
-python3 scripts/pagamentos_prata.py
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
+for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # gera toda a prata
+for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ouro e os artefatos
 ```
 
-Prata e ouro não são versionados: depois de clonar ou de atualizar um script, rode os scripts
+Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
 para gerar as tabelas.
 
 ## Tabelas
 
-| Tabela | Script | O que tem |
+| Tabela | Notebook | O que tem |
 |---|---|---|
-| `dados/2.prata/pagamentos.csv` | `scripts/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
+| `dados/2.prata/usuarios.csv` | `notebooks/usuarios_prata.py` | contas sem duplicatas, cidade/sexo/sistema padronizados, idade no corte, contas de teste marcadas |
+| `dados/2.prata/assinaturas.csv` | `notebooks/assinaturas_prata.py` | retrato de cada assinatura no corte, com `canal`/`metodo` nos rótulos de pagamentos e cortesias marcadas |
+| `dados/2.prata/eventos_assinatura.csv` | `notebooks/eventos_assinatura_prata.py` | log de eventos em horário de Brasília, ordenado por usuário, com fase trial/assinatura e sequências estranhas marcadas |
+| `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, tentativa reconstruída, taxa e valor líquido |
+| `dados/2.prata/uso_mensal.csv` | `notebooks/uso_mensal_prata.py` | uso por usuário e mês, valores intactos, com flags para mês sem treino e mudança de contagem de sessões |
+| `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | treinos em horário de Brasília (Garmin corrigido), tipo em português, sem cópias relógio+app, distância e duração corrigidas |
+| `dados/2.prata/amizades.csv` | `notebooks/amizades_prata.py` | relações de seguir com `reciproco` e relações depois do corte marcadas |
+| `dados/2.prata/campanha_ago26.csv` | `notebooks/campanha_ago26_prata.py` | experimento de ago/26 com `tratado` (1/0) e booleanos em 1/0 |
+| `dados/2.prata/onboarding.csv` | `notebooks/onboarding_prata.py` | respostas do onboarding com `dias_por_semana` inteiro e respostas sem conteúdo marcadas |
+| `dados/2.prata/feed_posts.csv` | `notebooks/feed_posts_prata.py` | posts com texto limpo, posts removidos e posts depois do corte marcados |
+| `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | respostas de saída com comentário bruto para a extração com IA |
+| `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | chamados com tempo de resolução, resolvidos depois do corte e abandonados marcados |
+| `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | churn mensal por plano, canal e método, ago/24–set/26, conferido com o enunciado · gráficos em `artefatos/01_churn_mensal.html` |
 
-As regras de limpeza de cada tabela estão no cabeçalho do script correspondente.
+As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
+cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).
 
 ## Para agentes de IA
 
