@@ -145,7 +145,7 @@ entra só como apoio.
 
 ### O que a etapa mostrou
 
-Números de `artefatos/02_quem_saiu.html` (decisões K1–K6). Base de 14.059 assinantes, dos
+Números de `artefatos/02_quem_saiu.html` (decisões K1–K7). Base de 14.059 assinantes, dos
 quais 2.343 (16,7%) saíram em jul–set/2026.
 
 - **O plano esconde o calendário.** Dos 8.212 anuais, só 1.931 venciam na janela, e 46,3% deles
@@ -191,6 +191,93 @@ escolha de estratificar antes de ranquear.
 ### Referências da etapa
 
 Aula 2 (22/10/2026), "Limpeza e Análise Exploratória de Dados", trilha de Tecnologia.
+
+---
+
+## Etapa 03 · Por que saem (`artefatos/03_por_que_saem.html`)
+
+**Pergunta.** De que tipo são as saídas, qual tipo explica a subida de 2026, com quanta
+antecedência o assinante avisa e o que ele diz quando sai?
+
+**Para onde vai.** Hipóteses de driver por segmento no Customer Segmentation Report e, na
+semana 10, a escolha de quem recebe que tipo de ação (oferta de retenção × correção de
+cobrança) e quando.
+
+### Conceitos
+
+- **Decomposição aditiva da taxa.** Com o mesmo denominador (ativos no dia 1, regra G1), o
+  churn total é a soma das taxas por tipo de saída. A conferência é exata: a soma dos tipos tem
+  de dar as perdas do `01_churn_mensal` em todos os meses. Uma decomposição que não fecha
+  esconde linhas perdidas ou contadas duas vezes.
+- **Churn voluntário × involuntário.** Voluntário é decisão do cliente (desligou a renovação);
+  involuntário é falha de cobrança (cartão recusado até o fim da carência). As alavancas são
+  diferentes: oferta, conteúdo e contato para o primeiro; retentativa de cobrança, aviso de
+  cartão vencido e troca de método para o segundo. Misturar os dois numa taxa só leva à ação
+  errada.
+- **Janela de intervenção.** O tempo entre o sinal de decisão (desligar a renovação) e o fim
+  da assinatura. É uma distribuição de duração: lida por mediana e quartis, não pela média,
+  porque é limitada em 0 e tem cauda longa no anual.
+- **Motivo declarado × motivo revelado.** A pesquisa de saída registra o que a pessoa marca
+  numa lista fechada (declarado); o comentário livre e o comportamento (treinos, chamados)
+  revelam outra coisa. A primeira opção de uma lista tende a ser marcada por quem não quer
+  pensar (efeito de primazia), o que explica `preco` sem menção a dinheiro.
+- **Viés de não resposta e de cobertura.** Só responde quem cancela pelo site, e só quem quer.
+  A pesquisa indica **quais** temas existem, não **quanto** cada um pesa na base: a loja, 67%
+  das saídas de jun–set, não aparece.
+- **Taxa de período × taxa mensal.** Dividir saídas de nove meses pelos que estiveram ativos em
+  algum dia do período dá uma taxa que serve para comparar grupos entre si, não para somar ao
+  churn mensal nem para o ROI.
+
+### Método
+
+1. Saídas pagas pelo `motivo_fim` da prata, em três tipos (W1–W2); churn por tipo com a regra
+   G1 e conferência da soma (W3).
+2. Média 2025 × jan–set/26 por tipo e plano; falha de pagamento por plano × método.
+3. Antecedência do aviso nas voluntárias de 2026 (W4): histograma por plano, quartis por plano
+   e canal.
+4. Pesquisa de saída: tema do comentário pela regra de palavra-chave da prata (W5), cruzado com
+   o motivo marcado e com o plano.
+
+### O que a etapa mostrou
+
+- **A subida é voluntária.** Voluntária 5,12% → 6,09% ao mês (+0,97 p.p. de +0,99 p.p. do
+  total); involuntária 0,43% → 0,46%; devolução estável em 0,07%. No mensal, voluntária 8,04%
+  → 9,83%.
+- **A falha de pagamento é pequena, estável e concentrada.** Mensal no cartão: 10,7 saídas
+  involuntárias por 100 assinaturas em jan–set/26, contra 2,1 a 3,6 nos outros métodos. É um
+  segmento operacional, não de produto.
+- **Quem sai avisa, e o tempo de aviso depende do plano.** Mediana de 14 dias no mensal (loja e
+  site iguais) e 157 dias no anual (loja 151, site 175). O anual que desligou segue pagando e
+  usando por meses: é a maior janela de intervenção da base.
+- **Um pico que pede explicação.** 287 anuais (12,8%) desligaram exatamente 42 dias antes do
+  fim, na loja e no site, com os dias vizinhos abaixo de 10. Seis semanas é um prazo típico de
+  lembrete de renovação, mas nada no enunciado ou no dicionário descreve um. Fica como
+  pergunta (D03.4).
+- **"Objetivo cumprido" domina o texto.** 55,3% dos comentários com tema ("era só até a prova")
+  falam de objetivo atingido, motivo que não existe na lista fechada. A mistura de temas é
+  quase igual no anual e no mensal.
+- **O motivo marcado engana.** Dos 187 que marcaram `preco` e comentaram, 2 falam de cobrança.
+
+Leitura metodológica: a decomposição por tipo mudou a pergunta da segmentação. Como quase toda
+a subida é voluntária, os segmentos de ação imediata são de comportamento (engajamento, tempo
+de casa, experiência técnica); a cobrança entra como um segmento operacional à parte.
+
+### Pontos em debate
+
+| # | Ponto | Opções | Proposta | Status |
+|---|---|---|---|---|
+| D03.1 | Fonte do tipo de saída | `motivo_fim` da prata · reconstruir pelos eventos anteriores ao fim | `motivo_fim`: a soma fecha com a G1 em todos os meses e os eventos já foram conferidos na prata (E5, E8) | **proposto** (aplicado em W2) |
+| D03.2 | Qual desligamento conta na antecedência | primeiro · último | último: é o que valeu; quem religou e desligou de novo teve a decisão revertida uma vez | **proposto** (aplicado em W4) |
+| D03.3 | Tema da pesquisa | palavra-chave (atual) · extração com IA | palavra-chave na EDA; a extração com IA, prevista no case, substitui quando existir e as duas são comparadas | **proposto** (aplicado em W5) |
+| D03.4 | Pico de 42 dias no anual | ignorar · tratar como lembrete de renovação · perguntar à empresa | perguntar antes de usar: se for um lembrete, ele é um momento de contato já existente, útil para o plano da semana 10 | **aberto** |
+| D03.5 | Denominador da falha de pagamento | ativos em algum dia do período · ativos no dia 1 de cada mês | período para comparar métodos na EDA; mensal (regra G1) quando entrar no ROI | **proposto** |
+
+### Referências da etapa
+
+- BLATTBERG, R. C.; KIM, B.-D.; NESLIN, S. A. **Database marketing**: analyzing and managing
+  customers. New York: Springer, 2008. (Cap. 24: churn voluntário e involuntário.)
+- GROVES, R. M. Nonresponse rates and nonresponse bias in household surveys. **Public Opinion
+  Quarterly**, v. 70, n. 5, 2006.
 
 ---
 

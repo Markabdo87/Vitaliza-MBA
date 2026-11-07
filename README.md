@@ -69,6 +69,7 @@ para gerar as tabelas.
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | chamados com tempo de resolução, resolvidos depois do corte e abandonados marcados |
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | churn mensal por plano, canal e método, ago/24–set/26, conferido com o enunciado · gráficos em `artefatos/01_churn_mensal.html` |
 | `dados/3.ouro/assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026, com a saída em jul–set/26 e as variáveis até 30/06 · gráficos em `artefatos/02_quem_saiu.html` |
+| `dados/3.ouro/saidas.csv` | `notebooks/saidas_ouro.py` | uma assinatura paga encerrada, com o tipo de saída, a antecedência do aviso e a pesquisa de saída · gráficos em `artefatos/03_por_que_saem.html` |
 
 As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
 cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).
