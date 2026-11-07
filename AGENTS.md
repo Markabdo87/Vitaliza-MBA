@@ -116,6 +116,8 @@ Regras das camadas:
 - Cada notebook gera sua tabela do zero, roda da raiz e documenta as regras na docstring.
   Pode ser `.py` ou Jupyter (`.ipynb`), a gosto de quem escreve: o que importa é rodar do zero.
 - Ao criar uma tabela nova, registre-a em "Tabelas prontas" abaixo.
+- `artefatos/00_historia_da_eda.html` resume as páginas 01–04 (EDA da semana 5, no lugar do
+  mini deck); é gerada por `notebooks/eda_historia.py`, que lê o ouro e não cria tabela.
 - Ouro com gráfico gera também uma página em `artefatos/NN_<tabela>.html` (helper
   `notebooks/_artefato.py`). As páginas vão para o git, para o grupo abrir sem rodar nada;
   só têm agregados. A análise anda uma etapa por vez: gera, discute com o grupo, registra
@@ -126,6 +128,7 @@ Rodar (a partir da raiz do repo):
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # toda a prata
 for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # ouro + artefatos
+.venv/bin/python notebooks/eda_historia.py                            # página-resumo 00 (lê o ouro)
 ```
 Os notebooks de prata usam a biblioteca padrão do Python 3, menos `atividades_prata.py`, que
 lê parquet e precisa do `pyarrow`. Os de ouro usam `pandas` e `plotly` e rodam com o venv

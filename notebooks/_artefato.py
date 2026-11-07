@@ -62,6 +62,7 @@ def _md(txt):
     txt = html.escape(txt)
     txt = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", txt)
     txt = re.sub(r"`(.+?)`", r"<code>\1</code>", txt)
+    txt = re.sub(r"\[(.+?)\]\((.+?)\)", r'<a href="\2">\1</a>', txt)
     return txt
 
 

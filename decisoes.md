@@ -509,6 +509,10 @@ no cartão: 17,2%. Já desligou: 32,3% expiraram em 60 dias, 6,9% religaram.
 - Anual: medir a taxa de não renovação (venceu no mês e não renovou). A taxa mensal sobre
   toda a base anual dilui o efeito.
 - Janeiro alto nos dois anos (6,4% e 7,4%): conferir se é vencimento de anuais.
+- A G1 registra média de 5,68% (2025) e 6,67% (jan–set/26), mas a tabela `churn_mensal.csv` atual dá
+  5,62% e 6,62% (média dos 12 e dos 9 meses de `churn_pct`, recorte total), que arredondam para os
+  5,6% e 6,6% do enunciado. Conferir de onde veio o 5,68/6,67 e corrigir a G1 (riscando a antiga).
+  Conferido em 07/11/2026 ao montar a `00_historia_da_eda.html`.
 
 ### Quem saiu em jul–set/2026 (ouro)
 

@@ -373,6 +373,49 @@ Aula 3 (29/10/2026), "Clusterização com k-means", trilha de Tecnologia.
 
 ---
 
+## Etapa 05 · A história da EDA (`artefatos/00_historia_da_eda.html`)
+
+**Pergunta.** Como contar a EDA para quem não vai ler as quatro páginas de detalhe: o professor, o
+mentor e a trilha de Negócios, que escreve o Customer Segmentation Report?
+
+**Formato.** O guia pede que a EDA "conte a história num mini deck". O grupo trocou o deck por uma
+página HTML (07/11/2026): o mesmo roteiro de deck, um achado por seção, sem copiar número à mão.
+
+### Conceitos
+
+- **Título que afirma** (assertion-evidence; ALLEY, 2013). Cada seção tem no título o achado em
+  frase ("A alta é voluntária"), não o tema ("Tipos de saída"); o gráfico é a evidência e duas ou
+  três frases dizem como ler.
+- **Um gráfico por ideia** (KNAFLIC, 2015). Cada seção usa a forma que responde à sua pergunta:
+  linha para o tempo, barras agrupadas para comparar recortes, caixa para duração, barras
+  horizontais para ranquear grupos.
+- **Uma fonte de número.** A página não tem número digitado: lê as tabelas de ouro e refaz cada
+  conta com a regra da etapa. Se o ouro mudar, a história muda junto; o notebook para se um número
+  âncora (churn médio do enunciado, 14.753 ativos, soma dos tipos de saída) não bater.
+
+### O roteiro
+
+1. O churn subiu (5,6% → 6,6% ao mês). 2. Veio do mensal e do Google Play. 3. A alta é de saída
+voluntária. 4. Quem sai avisa: duas semanas no mensal, cinco meses no anual. 5. No mensal pesa o
+tempo de casa; no anual que vence, o treino. 6. Para muitos, a decisão já está tomada
+(causalidade reversa). 7. Quatro grupos estáveis. 8. Personas e prioridade. 9. O que a EDA não
+responde.
+
+### Pontos em debate
+
+| # | Ponto | Opções | Proposta | Status |
+|---|---|---|---|---|
+| D05.1 | Formato da história | mini deck (guia) · página HTML | página HTML gerada do ouro, com links para as páginas 01–04 | **decidido** (07/11/2026; não muda número) |
+| D05.2 | O que vai para o Segmentation Report | gráficos da página 00 · gráficos das páginas de detalhe | a página 00 dá a sequência; os cartões e tabelas da página 04 dão as personas | **proposto** |
+
+### Referências da etapa
+
+- ALLEY, M. **The craft of scientific presentations**. 2. ed. New York: Springer, 2013.
+- KNAFLIC, C. N. **Storytelling with data**: a data visualization guide for business
+  professionals. Hoboken: Wiley, 2015.
+
+---
+
 ## Referências gerais
 
 - CHAPMAN, P. et al. **CRISP-DM 1.0**: step-by-step data mining guide. SPSS, 2000.
