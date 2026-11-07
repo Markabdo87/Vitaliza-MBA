@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -332,6 +332,30 @@ saída até 3 meses de casa, 10,0% acima de 24 meses), dias com treino abr–jun
 vence: dias com treino abr–jun 0,78 (65,7% não renovaram sem nenhum treino no trimestre, 43,0%
 com treino); só entre quem estava com a renovação ligada em 30/06, 0,67 (K7). Mensal android: 29,3% de saída com algum treino de GPS falho contra 25,0% sem.
 
+## Por que saem (ouro) (`2.prata/*` → `3.ouro/saidas.csv`)
+
+Notebook: `notebooks/saidas_ouro.py`. Grão: uma assinatura paga encerrada (= um `user_id`);
+17.830 linhas, 07/07/2024–30/09/2026. Artefato: `artefatos/03_por_que_saem.html`. Conceitos e
+debate de método: `memorial.md`, etapa 03.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| W1 | Quais saídas | **Definir**: assinaturas com `flag_cortesia = 0` e `data_fim` preenchida | Mesma base paga da G2 | 17.830 saídas |
+| W2 | Tipo de saída | **Definir** pelo `motivo_fim` da prata: voluntária = `renovacao_desligada`; involuntária = `falha_pagamento`; devolução = `chargeback` ou `reembolso` | Separa decisão do cliente, falha de cobrança e dinheiro devolvido, que pedem ações diferentes (Em aberto da G) | voluntária 16.145 · involuntária 1.321 · devolução 364 |
+| W3 | Churn por tipo | **Usar** a regra G1 por tipo; ago/24–set/26 (G3) | A soma dos tipos tem de ser o churn do `01_churn_mensal` | soma = perdas da G1 em todos os 26 meses; o notebook para se não bater |
+| W4 | Antecedência do aviso | **Definir** (só voluntária): dias entre o **último** `renovacao_automatica_desligada` e a `data_fim`; desligamento que chega depois do fim (`flag_apos_fim`, loja) conta como 0 e fica em `flag_aviso_apos_fim` | É a janela para intervir. O último desligamento é o que valeu; aviso atrasado da loja (E8) não é antecedência negativa | 91 saídas voluntárias de 2026 com aviso depois do fim (= 0 dia) |
+| W5 | Tema da pesquisa de saída | **Usar** a função `tema` de `pesquisa_saida_prata.py` (palavra-chave, a mesma do diagnóstico Q7); conta que respondeu duas vezes vale a resposta mais recente | Mesmo critério da prata, sem segunda regra. Extração com IA fica para a etapa de variáveis de texto | 641 contas (643 respostas); 353 delas já expiraram até 30/09 |
+
+### Resultado de referência
+
+Média mensal 2025 → jan–set/2026: voluntária 5,12% → 6,09% (+0,97 p.p.), involuntária 0,43%
+→ 0,46%, devolução 0,07% → 0,07%. Mensal voluntária 8,04% → 9,83% (+1,79 p.p.); anual
+voluntária 2,51% → 3,16%. Falha de pagamento em jan–set/26: mensal no cartão 10,7 por 100
+assinaturas, 2,1 a 3,6 nos outros métodos. Antecedência mediana (voluntárias de 2026): mensal
+14 dias (loja 14, site 15), anual 157 (loja 151, site 175); 287 anuais (12,8%) desligaram
+exatamente 42 dias antes do fim. Pesquisa: "objetivo cumprido" em 55,3% dos comentários com
+tema; dos 187 que marcaram `preco` e comentaram, 2 falam de cobrança.
+
 ## Em aberto
 
 ### Usuários
@@ -455,9 +479,9 @@ com treino); só entre quem estava com a renovação ligada em 30/06, 0,67 (K7).
 
 ### Churn mensal (ouro)
 
-- Separar a perda voluntária (renovação desligada, cancelamento) da involuntária (falha de
+- ~~Separar a perda voluntária (renovação desligada, cancelamento) da involuntária (falha de
   pagamento, carência) e da devolução (chargeback, reembolso), usando os eventos anteriores
-  ao fim (E5, E8).
+  ao fim (E5, E8).~~ Feito pelo `motivo_fim` em W2–W3: a subida de 2026 é voluntária.
 - Anual: medir a taxa de não renovação (venceu no mês e não renovou). A taxa mensal sobre
   toda a base anual dilui o efeito.
 - Janeiro alto nos dois anos (6,4% e 7,4%): conferir se é vencimento de anuais.
@@ -467,6 +491,16 @@ com treino); só entre quem estava com a renovação ligada em 30/06, 0,67 (K7).
 - Debates do `memorial.md` (D02.1–D02.6) estão como **proposto**: o grupo confirma a janela
   30/06 + jul–set, a fonte `atividades`, o trimestre abr–jun e o uso do tamanho do efeito.
 - Separar a saída voluntária da involuntária na base K1 (`motivo_fim`): a recusa de cobrança
-  separa pouco no total.
+  separa pouco no total. Tipos definidos em W2; falta aplicar na base K1 (etapa 04).
 - GPS falho no android mensal (+4,3 p.p.): testar se sobrevive ao tipo de treino (quem corre ao
   ar livre) antes de chamar de driver.
+
+### Por que saem (ouro)
+
+- Anual: 287 desligamentos (12,8%) exatamente 42 dias antes do fim, na loja e no site. Conferir
+  se há lembrete de renovação ou e-mail de aviso nessa data (não está no enunciado nem no
+  dicionário).
+- Taxa involuntária por método usa denominador de período (ativos em algum dia de jan–set/26):
+  trocar por taxa mensal se for para o ROI.
+- Tema da pesquisa por palavra-chave (W5): comparar com a extração por IA quando ela existir.
+- Debates D03.1–D03.4 do `memorial.md` estão como **proposto**.
