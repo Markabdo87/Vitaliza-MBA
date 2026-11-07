@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Rascunho de trabalho do Customer Segmentation Report da Vitaliza, com resultados de segmentação pendentes de validação.">
+  <title>Customer Segmentation Report | Vitaliza</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600;700&family=Platypi:wght@700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --roxo: #2e2640;
+      --coral: #ff4545;
+      --verde-escuro: #066d73;
+      --cinza-escuro: #b2b6bf;
+      --cinza-medio: #caced6;
+      --cinza-claro: #e6eaeb;
+      --branco: #ffffff;
+      --titulo: 'Platypi', Georgia, serif;
+      --texto: 'Manrope', Arial, sans-serif;
+    }
+    *, *::before, *::after { border-radius: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--roxo);
+      font-family: var(--texto);
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.55;
+    }
+    main { width: 100%; margin: 0; padding: 0; }
+    .page-inner { width: min(100%, 1120px); margin: 0 auto; padding: 28px 30px 64px; }
+    h1, h2 { color: var(--roxo); font-family: var(--titulo); font-weight: 700; line-height: 1.15; }
+    h1 { margin: 12px 0 10px; font-size: 40px; }
+    h2 { margin: 0 0 14px; font-size: 28px; }
+    h3 { color: var(--roxo); font-family: var(--texto); font-size: 20px; font-weight: 600; line-height: 1.3; margin: 0 0 10px; }
+    p { margin: 0 0 12px; max-width: 78ch; }
+    strong, b { font-weight: 700; }
+    code, pre, kbd, samp { font-family: Consolas, 'Courier New', monospace; }
+    code { overflow-wrap: anywhere; }
+    a { color: var(--branco); text-decoration: none; }
+    a:focus-visible { outline: 2px solid var(--roxo); outline-offset: 3px; }
+    .masthead { display: flex; align-items: flex-start; justify-content: space-between; gap: 28px; padding: 14px 0 26px; border-bottom: 1px solid var(--cinza-medio); }
+    .masthead-copy { max-width: 790px; }
+    .logo { display: block; width: 99px; height: 54px; flex: 0 0 auto; margin: 5px 6px 0 0; }
+    .eyebrow, .section-kicker { margin: 0 0 8px; color: var(--roxo); font-size: 13px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .subtitle { margin: 0; font-size: 18px; font-weight: 300; }
+    .status-note { margin: 22px 0 0; padding: 16px 18px; border-left: 4px solid var(--roxo); background: var(--cinza-claro); }
+    .status-note p { margin: 0; }
+    .meta-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 20px 0 0; }
+    .meta-item { min-height: 82px; padding: 15px 16px; border: 1px solid var(--cinza-medio); }
+    .meta-item dt { margin: 0 0 4px; font-size: 13px; font-weight: 600; }
+    .meta-item dd { margin: 0; font-size: 15px; }
+    section { padding: 38px 0; border-bottom: 1px solid var(--cinza-medio); }
+    .section-intro { margin: 0 0 20px; }
+    .callout { padding: 18px 20px; background: var(--cinza-claro); border-left: 4px solid var(--roxo); }
+    .callout p:last-child { margin-bottom: 0; }
+    .chart-card { margin-top: 18px; padding: 20px; border: 1px solid var(--cinza-medio); background: var(--branco); }
+    .chart-title { margin-bottom: 4px; font-size: 18px; font-weight: 600; }
+    .chart-caption { margin: 0 0 20px; font-size: 14px; }
+    .bar-row { display: grid; grid-template-columns: minmax(205px, 270px) minmax(120px, 1fr) 62px; gap: 14px; align-items: center; margin: 16px 0; }
+    .bar-label { font-size: 14px; font-weight: 600; }
+    .bar-track { height: 24px; background: var(--cinza-claro); }
+    .bar-fill { height: 24px; background: var(--verde-escuro); }
+    .bar-value { font-size: 16px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+    .axis { display: flex; justify-content: space-between; margin: 6px 74px 0 284px; font-size: 12px; }
+    .source-note { margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--cinza-medio); font-size: 13px; }
+    .button-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+    .button-link { display: inline-block; padding: 11px 16px; border: 0; background: var(--coral); color: var(--branco); font-size: 14px; font-weight: 700; }
+    .persona-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .persona-card { padding: 20px; border: 1px solid var(--cinza-medio); background: var(--branco); }
+    .persona-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding-bottom: 12px; margin-bottom: 4px; border-bottom: 1px solid var(--cinza-medio); }
+    .persona-heading h3 { margin: 0; }
+    .persona-tag { flex: 0 0 auto; padding: 4px 7px; border: 1px solid var(--cinza-medio); font-size: 12px; font-weight: 600; }
+    .field-list { margin: 0; }
+    .field-list div { padding: 10px 0; border-bottom: 1px solid var(--cinza-claro); }
+    .field-list div:last-child { border-bottom: 0; }
+    .field-list dt { margin: 0 0 2px; font-size: 13px; font-weight: 600; }
+    .field-list dd { margin: 0; font-size: 14px; }
+    .table-wrap { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 12px 13px; border-bottom: 1px solid var(--cinza-medio); text-align: left; vertical-align: top; }
+    th { background: var(--cinza-claro); font-size: 14px; font-weight: 700; }
+    td { font-size: 14px; }
+    .priority-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .priority-card { padding: 20px; border: 1px solid var(--cinza-medio); }
+    .priority-card h3 { padding-bottom: 10px; border-bottom: 3px solid var(--cinza-medio); }
+    .priority-card.monitor h3 { border-bottom-color: var(--cinza-escuro); }
+    .pending-line { padding: 12px 14px; background: var(--cinza-claro); }
+    .eda-list, .limits-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 18px 0 0; padding: 0; list-style: none; }
+    .eda-list li, .limits-list li { padding: 16px; border: 1px solid var(--cinza-medio); }
+    .item-label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 700; }
+    .source-list { margin: 14px 0 0; padding-left: 22px; }
+    .source-list li { margin: 7px 0; }
+    .footer-note { padding-top: 22px; font-size: 13px; }
+    @media (max-width: 760px) {
+      .page-inner { padding: 20px 18px 48px; }
+      h1 { font-size: 34px; }
+      h2 { font-size: 25px; }
+      .masthead { gap: 18px; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 1fr 58px; gap: 7px 12px; }
+      .bar-label { grid-column: 1 / -1; }
+      .axis { margin-left: 0; margin-right: 70px; }
+      .persona-grid, .priority-grid, .eda-list, .limits-list { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 420px) {
+      .masthead { align-items: center; }
+      .logo { width: 76px; height: auto; }
+      h1 { font-size: 30px; }
+      th, td { padding: 10px; }
+    }
+    @media print {
+      .page-inner { width: 100%; padding: 0; }
+      .button-row { display: none; }
+      section { break-inside: avoid; }
+      .persona-card, .priority-card, .eda-list li, .limits-list li { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<main>
+<div class="page-inner">
+  <header class="masthead">
+    <div class="masthead-copy">
+      <p class="eyebrow">Case Vitaliza · MBA em IA e Dados para Negócios · Módulo 2</p>
+      <h1>Customer Segmentation Report</h1>
+      <p class="subtitle">Relatório de trabalho para organizar evidências, hipóteses e decisões de segmentação.</p>
+    </div>
+    <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTkiIGhlaWdodD0iNTQiIHZpZXdCb3g9IjAgMCA5OSA1NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzM4MDJfMTE4MSkiPgo8cGF0aCBkPSJNNzUuMDM0MiAzMS43NzE4Qzc1Ljc4NzcgMzEuNzcxOCA3Ni4zOTg2IDMwLjkwMDcgNzYuMzk4NiAyOS44MjYxQzc2LjM5ODYgMjguNzUxNSA3NS43ODc3IDI3Ljg4MDQgNzUuMDM0MiAyNy44ODA0Qzc0LjI4MDggMjcuODgwNCA3My42Njk5IDI4Ljc1MTUgNzMuNjY5OSAyOS44MjYxQzczLjY2OTkgMzAuOTAwNyA3NC4yODA4IDMxLjc3MTggNzUuMDM0MiAzMS43NzE4WiIgZmlsbD0iI0ZGNDU0NSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTgxLjYwOTggMS4zODUwMkM4MS40MDYxIDEuNDY5NDUgODAuNTk1MiAxLjcxNTA2IDgwLjg5ODggMS4yNDY4NkM4MS4yNzkzIDAuNzM2NDQ5IDgxLjg4MjYgMC4zOTg3MzQgODIuNDU5MSAwLjE0OTI4NEM4Mi42MzIxIDAuMDgwMjA2MSA4My41MDgzIC0wLjE5OTk0NSA4My4yMzU0IDAuMjQ5MDY0QzgyLjg1NSAwLjc4NjMzOSA4Mi4yMDE2IDEuMTI3ODkgODEuNjEzNiAxLjM4NTAyTTcwLjQyNjIgMjYuMTI2NUM2OS42NjUyIDI2LjI1NyA2OS41OTk5IDI1LjA5MDQgNjkuNjM4MyAyNC41ODc2QzY5LjcxNTIgMjMuODYyMyA2OS45ODQyIDIyLjg0MTUgNzAuNzM3NSAyMi41NDIyQzcxLjUxNzYgMjIuMzI3MiA3MS42MDYgMjMuNTI0NiA3MS41NzE0IDI0LjAzMTJDNzEuNDk4NCAyNC43NTY1IDcxLjIyOTQgMjUuODg4NiA3MC40MjYyIDI2LjEyNjVaTTc1LjU5OTEgNi4yNzQyMkM3NS4yMzQgNi40ODUzIDc0LjkxNSA2LjQwNDcgNzUuMTYwOSA1Ljk2NzIxQzc1LjUwNjggNS4zOTUzOSA3Ni4wMjE4IDQuOTE1NjggNzYuNTkwNiA0LjU3NDEzQzc2LjkxMzQgNC4zODk5MiA3Ny4zNDc3IDQuMzU5MjIgNzcuMDk0MSA0LjgyMzU4Qzc2LjczNjYgNS40MTg0MiA3Ni4xOTA5IDUuOTE3MzIgNzUuNjAyOSA2LjI3ODA2TTgxLjU3MTMgMjQuMjE5MkM4MC40NjA3IDI0LjMxNTIgNzkuNzk1OCAyMy4zMjUgNzkuODIyNyAyMi4zMDQyQzc5LjkxNDkgMjEuMjAyOCA4MC42NTI4IDIwLjEyMDYgODEuNzc4OSAxOS44ODI2QzgyLjg5NzIgMTkuNzMzIDgzLjYxMjEgMjAuNjk2MiA4My42MDQ0IDIxLjczNjJDODMuNTI3NSAyMi44NzIyIDgyLjc1MTIgMjQuMDIzNSA4MS41NzEzIDI0LjIxNTRNODUuMzM3NyAyLjA2NDI5Qzg1LjAxODcgMi4xNTYzOSA4My45ODQ5IDIuMzI1MjUgODQuMjQ2MiAxLjY5NTg3Qzg0LjU4MDYgMS4wNTQ5OCA4NS4zNjg0IDAuNjk0MjM1IDg2LjAyOTQgMC40ODdDODYuMzI1MyAwLjQwMjU3MSA4Ny4zODYxIDAuMTk5MTc0IDg3LjE4MjQgMC44MTMyMDNDODYuODc4OCAxLjQ4ODYzIDg2LjAwMjUgMS44NTcwNSA4NS4zMzc3IDIuMDY4MTJNODEuOTY3MiAxNy44OTQ3QzgwLjcwMjggMTguMDkwNCA3OS44MzA0IDE3LjEyNzIgNzkuOTYxMSAxNS44OTUzQzgwLjE4NzggMTQuNTQ4MyA4MS4yMzMxIDEzLjM3MzkgODIuNTU1MiAxMy4wMjA5QzgzLjc5MjcgMTIuNzcxNCA4NC43NzI3IDEzLjYxOTUgODQuNjg4MiAxNC44NzgzQzg0LjQ5OTggMTYuMzAyMSA4My4zNyAxNy41NzYyIDgxLjk2MzQgMTcuODk0N004OS4zODA3IDE2LjEyNTVDODguMzIgMTYuMjI1MyA4Ny4zMDU0IDE1LjU2MTQgODcuMzUxNSAxNC40MjE2Qzg3LjQ4MjEgMTMuMjY2NSA4OC40ODkgMTIuNDEwNyA4OS41OTk3IDEyLjIxODhDOTAuNjQxMiAxMi4wOTk4IDkxLjY3ODkgMTIuNzEzOSA5MS42ODI3IDEzLjgzODNDOTEuNTk4MiAxNS4wNDMzIDkwLjUyOTggMTUuOTQ1MiA4OS4zODA3IDE2LjEyMTdNODQuMTMwOSA1LjY3MTcxQzgzLjQ3NzYgNS44NDQ0IDgyLjI3ODUgNS44MDk4NiA4Mi41ODk4IDQuODMxMjVDODIuOTg5NSAzLjg0MTEzIDg0LjA2MTcgMy4yMDQwOCA4NS4wMzc5IDIuODkzMjNDODUuNjM3NCAyLjcyODIxIDg2LjkyMSAyLjY1OTEzIDg2LjY5ODEgMy42MjYyMkM4Ni4zNDg0IDQuNjg5MjYgODUuMTQxNiA1LjM2MDg1IDg0LjEzNDcgNS42NzE3MU04Mi44NTExIDExLjI2MzJDODEuNzAyIDExLjUxNjUgODAuNTI2IDEwLjk1MjQgODAuODA2NiA5LjYzMjE5QzgxLjIwMjQgOC4yNDI5NSA4Mi40NzgzIDcuMjAyOTQgODMuODI3MyA2Ljc5MjMxQzg0LjkwMzQgNi41MTk4MyA4Ni4yMzMxIDYuODk1OTMgODYuMDQ4NiA4LjIzMTQ0Qzg1LjcyMiA5LjczMTk3IDg0LjI4MDggMTAuODY3OSA4Mi44NTExIDExLjI2N005Ni44OTQxIDguMTMxNjZDOTYuMDMzMiA4LjE5MzA2IDk0Ljc5MTggNy44MTMxMyA5NC43NzI2IDYuNzc2OTZDOTQuODU3MiA1Ljc2MzgxIDk1Ljk5NDggNS4yNzI1OSA5Ni44Nzg3IDUuMTkyQzk3LjY4OTYgNS4xNDk3OCA5OC45NjU1IDUuNDY4MzEgOTkuMDA3OCA2LjQ3Mzc4Qzk5LjA1MzkgNy41MTM3OSA5Ny43NTQ5IDguMDcwMjYgOTYuODkwMiA4LjEzMTY2TTkwLjUzMzYgMy44NzU2N0M4OS45OTE3IDMuOTYwMSA4OC44MDQyIDMuOTQwOTEgODguOTQ2NCAzLjExNTgxQzg5LjE3MzEgMi4zMDk5IDkwLjE3NjIgMS45MTg0NSA5MC45MjE4IDEuNzcyNjJDOTEuNDUyMSAxLjY4ODE5IDkyLjYxMjggMS42ODA1MiA5Mi41NTUxIDIuNDc4NzZDOTIuMzg5OSAzLjMzMDcyIDkxLjI4MyAzLjczMzY4IDkwLjUzMzYgMy44NzU2N1pNODkuODA3MyA5LjYzNjAzQzg4LjcyMzUgOS43NzQxOSA4Ny4yNDM5IDkuMzUyMDQgODcuMzkzNyA4LjAwMTE4Qzg3LjY1ODkgNi42NzcxOCA4OS4wMjcxIDUuODcxMjcgOTAuMjY0NiA1LjYzMzMzQzkxLjMwOTkgNS40Nzk4MiA5Mi43OTcyIDUuODIxMzggOTIuNzcwMyA3LjEzMDAzQzkyLjYwODkgOC41NDYxMyA5MS4wODMyIDkuNDA5NjEgODkuODA3MyA5LjYzNjAzTTcxLjA0NDkgMjAuODQ5N0M3MC4xMjI2IDIxLjE0OTEgNzAuMTE0OSAxOS44MDk3IDcwLjIxNDggMTkuMjM0MUM3MC40MTg1IDE4LjI1OTMgNzAuOTE0MiAxNy4xMjcyIDcxLjg0NDMgMTYuNjQzNkM3Mi43ODIgMTYuMjQ4NCA3Mi44NjY2IDE3LjUxNDggNzIuNzYyOCAxOC4xMzY1QzcyLjU1OTEgMTkuMTM4MSA3Mi4wNTE4IDIwLjQxNjEgNzEuMDQ0OSAyMC44NDk3Wk02OC4xNTg3IDIxLjY3MUM2Ny42MDE0IDIxLjkxMjggNjcuNzMyMSAyMC44MDc1IDY3Ljc3ODIgMjAuNTM4OUM2Ny45MTI3IDE5Ljg5NDIgNjguMTU4NyAxOS4wODQ0IDY4LjczNTIgMTguNjk2OEM2OS4zMDc4IDE4LjM4OTggNjkuMTk2MyAxOS40ODM1IDY5LjE0NjQgMTkuNzY3NUM2OS4wMTE5IDIwLjQxNjEgNjguNzY5OCAyMS4zMTQxIDY4LjE1NDggMjEuNjcxTTczLjk2MTkgOS44ODE2NEM3My4zMjAxIDEwLjIzMDkgNzMuMTIwMiA5Ljc0NzMyIDczLjM2NjIgOS4xNzU1MUM3My43NjU5IDguMzM1MDYgNzQuNDIzMSA3LjU5MDU1IDc1LjIxODYgNy4xMDMxNkM3NS43OTg5IDYuNzc2OTYgNzYuMTkwOSA3LjA0MTc2IDc1LjkyMTkgNy42ODY0OUM3NS41MDY4IDguNTY5MTYgNzQuNzk5NyA5LjM3ODkxIDczLjk2MTkgOS44ODE2NE03Mi4yMTcxIDE1LjEyMzlDNzEuMjY0IDE1LjU2MTQgNzEuMjMzMiAxNC40MjE2IDcxLjQyOTIgMTMuNzc2OUM3MS44MDIgMTIuNjc5MyA3Mi41MTY4IDExLjU5MzIgNzMuNTMxNCAxMC45ODY5Qzc0LjQ1IDEwLjUwNzIgNzQuNjc2NyAxMS4zODk5IDc0LjQ2MTUgMTIuMTQ1OUM3NC4wODEgMTMuMzA0OSA3My4zMTYyIDE0LjUyNTIgNzIuMjE3MSAxNS4xMjM5TTY3LjQxMzEgMTcuNTcyNEM2Ny4wMjUgMTcuODcxNyA2Ny4yMzYzIDE2Ljk1MDYgNjcuMjgyNSAxNi44MDFDNjcuNDY2OSAxNi4yMjUzIDY3LjcyMDYgMTUuNjAzNiA2OC4xNzAyIDE1LjE4MTVDNjguNTc3NiAxNC44NDM4IDY4LjM4MTYgMTUuNzE0OSA2OC4zMjc4IDE1Ljg5MTRDNjguMTM1NiAxNi40Nzg2IDY3Ljg4NTggMTcuMTUwMiA2Ny40MTMxIDE3LjU3MjRNNzEuMDA2NSAxMS41NTQ5QzcwLjU2NDUgMTEuODY1NyA3MC42Mzc1IDExLjMyMDggNzAuNzY0NCAxMS4wMjkxQzcxLjA0MTEgMTAuNDM0MyA3MS40MzY5IDkuODY2MjkgNzEuOTU5NiA5LjQ2MzM0QzcyLjM4NjIgOS4xNTYzMiA3Mi40MDE1IDkuNTgyMyA3Mi4yNTE3IDkuOTIwMDJDNzEuOTYzNCAxMC41MzQgNzEuNTUyMiAxMS4xMzY2IDcxLjAwNjUgMTEuNTU0OVpNNjkuMjQ2MyAxNi42NTlDNjguNTU4NCAxNy4wNzM1IDY4Ljc2NTkgMTUuODc5OSA2OC44Njk3IDE1LjU0MjJDNjkuMTU0MSAxNC42ODI2IDY5LjYxNTMgMTMuNzc2OSA3MC4zNTMxIDEzLjIxMjdDNzEuMDQ4OCAxMi43NDQ2IDcwLjkyOTYgMTMuNzg0NiA3MC44MDY2IDE0LjE5NTJDNzAuNTA2OSAxNS4wODU1IDcwLjAzOCAxNi4wOTQ4IDY5LjI0NjMgMTYuNjU1MU03NC45OTE4IDI1Ljk2OTJDNzMuODczNSAyNi4wOTIgNzMuNTA0NSAyNC44MDI1IDczLjU1MDcgMjMuOTE2QzczLjY1MDYgMjIuODUzIDc0LjIwNCAyMS41ODY2IDc1LjMxNDcgMjEuMjYwNEM3Ni40NTk5IDIxLjAzMzkgNzYuODkwNCAyMi4zMjcyIDc2Ljg1MTkgMjMuMjM2OEM3Ni43NTk3IDI0LjMyNjcgNzYuMTgzMiAyNS43MTk3IDc0Ljk5MTggMjUuOTY5MlpNNzUuNDc5OSAxOS43ODI5Qzc0LjE4ODYgMjAuMDc4NCA3My43Njk3IDE4LjcyNzUgNzMuOTMxMSAxNy42OTUyQzc0LjIwMDEgMTYuMzU5NiA3NS4wNTcyIDE0Ljk4OTYgNzYuMzcxNSAxNC40NzkyQzc3LjY1MTMgMTQuMDgwMSA3OC4yMjc4IDE1LjI3NzQgNzguMDg1NiAxNi4zODY1Qzc3LjgzNTggMTcuNzk0OSA3Ni45MDk2IDE5LjMzNzcgNzUuNDc5OSAxOS43ODY3TTc4LjIyMDEgNy45ODE5OUM3Ny40NTE1IDguMjg1MTcgNzYuNjgyOCA4LjAyODA0IDc3LjA1NTYgNy4xMDdDNzcuNTUxNCA2LjA0NzggNzguNTI3NiA1LjIxMTE4IDc5LjU3NjcgNC43Mjc2NEM4MC4yNDE2IDQuNDUxMzIgODEuMjUyNCA0LjQ3NDM1IDgwLjkxMDMgNS40NDE0NUM4MC40MjYxIDYuNTgxMjQgNzkuMzMwOCA3LjQ5MDc3IDc4LjIxNjMgNy45ODU4M003Ni42MjEzIDEzLjM1NDdDNzUuNDUzIDEzLjc0MjMgNzQuODg0MiAxMi44MzY3IDc1LjE4NCAxMS43NjU5Qzc1LjYyOTggMTAuNDIyOCA3Ni42NzkgOS4yMjkyNCA3Ny45NzggOC42NTM1OEM3OS4wNTc5IDguMjM5MTEgNzkuODk5NiA4Ljg0MTYzIDc5LjYyNjcgMTAuMDA4M0M3OS4yMDAxIDExLjQ1NTEgNzguMDI3OSAxMi43OTQ0IDc2LjYyMTMgMTMuMzU0N1pNNzkuODk5NiA0LjA2NzU2Qzc5LjUwNzYgNC4yMzI1OCA3OC43MDA1IDQuMzUxNTQgNzkuMDQyNSAzLjcwMjk4Qzc5LjQ2OTEgMi45OTMwMSA4MC4yMTQ3IDIuNDgyNTkgODAuOTU2NCAyLjE0ODcyQzgxLjI4NyAyLjAxMDU2IDgyLjIyMDggMS43OTE4MSA4MS45MDk1IDIuNDQwMzhDODEuNDg2OCAzLjE4ODczIDgwLjY2NDQgMy43MjIxNiA3OS44OTk2IDQuMDcxMzkiIGZpbGw9IiNGRjQ1NDUiLz4KPHBhdGggZD0iTTEuMzY0MzIgMzEuNzcxOEMyLjExNzgyIDMxLjc3MTggMi43Mjg2NSAzMC45MDA3IDIuNzI4NjUgMjkuODI2MUMyLjcyODY1IDI4Ljc1MTUgMi4xMTc4MiAyNy44ODA0IDEuMzY0MzIgMjcuODgwNEMwLjYxMDgyOSAyNy44ODA0IDAgMjguNzUxNSAwIDI5LjgyNjFDMCAzMC45MDA3IDAuNjEwODI5IDMxLjc3MTggMS4zNjQzMiAzMS43NzE4WiIgZmlsbD0iI0ZGNDU0NSIvPgo8cGF0aCBkPSJNMi40NjM4NSAzNS42NDc5SDAuMjYxNzE5VjUzLjczNDlIMi40NjM4NVYzNS42NDc5WiIgZmlsbD0iIzJFMjY0MCIvPgo8cGF0aCBkPSJNOC4yOTM5NSAzNi42NjkxQzkuODEyIDM2LjAyNDQgMTIuNTA5OSAzNS4zNDEzIDE1LjczODIgMzUuMzQxM0MyMC4wNjU2IDM1LjM0MTMgMjMuMDY3MSAzNi43ODQzIDIzLjA2NzEgNDIuNTQ0NlY1My43MzE1SDIwLjg2NDlWNDIuNTgzQzIwLjg2NDkgMzguMTQ2NyAxOC43NzgxIDM3LjQyNTIgMTUuNzM4MiAzNy40MjUyQzEzLjQ1OTIgMzcuNDI1MiAxMS44MjU4IDM3Ljc2NjcgMTAuNDk2MSAzOC4yOTYzVjUzLjcyNzZIOC4yOTM5NVYzNi42NjUzVjM2LjY2OTFaIiBmaWxsPSIjMkUyNjQwIi8+CjxwYXRoIGQ9Ik0yOC4yOTc5IDI4LjA5NTdIMzAuNVYzNS42NDgzSDM4LjA5NDFWMzcuNzMyMUgzMC41VjQ3LjQ0MTRDMzAuNSA1MC45Mjk5IDMyLjA1NjUgNTEuOTE2MiAzNC4zMzU1IDUxLjkxNjJDMzUuODUzNSA1MS45MTYyIDM3LjQ4NjkgNTEuNTc0NiAzOC41NTE0IDUxLjA0NUwzOC44OTM1IDUzLjA5NDRDMzcuNzU1OSA1My42MjQgMzYuMDQ1NyA1NC4wMDM5IDM0LjM3MzkgNTQuMDAzOUMzMC44NDIgNTQuMDAzOSAyOC4yOTc5IDUyLjI5NjEgMjguMjk3OSA0Ny40NDUzVjI4LjA5OTVWMjguMDk1N1oiIGZpbGw9IiMyRTI2NDAiLz4KPHBhdGggZD0iTTU3LjIwOTggNDUuNTgwMkg0NC40NTA1VjQ1LjczMzdDNDQuNDUwNSA1MC4xMzE3IDQ2Ljg3OTQgNTEuOTUwOCA1MC44MzAyIDUxLjk1MDhDNTMuMDMyMyA1MS45NTA4IDU1LjE5NiA1MS4zODI4IDU2LjYwMjYgNTAuNjIzTDU2LjkwNjIgNTIuNjcyM0M1NS4xNjE0IDUzLjU0MzQgNTMuMDcwOCA1NC4wMDAxIDUwLjc5MTggNTQuMDAwMUM0NS4wOTYyIDU0LjAwMDEgNDIuMjEgNTEuMTU2NCA0Mi4yMSA0NC42NzA3QzQyLjIxIDM5LjUxMjkgNDQuMDcwMSAzNS4zNDEzIDQ5Ljk1NzggMzUuMzQxM0M1NC42NjU3IDM1LjM0MTMgNTcuNTEzNSAzNy45OTcgNTcuNTEzNSA0My4xODk0QzU3LjUxMzUgNDMuOTg3NiA1Ny40MzY2IDQ0Ljg1ODggNTcuMjA5OCA0NS41ODAyTTQ0LjQ1MDUgNDMuNjQ2MUg1NS40MjI4VjQzLjQ1OEM1NS40MjI4IDM5LjA2IDUzLjIyMDYgMzcuMzUyMyA0OS45MTU1IDM3LjM1MjNDNDYuNjEwNCAzNy4zNTIzIDQ0LjQ0NjcgMzkuMDYgNDQuNDQ2NyA0My40NThWNDMuNjQ2MUg0NC40NTA1WiIgZmlsbD0iIzJFMjY0MCIvPgo8cGF0aCBkPSJNNjIuMzQ0NyAyOC4wNjFINjQuNTQ2OVY0OC41NzczQzY0LjU0NjkgNTEuMTk0NiA2NS40MTkzIDUxLjg3NzcgNjYuNzQ5IDUxLjg3NzdDNjcuNTA5OSA1MS44Nzc3IDY4LjA3ODcgNTEuNzYyNSA2OC41MzIyIDUxLjUzNjFMNjguODc0MyA1My41NDcxQzY4LjM3ODUgNTMuNzczNSA2Ny42NTk4IDUzLjkyNyA2Ni42NzIxIDUzLjkyN0M2NC4yMDQ4IDUzLjkyNyA2Mi4zNDQ3IDUyLjY3NTkgNjIuMzQ0NyA0OC44NDU5VjI4LjA2NDlWMjguMDYxWiIgZmlsbD0iIzJFMjY0MCIvPgo8cGF0aCBkPSJNNzYuMTM3NyAzNS42NDc5SDczLjkzNTVWNTMuNzM0OUg3Ni4xMzc3VjM1LjY0NzlaIiBmaWxsPSIjMkUyNjQwIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMzgwMl8xMTgxIj4KPHJlY3Qgd2lkdGg9Ijk5IiBoZWlnaHQ9IjU0IiBmaWxsPSIjMkUyNjQwIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" alt="Marca Inteli">
+  </header>
+
+  <div class="status-note" role="note" aria-label="Status do documento">
+    <p><strong>Rascunho de trabalho, análise em andamento.</strong> Os segmentos, os drivers de churn e a priorização ainda não foram consolidados. Os campos pendentes são intencionais, para evitar apresentar hipótese como resultado.</p>
+  </div>
+
+  <dl class="meta-grid" aria-label="Informações da entrega">
+    <div class="meta-item"><dt>Trilha</dt><dd>Negócios, com evidências de EDA</dd></div>
+    <div class="meta-item"><dt>Data de corte dos dados</dt><dd>30/09/2026</dd></div>
+    <div class="meta-item"><dt>Prazo informado no guia</dt><dd>15/11/2026, 23h59</dd></div>
+  </dl>
+
+  <section id="resumo">
+    <p class="section-kicker">01 · Síntese</p>
+    <h2>Resumo executivo</h2>
+    <p class="section-intro">A síntese final deve responder, com dados, quais grupos de clientes são úteis para decisão, como diferem em comportamento e que evidências sustentam cada hipótese de churn.</p>
+    <div class="callout">
+      <p><strong>Texto a fechar depois da EDA:</strong> resumir o principal padrão observado, a lógica de segmentação, a prioridade preliminar e a principal ressalva. Não nomear personas nem atribuir causas antes de validar os resultados.</p>
+    </div>
+  </section>
+
+  <section id="contexto">
+    <p class="section-kicker">02 · Evidência já registrada</p>
+    <h2>Contexto de churn documentado</h2>
+    <p class="section-intro">Este é o ponto de partida já registrado no projeto, não uma conclusão sobre os segmentos.</p>
+    <div class="chart-card">
+      <p class="chart-title">Média mensal de churn da base paga</p>
+      <p class="chart-caption">Comparação descritiva dos períodos: ano completo de 2025 e janeiro a setembro de 2026.</p>
+      <div class="bar-row">
+        <div class="bar-label">2025</div>
+        <div class="bar-track" role="img" aria-label="5,6 por cento, em escala de zero a oito por cento"><div class="bar-fill" style="width:70%"></div></div>
+        <div class="bar-value">5,6%</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Jan a set/2026</div>
+        <div class="bar-track" role="img" aria-label="6,6 por cento, em escala de zero a oito por cento"><div class="bar-fill" style="width:82.5%"></div></div>
+        <div class="bar-value">6,6%</div>
+      </div>
+      <div class="axis" aria-hidden="true"><span>0%</span><span>2%</span><span>4%</span><span>6%</span><span>8%</span></div>
+      <p class="source-note"><strong>Regra e fonte:</strong> perdas de assinaturas pagas no mês divididas pelos assinantes pagantes ativos no primeiro dia do mês, com cortesias internas excluídas. Valores arredondados, conforme o registro do projeto em <code>decisoes.md</code> (G1) e <code>artefatos/01_churn_mensal.html</code>. Os períodos têm durações diferentes e a comparação não identifica causa.</p>
+      <div class="button-row"><a class="button-link" href="../artefatos/01_churn_mensal.html" target="_blank" rel="noopener">Abrir a série de churn no repositório</a></div>
+    </div>
+  </section>
+
+  <section id="personas">
+    <p class="section-kicker">03 · Saída da segmentação</p>
+    <h2>Personas a construir com evidências</h2>
+    <p class="section-intro">O guia pede de três a quatro segmentos. Estes cartões são espaços de trabalho, não perfis encontrados nos dados. Manter apenas a quantidade que a análise sustentar.</p>
+    <div class="persona-grid">
+      <article class="persona-card">
+        <div class="persona-heading"><h3>Segmento A, nome a definir</h3><span class="persona-tag">Pendente</span></div>
+        <dl class="field-list">
+          <div><dt>Perfil e necessidade</dt><dd>A preencher com variáveis observadas.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+        </dl>
+      </article>
+      <article class="persona-card">
+        <div class="persona-heading"><h3>Segmento B, nome a definir</h3><span class="persona-tag">Pendente</span></div>
+        <dl class="field-list">
+          <div><dt>Perfil e necessidade</dt><dd>A preencher com variáveis observadas.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+        </dl>
+      </article>
+      <article class="persona-card">
+        <div class="persona-heading"><h3>Segmento C, nome a definir</h3><span class="persona-tag">Pendente</span></div>
+        <dl class="field-list">
+          <div><dt>Perfil e necessidade</dt><dd>A preencher com variáveis observadas.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+        </dl>
+      </article>
+      <article class="persona-card">
+        <div class="persona-heading"><h3>Segmento D, opcional</h3><span class="persona-tag">Só se sustentado</span></div>
+        <dl class="field-list">
+          <div><dt>Perfil e necessidade</dt><dd>Usar somente se um quarto grupo for interpretável.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section id="hipoteses">
+    <p class="section-kicker">04 · Interpretação</p>
+    <h2>Hipóteses de driver e validação</h2>
+    <p class="section-intro">Preencher uma linha por segmento mantido. Cruzamentos observacionais indicam associação; não demonstram causalidade.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Segmento</th><th>Hipótese a testar</th><th>Evidência que sustentará a leitura</th><th>Ressalva</th></tr></thead>
+        <tbody>
+          <tr><td>A, B ou C</td><td>Pendente de análise</td><td>Diferença observável, medida, período e notebook de origem</td><td>Cobertura, viés ou mudança de medição</td></tr>
+          <tr><td>Outro segmento</td><td>Pendente de análise</td><td>Diferença observável, medida, período e notebook de origem</td><td>Cobertura, viés ou mudança de medição</td></tr>
+          <tr><td>D, se houver</td><td>Pendente de análise</td><td>Diferença observável, medida, período e notebook de origem</td><td>Cobertura, viés ou mudança de medição</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="prioridade">
+    <p class="section-kicker">05 · Decisão preliminar</p>
+    <h2>Prioridade: agir ou monitorar</h2>
+    <p class="section-intro">A classificação só será preenchida depois de comparar risco, tamanho do grupo, evidência e possibilidade de intervenção. Nenhum segmento está alocado nesta versão.</p>
+    <div class="priority-grid">
+      <article class="priority-card">
+        <h3>Ação imediata</h3>
+        <p>Critério proposto: evidência consistente e relevante, hipótese verificável e ação viável de curto prazo.</p>
+        <p class="pending-line"><strong>Segmentos:</strong> ainda não definidos.</p>
+      </article>
+      <article class="priority-card monitor">
+        <h3>Monitorar</h3>
+        <p>Critério proposto: sinal que merece acompanhamento, mas cuja evidência, estabilidade ou possibilidade de ação ainda precisa de validação.</p>
+        <p class="pending-line"><strong>Segmentos:</strong> ainda não definidos.</p>
+      </article>
+    </div>
+  </section>
+
+  <section id="eda">
+    <p class="section-kicker">06 · Base tecnológica</p>
+    <h2>Evidências que a EDA precisa trazer</h2>
+    <p class="section-intro">O relatório final deve ligar cada persona a gráficos e medidas reproduzíveis, gerados a partir do código do projeto.</p>
+    <ul class="eda-list">
+      <li><span class="item-label">População e preparo</span>Declarar unidade de análise, filtros, corte temporal, dados ausentes e exclusões.</li>
+      <li><span class="item-label">Padrões de churn</span>Detalhar diferenças por plano, canal e variáveis comportamentais, com denominadores e período.</li>
+      <li><span class="item-label">Engajamento e qualidade</span>Conferir comparabilidade das medidas de uso e separar sinais de problemas de cobertura ou medição.</li>
+      <li><span class="item-label">Segmentação</span>Justificar variáveis, método, escala e quantidade de grupos; perfilar os grupos e verificar se são interpretáveis.</li>
+    </ul>
+    <div class="callout" style="margin-top:16px">
+      <p><strong>Sobre o método:</strong> a aula 3 aborda k-Means, mas o algoritmo e o número de grupos não estão definidos por este rascunho. A escolha deve ser justificada pelos dados e pela utilidade das personas.</p>
+    </div>
+  </section>
+
+  <section id="intervencao">
+    <p class="section-kicker">07 · Desdobramento para a semana 10</p>
+    <h2>Plano de intervenção de risco (Churn)</h2>
+    <p class="section-intro">A entrega da semana 10 pede ligar segmentos de risco a uma intervenção, comunicação e retorno esperado. O prazo informado no guia é 20/12/2026. Esta seção é uma estrutura de trabalho: nenhum segmento, oferta, limiar de risco ou ROI está fechado.</p>
+    <div class="callout">
+      <p><strong>Dependências:</strong> concluir a segmentação e a EDA, validar o modelo de risco para o horizonte de 60 dias e só então escolher a quem contatar. O score, por si só, não define uma oferta nem demonstra que a intervenção funcionará.</p>
+    </div>
+    <h3 style="margin-top:24px">Matriz de intervenção a preencher</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Segmento</th><th>Elegibilidade e risco</th><th>Intervenção e comunicação</th><th>Medição</th></tr></thead>
+        <tbody>
+          <tr><td>A, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
+          <tr><td>B, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
+          <tr><td>C, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
+          <tr><td>D, se a análise sustentar</td><td>Definir somente se houver um quarto grupo interpretável e útil.</td><td>Não presumir que o grupo precise da mesma oferta dos demais.</td><td>Comparar resultado e custo separadamente, se houver amostra suficiente.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="priority-grid" style="margin-top:18px">
+      <article class="priority-card">
+        <h3>Desenho de teste</h3>
+        <p>Definir grupo tratado e comparação adequada antes do contato. A campanha de ago/2026 pode informar a análise de uplift; abertura e clique medem atenção, não retenção.</p>
+        <p class="pending-line"><strong>Resultado do teste:</strong> pendente de análise.</p>
+      </article>
+      <article class="priority-card">
+        <h3>Economia da intervenção</h3>
+        <p>Estimar o benefício incremental de retenção e subtrair o custo total da ação, incluindo oferta, contato, tokens de IA e infraestrutura.</p>
+        <p><strong>Estrutura do cálculo:</strong> ROI = (benefício incremental atribuível à intervenção menos custo total da intervenção) dividido pelo custo total da intervenção. Preencher após validar as premissas.</p>
+        <p class="pending-line"><strong>ROI, payback e premissas:</strong> pendentes de quantificação.</p>
+      </article>
+    </div>
+    <div class="callout" style="margin-top:18px">
+      <p><strong>Indicadores a fechar:</strong> taxa de retenção, uplift contra a comparação, custo por cliente contatado e payback. O cálculo deve usar as premissas de negócio da seção 03 do enunciado e custos de tecnologia efetivamente estimados, sem supor conversão ou efeito da oferta.</p>
+    </div>
+  </section>
+
+  <section id="limites">
+    <p class="section-kicker">08 · Leitura responsável</p>
+    <h2>Limitações conhecidas para manter visíveis</h2>
+    <ul class="limits-list">
+      <li><span class="item-label">Corte dos dados</span>O corte oficial é 30/09/2026. Não usar informação posterior ao corte em variáveis ou conclusões sobre o período.</li>
+      <li><span class="item-label">Histórico de churn</span>O histórico começa em jul/2024; na série mensal, ago a dez/2024 têm viés de sobrevivência e exigem cautela.</li>
+      <li><span class="item-label">Uso mensal</span>A contagem de sessões mudou em mar/2026 e a cobertura de meses sem treino varia. Comparações precisam respeitar as flags documentadas.</li>
+      <li><span class="item-label">Pesquisa de saída</span>As respostas são autosselecionadas e vêm de cancelamentos pelo site. Não generalizar automaticamente para toda a base.</li>
+      <li><span class="item-label">Suporte e GPS</span>O pico de chamados de GPS em maio e junho de 2026 é uma pista para investigar, não prova de que o incidente causou churn.</li>
+      <li><span class="item-label">Correlação e causa</span>Diferenças entre segmentos ajudam a formular hipóteses. Causalidade exige desenho de validação apropriado.</li>
+    </ul>
+  </section>
+
+  <section id="fontes">
+    <p class="section-kicker">09 · Referências</p>
+    <h2>Fontes e atualização</h2>
+    <p>Base de trabalho: documentos oficiais e decisões registradas no repositório Vitaliza-MBA. A estrutura deste HTML está alinhada ao escopo da entrega da semana 5; valores e segmentos devem ser atualizados após a análise e a discussão do grupo.</p>
+    <ul class="source-list">
+      <li><code>AGENTS.md</code>, escopo da entrega, corte e limites metodológicos.</li>
+      <li><code>decisoes.md</code>, decisões de limpeza e métrica de churn (G1).</li>
+      <li><code>artefatos/01_churn_mensal.html</code>, visualização já existente de churn.</li>
+      <li><code>notebooks/</code>, código de preparo e análise atualmente versionado.</li>
+    </ul>
+    <p class="footer-note"><strong>Atualizado em 07/11/2026.</strong> Este arquivo é um rascunho interno, não substitui os notebooks de EDA nem o mini deck. O botão para a série de churn usa um caminho relativo do repositório; se o HTML for enviado sozinho para outro local, esse link não acompanhará o arquivo.</p>
+  </section>
+</div>
+</main>
+</body>
+</html>
