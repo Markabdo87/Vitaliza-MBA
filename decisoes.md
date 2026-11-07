@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro) · `L` segmentação (ouro) · `N` segmentos k-means de nove variáveis (ouro) · `R` conciliação dos segmentos (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro) · `L` segmentação (ouro) · `N` segmentos k-means de nove variáveis (ouro) · `R` recusas de cobrança (ouro) · `X` conciliação dos segmentos (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -127,16 +127,17 @@ Notebook: `notebooks/pagamentos_prata.py`. Bronze: 165.548 linhas · prata: 163.
 | P3 | Lojas gravam em UTC (`...Z`); site em horário de Brasília | **Corrigir**: lojas −3h; tudo em `data_hora_brt`. Origem guardada em `fuso_origem` | Cortar por dia ou mês com fusos misturados joga cobranças no período errado | 110.824 linhas convertidas · 12.709 mudam de dia · 453 mudam de mês · set/26: −R$ 100,90 |
 | P4 | Estornos e chargebacks lançados pelo preço de tabela, não pelo valor cobrado | **Corrigir**: valor = −(última cobrança aprovada do usuário antes da devolução). Original em `valor_bronze`; cobrança de referência em `pagamento_id_original` | Devolver mais do que o cliente pagou distorce a receita líquida | 179 devoluções: 138 de −39,90 → −34,90 e 41 de −299,90 → −239,90 · +R$ 3.150,00 no total · set/26: +R$ 360,00 |
 | P5 | Coluna `tentativa` não registra retentativa: recusa seguida de nova cobrança volta a `1`, e `2` aparece em renovações normais | **Corrigir** em coluna nova `tentativa_real`; original em `tentativa_bronze` | Sem isso não se separa quem saiu por cobrança falha. Regra: cobrança até 16 dias depois de uma recusa do mesmo usuário é retentativa (o maior intervalo observado foi 15 dias) | 6.585 linhas com tentativa diferente da bronze · retentativas aprovadas: 4.812 (bronze) → 1.881 (prata) · devoluções ficam sem tentativa |
-| P6 | Cobranças recusadas | **Manter** (não entram no faturamento) | São a base da análise de churn involuntário | 3.250 linhas · R$ 191.935,00 tentados e não recebidos · para faturar, filtrar `status != 'recusado'` |
+| ~~P6~~ | ~~Cobranças recusadas~~ | ~~**Manter** (não entram no faturamento)~~ → ver P12 | São a base da análise de churn involuntário | 3.250 linhas · R$ 191.935,00 tentados e não recebidos · para faturar, filtrar `status != 'recusado'` |
 | P7 | Duas cobranças aprovadas do mesmo usuário com menos de 20 dias entre elas | **Marcar** `flag_intervalo_curto = 1` | Pode ser ciclo reiniciado depois de retentativa ou cobrança em dobro; sem cruzar com `eventos_assinatura.csv` não dá para afirmar erro | 223 linhas · nenhum valor removido |
 | P8 | Mensal de R$ 34,90 aprovado depois do reajuste de 01/03/2026 | **Marcar** `flag_preco_antigo = 1` | Concentradas nos primeiros dias de março: provável cobrança atrasada do ciclo de fevereiro | 16 linhas · nenhum valor removido |
 | P9 | Meio de pagamento com nomes diferentes entre arquivos (`cartao`/`pix_automatico` aqui, `web_cartao`/`web_pix` em `assinaturas.csv`) | **Corrigir** só no cruzamento; coluna nova `canal` (`loja`/`site`) | Mesmo conceito com rótulo diferente; o valor original de `metodo` fica intacto | nenhuma linha alterada |
 | P10 | 48 cobranças no cartão de assinantes cadastrados como `web_pix` | **Manter** | Troca de meio de pagamento é plausível; `assinaturas` guarda só a situação atual | nenhuma |
 | P11 | Taxa sobre devoluções | **Premissa**: a taxa é devolvida junto (`valor_liquido` da devolução também desconta a taxa) | O enunciado não diz se loja e operadora devolvem a taxa | ≈ R$ 400 em set/26 |
+| P12 | Cobranças recusadas com `valor` e `valor_liquido` preenchidos (o valor tentado): somar a coluna sem filtrar `status` contava dinheiro que não entrou | **Manter** as linhas e **corrigir** `valor` e `valor_liquido` para 0; valor tentado em `valor_bronze` | Recusa não gera receita. Com zero, a soma da coluna já é o faturamento, com ou sem filtro; as linhas continuam servindo ao churn involuntário (ver R1–R5) | 3.250 linhas zeradas · R$ 191.935,00 tentados (R$ 178.450,30 líquidos) saem da soma sem filtro · set/26 sem filtro: R$ 503.015,90 → R$ 489.873,50 bruto e R$ 446.246,38 → R$ 434.056,93 líquido · faturamento com filtro inalterado |
 
 ### Resultado de referência
 
-Faturamento com a prata (`status != 'recusado'`):
+Faturamento com a prata (soma de `valor` e `valor_liquido`; desde P12 o filtro `status != 'recusado'` não muda o resultado):
 
 | Recorte | Bruto | Líquido de taxas |
 |---|---:|---:|
@@ -148,7 +149,7 @@ Conciliação de set/2026, do valor puro ao final:
 | Etapa | Faturamento | Efeito |
 |---|---:|---:|
 | Soma de todas as linhas com data de setembro | R$ 509.587,50 | — |
-| − recusados (P6) | R$ 496.445,10 | −13.142,40 |
+| − recusados (P6, P12) | R$ 496.445,10 | −13.142,40 |
 | + fuso (P3) | R$ 496.344,20 | −100,90 |
 | − duplicatas (P1) | R$ 489.513,50 | −6.830,70 |
 | devoluções pelo valor cobrado (P4) | R$ 489.873,50 | +360,00 |
@@ -404,13 +405,13 @@ mensal, Parados saem 46,7% contra 12,6% dos Engajados. Base de 30/09: 8.368 · 3
 
 ## Conciliação dos segmentos (ouro) (`3.ouro/segmentos.csv` + `3.ouro/segmentos_kmeans.csv` → `3.ouro/conciliacao_segmentos.csv`)
 
-Notebook: `notebooks/conciliacao_segmentos_ouro.py`. Grão: segmento L × segmento N × data de
+Notebook: `notebooks/conciliacao_segmentos.py`. Grão: segmento L × segmento N × data de
 referência (31/07 e 30/09/2026), 36 linhas. Cruza `segmentos.csv` (decisões L1–L8) com `segmentos_kmeans.csv` (N1–N7). Página:
 `estudos-analises/rascunho_customer_segmentation_report.html`, seção 04.
 
 | # | Problema | Decisão | Motivo | Efeito na contagem |
 |---|---|---|---|---|
-| R1 | Duas segmentações k-means para o mesmo relatório | **Usar** os quatro grupos de L (renovação ligada, quatro variáveis da aula) como personas e a saída por decisão de L2; **usar** "Já desligou" (L) e "Cobrança falhando" (N) como listas operacionais; "Recém-chegados" (N) vira recorte (mensal com até 90 dias) dentro dos Ativos; "Parados" e "Engajados" de N ficam só no cruzamento. Prioridade: ação imediata se a saída em 60 dias ≥ 1,5 × a média **ou** o grupo tem o maior número esperado de saídas (taxa × base de 30/09) | Mesma base de 14.032 em 31/07, mas eixos diferentes (Rand ajustado 0,046 sem "Já desligou"). Em N, 58% dos Parados já tinham desligado a renovação (causalidade reversa, K7 da etapa "quem saiu"); L separa estável (Rand 0,999 em reamostras, silhueta 0,43). Recusas e treino dos últimos 30 dias, que só N tem, separam a cobrança. A saída por decisão chega meses antes do fim no anual (1.502 decidiram, 711 já tinham `data_fim` na janela) | Personas em 30/09: Parados 514 · Ativos ao ar livre 6.327 · Ativos em ambiente fechado 4.616 · Veteranos 1.046 (12.503). Listas: Já desligou 2.250 · Cobrança falhando 462 (se sobrepõe às personas). Ação imediata: Parados (29,8%) e Ativos ao ar livre (≈ 887 saídas) |
+| X1 | Duas segmentações k-means para o mesmo relatório | **Usar** os quatro grupos de L (renovação ligada, quatro variáveis da aula) como personas e a saída por decisão de L2; **usar** "Já desligou" (L) e "Cobrança falhando" (N) como listas operacionais; "Recém-chegados" (N) vira recorte (mensal com até 90 dias) dentro dos Ativos; "Parados" e "Engajados" de N ficam só no cruzamento. Prioridade: ação imediata se a saída em 60 dias ≥ 1,5 × a média **ou** o grupo tem o maior número esperado de saídas (taxa × base de 30/09) | Mesma base de 14.032 em 31/07, mas eixos diferentes (Rand ajustado 0,046 sem "Já desligou"). Em N, 58% dos Parados já tinham desligado a renovação (causalidade reversa, K7 da etapa "quem saiu"); L separa estável (Rand 0,999 em reamostras, silhueta 0,43). Recusas e treino dos últimos 30 dias, que só N tem, separam a cobrança. A saída por decisão chega meses antes do fim no anual (1.502 decidiram, 711 já tinham `data_fim` na janela) | Personas em 30/09: Parados 514 · Ativos ao ar livre 6.327 · Ativos em ambiente fechado 4.616 · Veteranos 1.046 (12.503). Listas: Já desligou 2.250 · Cobrança falhando 462 (se sobrepõe às personas). Ação imediata: Parados (29,8%) e Ativos ao ar livre (≈ 887 saídas) |
 
 ### Resultado de referência
 
@@ -419,6 +420,37 @@ até 90 dias de casa, 1.104 estão em Recém-chegados (N). Cobrança falhando (N
 193 nos Ativos ao ar livre e 189 nos de ambiente fechado. Dentro dos Ativos ao ar livre, quem
 está em Parados de N (pouco treino nos últimos 30 dias) sai 25,9% pela decisão, contra 11,7%
 dos Engajados.
+## Recusas de cobrança (ouro) (`2.prata/pagamentos.csv` + `2.prata/assinaturas.csv` → `3.ouro/recusas_cobranca.csv`)
+
+Notebook: `notebooks/recusas_cobranca_ouro.py`. Grão: uma cobrança recusada; jul/2024–set/2026,
+3.250 linhas de 3.013 assinantes. Saídas: `dados/3.ouro/recusas_cobranca.csv`, a planilha
+`dados/3.ouro/recusas_cobranca.xlsx` (abas `recusas`, `resumo_mensal`, `resumo_canal`,
+`regras`) e o artefato `artefatos/06_recusas_cobranca.html`.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| R1 | O que é um caso de recusa | **Definir**: uma linha por cobrança com `status = 'recusado'`; a retentativa é a cobrança seguinte do mesmo usuário com `tentativa_real = 2` (até 16 dias, P5) | Nos dados cada recusa tem no máximo uma retentativa: nenhuma cobrança tem `tentativa_real` 3 | 3.250 recusas · 3.013 assinantes · 1.881 retentativas, todas aprovadas |
+| R2 | Desfecho de cada recusa | **Definir**: `recuperada` = retentativa aprovada; `perdida` = sem retentativa aprovada e a assinatura terminou depois da recusa; `em_aberto` = sem retentativa aprovada e assinatura ativa em 30/09/2026 | Separa o que a retentativa salva do que vira churn involuntário. O notebook para se alguma recusa não cair em um dos três | 1.881 recuperadas · 1.321 perdidas · 48 em aberto (recusas de 16 a 30/09/2026) |
+| R3 | Perdida = `motivo_fim = falha_pagamento` | **Conferir** no notebook | As 1.321 perdidas são exatamente as 1.321 assinaturas com `falha_pagamento` em `assinaturas`, uma recusa por assinatura | 0 divergências |
+| R4 | Taxa de recuperação | **Definir**: recuperadas ÷ (recuperadas + perdidas); em aberto fica fora | Recusa em aberto ainda não tem desfecho | 58,7% (1.881 ÷ 3.202) |
+| R5 | Valores | **Usar** `valor_bronze` como valor tentado (P12) e a taxa do método (enunciado, seção 03); valor recuperado = valor da retentativa aprovada | Mesmas premissas do faturamento | R$ 191.935,00 tentados · R$ 110.186,90 recuperados (R$ 102.610,77 líquidos) |
+
+### Resultado de referência
+
+3.250 recusas: 1.881 recuperadas, 1.321 perdidas, 48 em aberto; recuperação de 58,7%. Sem
+retentativa aprovada, a assinatura expira **7 dias** depois da recusa no site (cartão e Pix) e
+**16 dias** na loja (App Store e Google Play), sem exceção. Recuperação por método e plano:
+de 42,4% (App Store anual, 33 recusas) a 63,6% (Pix anual, 11); no volume, cartão mensal
+60,3% (1.488 recusas) e Google Play mensal 58,8% (645).
+
+## Conferências (`notebooks/conferencias.py`)
+
+Não gera tabela: confere de uma vez as contagens de cada tabela (bronze = dicionário, prata =
+"Visão geral da prata"), os números de referência (faturamento de set/26, 14.753 ativos, 717 e
+3.389 expirações), os cruzamentos entre tabelas (nenhum `user_id` órfão; cada cobrança
+aprovada com início/renovação no mesmo dia; nenhuma cobrança fora da vida da assinatura;
+só os preços do enunciado; P12) e o ouro já gerado (5,6% e 6,6%; R3). Sai com erro se algo
+quebrar. Rode depois de mexer em qualquer notebook.
 
 ## Em aberto
 
@@ -452,7 +484,7 @@ dos Engajados.
 
 - P7 e P8: conferidos com `eventos_assinatura.csv` (ver "Eventos de assinatura" acima): os
   dois casos têm renovação registrada no log, então não são erro. Falta o grupo decidir se
-  passam de marcar para manter (riscar P7/P8 e abrir P12/P13); as flags continuam na prata.
+  passam de marcar para manter (riscar P7/P8 e abrir P13/P14); as flags continuam na prata.
 
 ### Uso mensal
 
@@ -600,6 +632,12 @@ dos Engajados.
 - ~~Numeração das páginas colide (`02_segmentos_kmeans` × `02_quem_saiu`).~~ Resolvido na
   integração: a página do k-means de nove variáveis é `05_segmentos_kmeans.html` e a de
   recusas de cobrança, `06_recusas_cobranca.html`.
+- ~~A letra R da conciliação colide com R1–R5 (recusas de cobrança).~~ Resolvido na
+  integração: a conciliação passou a X1.
+- ~~O laço `notebooks/*_ouro.py` roda em ordem alfabética: `assinantes_30jun26_ouro.py` lê o
+  `churn_mensal.csv` antes de ele existir, e a conciliação lê os dois k-means.~~ Resolvido na
+  integração: `churn_mensal_ouro.py` roda antes do laço e a conciliação virou
+  `conciliacao_segmentos.py`, rodado depois (instruções no `AGENTS.md` e no `README.md`).
 - ~~`segmentos_ouro.py` quebra no pandas 2.x (`np.maximum` entre data e `Timestamp`).~~
   Trocado por `b.inicio.clip(lower=INICIO_ARQUIVO)` na integração; mesmo resultado.
-- Validar R1 com o grupo (Camila, Douglas) antes de fechar o relatório de 15/11.
+- Validar X1 com o grupo (Camila, Douglas) antes de fechar o relatório de 15/11.

@@ -9,8 +9,11 @@ Correções aplicadas:
   5. tentativa: a coluna original não registra retentativa. tentativa_real é reconstruída
      pela sequência do usuário: cobrança até 16 dias depois de uma recusa = retentativa.
   6. taxa: 15% loja, 3,5% cartão, 0,99% Pix (enunciado, seção 03) -> valor_liquido.
+  7. recusados: não entra dinheiro, então valor e valor_liquido = 0. O valor tentado fica
+     em valor_bronze. Assim somar valor/valor_liquido sem filtrar status já dá o faturamento.
 
-Não remove nada além das duplicatas. Recusados ficam (servem para churn involuntário);
+Não remove nada além das duplicatas. Recusados ficam, com valor zero (servem para churn
+involuntário);
 casos suspeitos e não confirmados viram flag:
   flag_intervalo_curto  aprovado <20 dias depois de outro aprovado do mesmo usuário
   flag_preco_antigo     mensal de 34,90 aprovado a partir de 01/03/2026
@@ -100,6 +103,8 @@ def main():
                     antigo = r["v"] == 34.90 and r["t"] >= REAJUSTE
                     ultima_aprovada = r
                 ultima_cobranca = r
+            if r["status"] == "recusado":
+                valor = 0.0
             taxa = TAXA[r["metodo"]]
             saida.append({
                 "pagamento_id": r["pagamento_id"],
@@ -128,9 +133,13 @@ def main():
         w.writeheader()
         w.writerows(saida)
 
-    corrigidas = sum(1 for r in saida if r["valor"] != r["valor_bronze"])
+    corrigidas = sum(1 for r in saida if r["status"] in ("estornado", "chargeback")
+                     and r["valor"] != r["valor_bronze"])
+    recusados = [r for r in saida if r["status"] == "recusado"]
+    tentado = sum(Decimal(r["valor_bronze"]) for r in recusados)
     print(f"{len(saida)} linhas -> {SAIDA}")
     print(f"duplicatas removidas: {duplicatas} · devoluções corrigidas: {corrigidas}")
+    print(f"recusados com valor zerado: {len(recusados)} · R$ {tentado} tentados (em valor_bronze)")
 
 
 if __name__ == "__main__":

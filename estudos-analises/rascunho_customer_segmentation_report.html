@@ -150,7 +150,7 @@
   </header>
 
   <div class="status-note" role="note" aria-label="Status do documento">
-    <p><strong>Versão conciliada, em revisão do grupo.</strong> Reúne a EDA e o k-means de quatro variáveis da Douglas (páginas 00 a 04, decisões L1–L8) e o k-means de nove variáveis do ramo principal (página 05_segmentos_kmeans, decisões N1–N7), cruzados assinante por assinante (decisão R1). As taxas de saída são históricas (ago–set/2026) e descrevem os grupos; não são previsão.</p>
+    <p><strong>Versão conciliada, em revisão do grupo.</strong> Reúne a EDA e o k-means de quatro variáveis da Douglas (páginas 00 a 04, decisões L1–L8) e o k-means de nove variáveis (página 05_segmentos_kmeans, decisões N1–N7), cruzados assinante por assinante (decisão X1). As taxas de saída são históricas (ago–set/2026) e descrevem os grupos; não são previsão.</p>
   </div>
 
   <dl class="meta-grid" aria-label="Informações da entrega">
@@ -319,7 +319,7 @@
           </tbody>
         </table>
       </div>
-      <p class="source-note"><strong>Regra e fonte:</strong> <code>dados/3.ouro/conciliacao_segmentos.csv</code>, gerada por <code>notebooks/conciliacao_segmentos_ouro.py</code> (R1), que só cruza as duas tabelas de ouro. Os "Já desligou" não têm taxa de decisão: já tinham decidido.</p>
+      <p class="source-note"><strong>Regra e fonte:</strong> <code>dados/3.ouro/conciliacao_segmentos.csv</code>, gerada por <code>notebooks/conciliacao_segmentos.py</code> (X1), que só cruza as duas tabelas de ouro. Os "Já desligou" não têm taxa de decisão: já tinham decidido.</p>
     </div>
     <ul class="eda-list">
       <li><span class="item-label">Os "Parados" de nove variáveis misturam dois públicos</span>Dos 2.755, 1.587 (58%) já tinham desligado a renovação. Separados, os que ainda estão com a renovação ligada (1.168) saem 25,6% pela decisão. Por isso as personas tiram quem já decidiu.</li>
@@ -383,7 +383,7 @@
       <li><span class="item-label">População e preparo</span>Pagantes sem cortesias; corte 30/09/2026; horários em Brasília; duplicatas e fusos tratados na prata (<code>decisoes.md</code>, seções U a Z).</li>
       <li><span class="item-label">Padrões de churn</span>Churn mensal por plano, canal e tipo de saída; antecedência do aviso; pesquisa de saída (páginas 01 e 03; decisões G e W).</li>
       <li><span class="item-label">Engajamento e qualidade</span>Quem saiu em jul–set por tempo de casa, treino e GPS, com a situação da renovação reconstruída pelos eventos (página 02; decisões K da etapa "quem saiu").</li>
-      <li><span class="item-label">Segmentação</span>Dois k-means e o cruzamento entre eles (página 04 e 05_segmentos_kmeans; decisões L, N e R1).</li>
+      <li><span class="item-label">Segmentação</span>Dois k-means e o cruzamento entre eles (página 04 e 05_segmentos_kmeans; decisões L, N e X1).</li>
     </ul>
     <div class="table-wrap" style="margin-top:16px">
       <table>
@@ -394,7 +394,8 @@
           <tr><td><code>saidas_ouro.py</code></td><td><code>saidas.csv</code></td><td><code>03_por_que_saem.html</code></td></tr>
           <tr><td><code>segmentos_ouro.py</code></td><td><code>segmentos.csv</code></td><td><code>04_segmentos.html</code></td></tr>
           <tr><td><code>segmentos_kmeans_ouro.py</code></td><td><code>segmentos_kmeans.csv</code></td><td><code>05_segmentos_kmeans.html</code></td></tr>
-          <tr><td><code>conciliacao_segmentos_ouro.py</code></td><td><code>conciliacao_segmentos.csv</code></td><td>esta página, seção 04</td></tr>
+          <tr><td><code>recusas_cobranca_ouro.py</code></td><td><code>recusas_cobranca.csv</code></td><td><code>06_recusas_cobranca.html</code></td></tr>
+          <tr><td><code>conciliacao_segmentos.py</code></td><td><code>conciliacao_segmentos.csv</code></td><td>esta página, seção 04</td></tr>
           <tr><td><code>eda_historia.py</code></td><td>lê o ouro acima</td><td><code>00_historia_da_eda.html</code> (mini deck)</td></tr>
         </tbody>
       </table>
@@ -454,9 +455,9 @@
     <h2>Fontes e atualização</h2>
     <ul class="source-list">
       <li><code>documentos/</code>: enunciado (seções 02 e 03), dicionário de dados e guia de entregas.</li>
-      <li><code>decisoes.md</code>: G (churn mensal), K (quem saiu), W (por que saem), L (personas), N (k-means de 9 variáveis) e R1 (conciliação).</li>
+      <li><code>decisoes.md</code>: G (churn mensal), K (quem saiu), W (por que saem), L (personas), N (k-means de 9 variáveis), R (recusas de cobrança) e X1 (conciliação).</li>
       <li><code>memorial.md</code>: método e debate de cada etapa da EDA.</li>
-      <li><code>artefatos/00_historia_da_eda.html</code> a <code>04_segmentos.html</code> e <code>05_segmentos_kmeans.html</code>.</li>
+      <li><code>artefatos/00_historia_da_eda.html</code> a <code>06_recusas_cobranca.html</code>.</li>
     </ul>
     <div class="button-row"><a class="button-link" href="../artefatos/00_historia_da_eda.html" target="_blank" rel="noopener">Abrir a história da EDA</a><a class="button-link" href="../artefatos/04_segmentos.html" target="_blank" rel="noopener">Abrir os segmentos</a></div>
     <p class="footer-note"><strong>Atualizado em 07/11/2026.</strong> Os links usam caminhos relativos do repositório; se o HTML for enviado sozinho, eles não acompanham o arquivo.</p>

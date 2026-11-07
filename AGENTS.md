@@ -131,12 +131,15 @@ Rodar (a partir da raiz do repo):
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # toda a prata
+.venv/bin/python notebooks/churn_mensal_ouro.py                       # antes do laço: assinantes_30jun26 lê o churn_mensal
 for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # ouro + artefatos
+.venv/bin/python notebooks/conciliacao_segmentos.py                   # cruza os dois k-means (lê o ouro)
 .venv/bin/python notebooks/eda_historia.py                            # página-resumo 00 (lê o ouro)
+.venv/bin/python notebooks/conferencias.py                             # confere tudo
 ```
 Os notebooks de prata usam a biblioteca padrão do Python 3, menos `atividades_prata.py`, que
 lê parquet e precisa do `pyarrow`. Os de ouro usam `pandas` e `plotly` e rodam com o venv
-(`.venv/bin/python notebooks/<tabela>_ouro.py`); todos em `requirements.txt`. Dependência nova entra no
+(`.venv/bin/python notebooks/<tabela>_ouro.py`); planilha `.xlsx` usa `openpyxl`; todos em `requirements.txt`. Dependência nova entra no
 `requirements.txt` com versão fixada.
 
 ## Armadilhas conhecidas dos dados
@@ -155,6 +158,8 @@ Já confirmado:
     (−39,90 em quem pagou 34,90; −299,90 em quem pagou 239,90 com cupom);
   - a coluna `tentativa` não registra retentativa: recusa seguida de nova cobrança aparece
     como `tentativa = 1` de novo. Use `tentativa_real` da prata.
+  - recusados vêm com o valor tentado em `valor`; na prata ficam com 0 (P12). Sem retentativa
+    aprovada, a assinatura expira 7 dias depois da recusa no site e 16 dias na loja.
 - Preço: mensal R$ 34,90 até 28/02/2026 e R$ 39,90 desde 01/03/2026; anual R$ 299,90
   (R$ 239,90 no 1º ano com cupom de influenciador).
 - **Nem todo "loja" é UTC.** UTC com `Z`: `pagamentos` e `eventos_assinatura` (lojas).
@@ -200,7 +205,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/2.prata/usuarios.csv` | `notebooks/usuarios_prata.py` | uma conta | 63.989 contas sem duplicatas; para análise de cliente filtre `flag_conta_teste = 0`; `idade_corte` vazia em 3.837 contas; hora de cadastro só vale com `flag_hora_cadastro_desconhecida = 0` |
 | `dados/2.prata/assinaturas.csv` | `notebooks/assinaturas_prata.py` | uma assinatura (= um `user_id`), retrato de 01/10/2026 | situação atual, não histórico (para datas passadas use eventos); `canal`/`metodo` alinhados a pagamentos; filtre `flag_cortesia = 0` para base paga; `flag_inicio_antes_historico` = sem rastro nos logs |
 | `dados/2.prata/eventos_assinatura.csv` | `notebooks/eventos_assinatura_prata.py` | um evento | ordenada por `user_id` e `seq_usuario`; horários em Brasília (`data_hora_brt`, `mes`); fim de assinatura = `assinatura_expirada`, fim de trial = `trial_expirado`; linhas com `flag_apos_fim = 1` não mudam o estado (contam como causa do fim, não como evento novo) e conte cancelamento por `renovacao_automatica_desligada` (não some `cancelamento_web`) |
-| `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | uma cobrança | inclui recusados; para faturamento filtre `status != 'recusado'` e some `valor` (bruto) ou `valor_liquido` (após taxas) |
+| `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | uma cobrança | inclui recusados com `valor` e `valor_liquido` zerados (P12; valor tentado em `valor_bronze`); para faturamento some `valor` (bruto) ou `valor_liquido` (após taxas) |
 | `dados/2.prata/uso_mensal.csv` | `notebooks/uso_mensal_prata.py` | um usuário e mês | jan/25–set/26; valores da bronze intactos. Para comparar 2025 com 2026 filtre `flag_sem_treino = 0`; não compare `sessoes_app` antes e depois de mar/26 (`flag_sessoes_nova_contagem`); em 2026 subconta treinos de relógio |
 | `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | um treino | `inicio_brt` em Brasília, `tipo` em português (6 tipos). Para minutos e km, ignore nulos em `duracao_min`/`distancia_km`; `flag_inicio_repetido` marca possíveis registros em dobro. Set/2026: 150.946 treinos; 36.551 usuários no arquivo |
 | `dados/2.prata/amizades.csv` | `notebooks/amizades_prata.py` | uma relação de seguir (mão única) | `seguidor_id` segue `seguido_id` desde `desde` (data, sem hora); `reciproco` marca conexão mútua; para variável de modelo filtre `flag_apos_corte = 0` |
@@ -215,10 +220,13 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/3.ouro/segmentos.csv` | `notebooks/segmentos_ouro.py` | um assinante pagante ativo × `data_ref` (2026-07-31 ou 2026-09-30) | `segmento` = Parados, Ativos ao ar livre, Ativos em ambiente fechado, Veteranos (k-means k = 4 nas quatro variáveis da aula, ajustado em 31/07, L1–L5) ou Já desligou (renovação desligada, fora do agrupamento); `saiu_60d` só em 31/07 e fora de Já desligou (L2); 30/09 classificado com os mesmos centros (L8), 14.753 ativos; gera `artefatos/04_segmentos.html` |
 | `dados/3.ouro/pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | mês × meio de pagamento | jul/24–set/26; aprovadas, devoluções (no mês do lançamento) e recusadas; `valor_bruto` = aprovado − devolvido; soma set/26 = referência abaixo |
 | `dados/3.ouro/segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | assinante × data de referência (31/07 e 30/09/26) | k-means k = 4 em 9 variáveis de comportamento (N1–N7); `segmento`, variáveis, plano/canal/sistema e `saiu_60d` (só em 31/07); gera `artefatos/05_segmentos_kmeans.html` |
-| `dados/3.ouro/conciliacao_segmentos.csv` | `notebooks/conciliacao_segmentos_ouro.py` | segmento L × segmento N × data de referência | cruza `segmentos.csv` (L1–L8) com `segmentos_kmeans.csv` (N1–N7); assinantes e saída em 60 dias pelas duas réguas (decisão e fim); alimenta o Customer Segmentation Report (R1) |
+| `dados/3.ouro/conciliacao_segmentos.csv` | `notebooks/conciliacao_segmentos.py` | segmento L × segmento N × data de referência | cruza `segmentos.csv` (L1–L8) com `segmentos_kmeans.csv` (N1–N7); assinantes e saída em 60 dias pelas duas réguas (decisão e fim); alimenta o Customer Segmentation Report (X1) |
+
+| `dados/3.ouro/recusas_cobranca.csv` | `notebooks/recusas_cobranca_ouro.py` | uma cobrança recusada | jul/24–set/26, 3.250 recusas com desfecho `recuperada`/`perdida`/`em_aberto` (R1–R5); gera também `recusas_cobranca.xlsx` e `artefatos/06_recusas_cobranca.html` |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
-R$ 434.056,93 líquido de taxas.
+R$ 434.056,93 líquido de taxas. `notebooks/conferencias.py` confere esse e os demais números
+de referência e cruzamentos de uma vez; rode depois de mexer em qualquer notebook.
 
 ## Regras de trabalho
 

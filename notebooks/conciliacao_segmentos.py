@@ -1,4 +1,4 @@
-"""Ouro -> ouro: conciliacao_segmentos.csv (segmento L × segmento N × data de referência).
+"""Ouro -> ouro (não termina em _ouro: roda depois do laço dos notebooks de ouro): conciliacao_segmentos.csv (segmento L × segmento N × data de referência).
 
 Cruza, assinante por assinante, as duas segmentações k-means do grupo para o Customer
 Segmentation Report:
@@ -10,7 +10,7 @@ Segmentation Report:
   - N (`segmentos_kmeans.csv`, notebook `segmentos_kmeans_ouro.py`, decisões N1–N7): todos os pagantes ativos, nove variáveis de comportamento, cobrança e tempo de
     casa. Saída em 60 dias = assinatura terminada (`data_fim`) de 01/08 a 29/09.
 
-Regras (decisão R1 no decisoes.md):
+Regras (decisão X1 no decisoes.md):
   1. As duas tabelas têm de cobrir os mesmos `user_id` em cada data de referência (31/07 e
      30/09/2026); o notebook para se não cobrirem.
   2. Uma linha por par (segmento L, segmento N, data): assinantes e, em 31/07, a saída em 60
@@ -22,7 +22,7 @@ Regras (decisão R1 no decisoes.md):
 Pré-requisito: rodar antes `notebooks/segmentos_kmeans_ouro.py` e `notebooks/segmentos_ouro.py`
 .
 
-Uso: .venv/bin/python notebooks/conciliacao_segmentos_ouro.py  (a partir da raiz do repo)
+Uso: .venv/bin/python notebooks/conciliacao_segmentos.py  (a partir da raiz do repo)
 """
 import sys
 
