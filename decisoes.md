@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` segmentos k-means (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -309,6 +309,28 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 2,63% → 3,33% (+0,70 p.p.); loja 5,38% → 6,34%; site 6,15% → 7,26%; Google Play 5,35% →
 6,71% (+1,36 p.p.) contra App Store 5,40% → 5,98% (+0,57 p.p.).
 
+## Segmentos k-means (ouro) (prata → `3.ouro/segmentos_kmeans.csv`)
+
+Notebook: `notebooks/segmentos_kmeans_ouro.py`. Grão: assinante × data de referência
+(31/07/2026 e 30/09/2026), 28.785 linhas. Artefato: `artefatos/02_segmentos_kmeans.html`.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| K1 | Quem segmentar | **Definir**: assinaturas pagas (`flag_cortesia = 0`) ativas no fim da data de referência (`inicio <= ref` e `data_fim` vazia ou depois de `ref`) | O relatório da semana 5 segmenta a base que pode sair | 14.032 em 31/07/26 · 14.753 em 30/09/26 |
+| K2 | Data de ajuste | **Ajustar** o k-means em 31/07/2026 e medir a saída nos 60 dias seguintes (`data_fim` de 01/08 a 29/09/26); em 30/09 só **atribuir** o centróide mais próximo, com a padronização de 31/07 | Em 30/09 o horizonte de 60 dias ainda não aconteceu; 31/07 é a última data com 60 dias observados até o corte | saída em 60 dias da base de 31/07: 10,5% |
+| K3 | Variáveis | **Usar** nove variáveis de comportamento até `ref`: treinos em 30 dias, tendência (30 dias contra os 60 anteriores), dias sem treinar (teto 120), sessões no app (média de 3 meses), conexões recíprocas, posts em 90 dias, chamados + treinos com GPS falho em 90 dias, recusas em 180 dias, meses de assinatura. Contagens em `log1p`, z-score com média e desvio de 31/07 | Só informação até a data de referência; treinos de `atividades` (sem `flag_inicio_repetido`), que conta o relógio que `uso_mensal` subconta (M9) | — |
+| K4 | Plano, canal, sistema | **Não usar** no agrupamento; só para descrever os segmentos | O anual só sai na renovação: com plano no k-means o segmento repetiria o plano | — |
+| K5 | Número de segmentos | **k = 4** (k-means++, 20 inicializações, `random_state = 7`) | Guia pede 3–4 segmentos; entre 3 e 4, k = 4 tem o maior silhouette (0,237; k = 3: 0,203). k = 5 (0,253) separa Android com GPS falho, que sai 7,6%, abaixo da média | — |
+| K6 | Nome dos segmentos | **Rotular** pelo traço do centróide: maior recusa = Cobrança falhando; mais dias sem treino = Parados; menos meses de assinatura = Recém-chegados; o restante = Engajados | Rótulo estável se a ordem dos clusters mudar | — |
+
+### Resultado de referência
+
+Base de 31/07/2026, saída em 60 dias: Engajados 8.218 (58,6%) saem 6,8% · Recém-chegados
+2.614 (18,6%) saem 9,4% · Parados 2.755 (19,6%, 93% anual) saem 20,9% · Cobrança falhando
+445 (3,2%, 90% mensal, 64% site) saem 18,9%, 32% das saídas por falha de pagamento. No
+mensal, Parados saem 46,7% contra 12,6% dos Engajados. Base de 30/09: 8.368 · 3.477 · 2.446 ·
+462.
+
 ## Em aberto
 
 ### Usuários
@@ -438,3 +460,10 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 - Anual: medir a taxa de não renovação (venceu no mês e não renovou). A taxa mensal sobre
   toda a base anual dilui o efeito.
 - Janeiro alto nos dois anos (6,4% e 7,4%): conferir se é vencimento de anuais.
+
+### Segmentos k-means (ouro)
+
+- Discutir com o grupo os quatro segmentos e os rótulos antes do Segmentation Report (15/11).
+- Decidir se o segmento entra no modelo de churn como variável ou fica só para comunicação.
+- Reajustar quando a extração com IA trouxer objetivo do onboarding e intenção de sair no feed.
+- Cruzar segmentos com o resultado da campanha de ago/26 (uplift por segmento).

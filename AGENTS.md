@@ -203,6 +203,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | um chamado | 4.422 chamados de 3.989 contas, 01/07/2025–30/09/2026, `aberto_em` em Brasília; `texto_cliente` é texto bruto para a extração com IA; `categoria_atendente` diverge do texto em 33,6% (S9); para variável de modelo trate `flag_resolvido_pos_corte = 1` como aberto; `flag_aberto_antigo` marca chamados abandonados |
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | mês × recorte × segmento | ago/24–set/26; churn = perdas ÷ ativos no dia 1 (G1), reproduz o enunciado; recortes total, plano, canal, plano_canal, metodo; gera `artefatos/01_churn_mensal.html` |
 | `dados/3.ouro/pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | mês × meio de pagamento | jul/24–set/26; aprovadas, devoluções (no mês do lançamento) e recusadas; `valor_bruto` = aprovado − devolvido; soma set/26 = referência abaixo |
+| `dados/3.ouro/segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | assinante × data de referência (31/07 e 30/09/26) | k-means k = 4 em 9 variáveis de comportamento (K1–K6); `segmento`, variáveis, plano/canal/sistema e `saiu_60d` (só em 31/07); gera `artefatos/02_segmentos_kmeans.html` |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas.

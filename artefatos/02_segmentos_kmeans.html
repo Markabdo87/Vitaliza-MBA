@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>02 · Segmentos (k-means) · Vitaliza G07</title>
+<style>
+body { background:#fcfcfb; color:#0b0b0b; font:15px/1.55 Inter, system-ui, sans-serif;
+       margin:0; padding:24px 16px 64px; }
+main { max-width:960px; margin:0 auto; }
+h1 { font-size:26px; margin:0 0 4px; } h2 { font-size:19px; margin:40px 0 8px; }
+h3 { font-size:15px; margin:20px 0 6px; }
+.sub { color:#52514e; margin:0 0 4px; } .meta { color:#52514e; font-size:13px; }
+p, li { max-width:72ch; } code { background:#f0efea; padding:1px 4px; border-radius:4px; font-size:13px; }
+figure { margin:12px 0 4px; } figcaption { color:#52514e; font-size:13px; margin-top:4px; }
+.rolagem { overflow-x:auto; }
+table.tab { border-collapse:collapse; font-size:13px; font-variant-numeric:tabular-nums; }
+table.tab th, table.tab td { padding:5px 10px; border-bottom:1px solid #e6e5e0; text-align:right; }
+table.tab th:first-child, table.tab td:first-child { text-align:left; }
+table.tab th { color:#52514e; font-weight:600; }
+</style></head><body><main>
+<h1>02 · Segmentos (k-means)</h1>
+<p class="sub">Quatro grupos de assinantes pelo comportamento no app, e quanto cada um sai em 60 dias.</p>
+<p class="meta">Gerado em 07/11/2026 17:50 · fonte: <code>dados/3.ouro/segmentos_kmeans.csv</code>, gerada por <code>notebooks/segmentos_kmeans_ouro.py</code> (decisões K1–K6)</p>
+<p><strong>Regra.</strong> Base: assinantes pagantes ativos em 31/07/2026 (14.032 assinaturas, sem as cortesias internas). Cada um é descrito por nove variáveis calculadas só com dados até 31/07: treinos nos últimos 30 dias, tendência de treino (30 dias contra os 60 anteriores), dias sem treinar, sessões no app, conexões recíprocas, posts no feed, chamados e treinos com GPS falho, cobranças recusadas e meses de assinatura. Contagens em log, tudo padronizado; k-means com k = 4. Plano, canal e sistema ficam fora do agrupamento e servem para descrever os grupos. <strong>Saída em 60 dias</strong> = assinatura terminada entre 01/08 e 29/09/2026 (média da base: 10,5%).</p>
+<h2>Os quatro segmentos</h2>
+<figure><div style="height:340px; width:100%;">                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-4.1.1.min.js" integrity="sha256-O24V1F27f8pb0glCkelh3cVHLNiHAJ5gCaVtq2aNch8=" crossorigin="anonymous"></script>                <div id="8622856b-37d6-449b-a5fd-9e5f4bec2a2c" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("8622856b-37d6-449b-a5fd-9e5f4bec2a2c")) {                    Plotly.newPlot(                        "8622856b-37d6-449b-a5fd-9e5f4bec2a2c",                        [{"hovertemplate":"Engajados: %{y:.1f}% \u00b7 8.218 assinantes\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#2a78d6"},"name":"Engajados","text":["6,8%"],"textposition":"outside","x":["Engajados"],"y":[6.8386468727184235],"type":"bar"},{"hovertemplate":"Rec\u00e9m-chegados: %{y:.1f}% \u00b7 2.614 assinantes\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#eb6834"},"name":"Rec\u00e9m-chegados","text":["9,4%"],"textposition":"outside","x":["Rec\u00e9m-chegados"],"y":[9.449120122417751],"type":"bar"},{"hovertemplate":"Parados: %{y:.1f}% \u00b7 2.755 assinantes\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#1baf7a"},"name":"Parados","text":["20,9%"],"textposition":"outside","x":["Parados"],"y":[20.907441016333937],"type":"bar"},{"hovertemplate":"Cobran\u00e7a falhando: %{y:.1f}% \u00b7 445 assinantes\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#eda100"},"name":"Cobran\u00e7a falhando","text":["18,9%"],"textposition":"outside","x":["Cobran\u00e7a falhando"],"y":[18.876404494382022],"type":"bar"}],                        {"template":{"data":{"scatter":[{"type":"scatter"}]}},"shapes":[{"line":{"color":"#52514e","dash":"dash","width":1},"type":"line","x0":0,"x1":1,"xref":"x domain","y0":10.468928164196123,"y1":10.468928164196123,"yref":"y"}],"annotations":[{"showarrow":false,"text":"base: 10,5%","x":1,"xanchor":"right","xref":"x domain","y":10.468928164196123,"yanchor":"bottom","yref":"y"}],"margin":{"l":56,"r":24,"t":16,"b":40},"font":{"family":"Inter, system-ui, sans-serif","size":13,"color":"#52514e"},"legend":{"orientation":"h","y":1.08,"x":0},"hoverlabel":{"font":{"color":"#0b0b0b"},"bgcolor":"white"},"height":340,"paper_bgcolor":"#fcfcfb","plot_bgcolor":"#fcfcfb","hovermode":"closest","xaxis":{"showgrid":false,"linecolor":"#e6e5e0","ticks":"outside","tickcolor":"#e6e5e0"},"yaxis":{"title":{"text":"sa\u00edram em 60 dias (%)"},"gridcolor":"#e6e5e0","zeroline":false},"showlegend":false},                        {"displaylogo": false, "responsive": true}                    )                };            </script>        </div><figcaption>Parcela de cada segmento (base de 31/07/2026) cuja assinatura terminou até 29/09/2026.</figcaption></figure>
+<figure><div style="height:420px; width:100%;">                            <div id="1f3e5a6a-6742-40fe-9bdf-b5476258ef92" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("1f3e5a6a-6742-40fe-9bdf-b5476258ef92")) {                    Plotly.newPlot(                        "1f3e5a6a-6742-40fe-9bdf-b5476258ef92",                        [{"colorbar":{"title":{"text":"z"}},"colorscale":[[0,"#2a78d6"],[0.5,"#fcfcfb"],[1,"#eb6834"]],"hovertemplate":"%{y} \u00b7 %{x}: %{z:.2f} desvios\u003cextra\u003e\u003c\u002fextra\u003e","text":{"dtype":"f8","bdata":"mpmZmZmZ2T8zMzMzMzPTPzMzMzMzM\u002fu\u002fmpmZmZmZ2T+amZmZmZm5vzMzMzMzM\u002fM\u002fZmZmZmZm5r+amZmZmZm5v5qZmZmZmdm\u002fmpmZmZmZ2b+amZmZmZn5PzMzMzMzM9O\u002fAAAAAAAA4D8AAAAAAADgv5qZmZmZmfG\u002fmpmZmZmZ2T+amZmZmZnJP83MzMzMzOy\u002fmpmZmZmZuT+amZmZmZm5P5qZmZmZmdk\u002fMzMzMzMz478AAAAAAADgv5qZmZmZmck\u002fmpmZmZmZyT+amZmZmZnZv5qZmZmZmcm\u002fMzMzMzMz0z+amZmZmZnJv5qZmZmZmcm\u002fmpmZmZmZyb8AAAAAAAAWQDMzMzMzM9M\u002fMzMzMzMz878zMzMzMzPTP5qZmZmZmbk\u002f","shape":"9, 4"},"texttemplate":"%{text}","x":["Engajados","Rec\u00e9m-chegados","Parados","Cobran\u00e7a falhando"],"y":["treinos_30d","tendencia_treino","dias_sem_treino","sessoes_app","conexoes","posts_90d","problemas_90d","recusas_180d","meses_assinatura"],"z":{"dtype":"f8","bdata":"n3zelPqz3D\u002fCB3EsnnzRP7czGYAcf\u002fq\u002fg\u002f2F5WAP2T\u002fTlZlr4u+\u002fv1gfCPPWE\u002fM\u002fuwk1DE7e57+f16axXEquvzOnwtuLmdi\u002f3qmMgUo92L9nrWZyseb4P6wR3paapNW\u002fdBA7BXrU3z85O0KVbprfv9lSufnhM\u002fG\u002f7FU7twh62D9T3PyCgs\u002fLP1ILUlOAZuu\u002f07ewhBISwj\u002f5d8gUffDAP9xoSVgNmtc\u002fe01FSIpM5L97O7yS7Nfgv5kZks\u002fWccY\u002fIbNzaxmSxj8GTqQ50hTXv7Y7VYqgb82\u002fDvdjFItB0j91FuPtrBPHvywW4+2sE8e\u002f8hXj7awTx79fhzDNxAQWQLtvhES9ntE\u002foow9VMuW878hBNXCT93UPzNsKOm1VrI\u002f","shape":"9, 4"},"zmax":2,"zmid":0,"zmin":-2,"type":"heatmap"}],                        {"template":{"data":{"scatter":[{"type":"scatter"}]}},"margin":{"l":140,"r":24,"t":16,"b":40},"font":{"family":"Inter, system-ui, sans-serif","size":13,"color":"#52514e"},"legend":{"orientation":"h","y":1.08,"x":0},"hoverlabel":{"font":{"color":"#0b0b0b"},"bgcolor":"white"},"height":420,"paper_bgcolor":"#fcfcfb","plot_bgcolor":"#fcfcfb","hovermode":"closest","xaxis":{"showgrid":false,"linecolor":"#e6e5e0","ticks":"outside","tickcolor":"#e6e5e0"},"yaxis":{"title":{"text":""},"gridcolor":"rgba(0,0,0,0)","zeroline":false,"autorange":"reversed"}},                        {"displaylogo": false, "responsive": true}                    )                };            </script>        </div><figcaption>Centróides em desvios-padrão da média da base (laranja = acima, azul = abaixo). A escala corta em ±2; recusas do segmento Cobrança falhando ficam em +5,5.</figcaption></figure>
+<h3>Perfil (medianas, exceto %, e recusas em média)</h3><div class="rolagem"><table class="dataframe tab">
+  <thead>
+    <tr style="text-align: right;">
+      <th>segmento</th>
+      <th>assinantes 31/07</th>
+      <th>% da base</th>
+      <th>saída em 60 dias (%)</th>
+      <th>treinos em 30 dias</th>
+      <th>dias sem treinar</th>
+      <th>sessões no app/mês</th>
+      <th>conexões</th>
+      <th>posts em 90 dias</th>
+      <th>recusas em 180 dias</th>
+      <th>meses de assinatura</th>
+      <th>% mensal</th>
+      <th>% loja</th>
+      <th>% android</th>
+      <th>assinantes 30/09</th>
+      <th>% em 30/09</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Engajados</td>
+      <td>8,218</td>
+      <td>58.6</td>
+      <td>6.8</td>
+      <td>9.0</td>
+      <td>2.0</td>
+      <td>9.7</td>
+      <td>1.0</td>
+      <td>2.0</td>
+      <td>0.0</td>
+      <td>10.7</td>
+      <td>45.3</td>
+      <td>71.9</td>
+      <td>49.2</td>
+      <td>8,368</td>
+      <td>56.7</td>
+    </tr>
+    <tr>
+      <td>Recém-chegados</td>
+      <td>2,614</td>
+      <td>18.6</td>
+      <td>9.4</td>
+      <td>8.0</td>
+      <td>2.0</td>
+      <td>3.3</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.6</td>
+      <td>55.4</td>
+      <td>70.6</td>
+      <td>47.8</td>
+      <td>3,477</td>
+      <td>23.6</td>
+    </tr>
+    <tr>
+      <td>Parados</td>
+      <td>2,755</td>
+      <td>19.6</td>
+      <td>20.9</td>
+      <td>0.0</td>
+      <td>48.0</td>
+      <td>1.7</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>11.1</td>
+      <td>6.5</td>
+      <td>69.5</td>
+      <td>56.9</td>
+      <td>2,446</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <td>Cobrança falhando</td>
+      <td>445</td>
+      <td>3.2</td>
+      <td>18.9</td>
+      <td>9.0</td>
+      <td>2.0</td>
+      <td>8.7</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>1.0</td>
+      <td>9.4</td>
+      <td>89.9</td>
+      <td>35.7</td>
+      <td>53.5</td>
+      <td>462</td>
+      <td>3.1</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2>Cartões de persona</h2>
+<p><strong>Engajados · 59% da base · saem 6,8% em 60 dias.</strong> Treinam ~9 vezes por mês, abrem o app ~10 vezes por mês, postam no feed e têm conexões. Assinam há ~11 meses; 45% no mensal. <strong>Hipótese de driver</strong>: quando saem, é por fim de objetivo (prova, evento) ou preço no mensal depois do reajuste. <strong>Prioridade: monitorar.</strong></p>
+<p><strong>Recém-chegados · 19% da base · saem 9,4% em 60 dias.</strong> Até ~2 meses de casa, treinam bem (~8 por mês, em alta), mas usam pouco o lado social: mediana de 0 conexões e 0 posts. 55% no mensal. <strong>Hipótese de driver</strong>: hábito ainda não formado e app sem laço social; o primeiro vencimento é o momento de risco. <strong>Prioridade: ação imediata (onboarding social).</strong></p>
+<p><strong>Parados · 20% da base · saem 20,9% em 60 dias.</strong> Não treinam há ~48 dias e quase não abrem o app (~1,7 sessões/mês). São 94% anuais: pagam sem usar e decidem na renovação. <strong>Hipótese de driver</strong>: perda de hábito ou objetivo cumprido; o anual adia a saída até o vencimento. <strong>Prioridade: ação imediata antes da renovação.</strong></p>
+<p><strong>Cobrança falhando · 3% da base · saem 18,9% em 60 dias.</strong> Usam o app como os engajados, mas têm ~1,0 cobranças recusadas em 180 dias. 90% mensal e 64% no site (cartão/Pix). <strong>Hipótese de driver</strong>: churn involuntário, cartão vencido ou sem limite. <strong>Prioridade: ação imediata (régua de cobrança, troca de meio de pagamento), barata e sem desconto.</strong></p>
+<h2>Como cada segmento sai</h2>
+<figure><div style="height:300px; width:100%;">                            <div id="5d29be5f-17a1-4e47-90cf-6513e90eae93" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("5d29be5f-17a1-4e47-90cf-6513e90eae93")) {                    Plotly.newPlot(                        "5d29be5f-17a1-4e47-90cf-6513e90eae93",                        [{"hovertemplate":"chargeback: %{x:.0f}%\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#e87ba4","line":{"color":"#fcfcfb","width":1}},"name":"chargeback","orientation":"h","x":{"dtype":"f8","bdata":"AAAAAAAAAACTnhHJMukJQAAAAAAAAAAAAAAAAAAAAAA="},"y":["Engajados","Rec\u00e9m-chegados","Parados","Cobran\u00e7a falhando"],"type":"bar"},{"hovertemplate":"falha_pagamento: %{x:.0f}%\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#008300","line":{"color":"#fcfcfb","width":1}},"name":"falha_pagamento","orientation":"h","x":{"dtype":"f8","bdata":"R4IZhMftI0C19zcGVnsnQHIcx3Ecx+s\u002fJUmSJEkSQEA="},"y":["Engajados","Rec\u00e9m-chegados","Parados","Cobran\u00e7a falhando"],"type":"bar"},{"hovertemplate":"reembolso: %{x:.0f}%\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#6250d6","line":{"color":"#fcfcfb","width":1}},"name":"reembolso","orientation":"h","x":{"dtype":"f8","bdata":"AAAAAAAAAAAAAAAAAAAAAHIcx3Ecx+s\u002fAAAAAAAAAAA="},"y":["Engajados","Rec\u00e9m-chegados","Parados","Cobran\u00e7a falhando"],"type":"bar"},{"hovertemplate":"renovacao_desligada: %{x:.0f}%\u003cextra\u003e\u003c\u002fextra\u003e","marker":{"color":"#e34948","line":{"color":"#fcfcfb","width":1}},"name":"renovacao_desligada","orientation":"h","x":{"dtype":"f8","bdata":"t898D0eCVkAVdPCoS0FVQI7jOI7jkFhAbtu2bdv2UEA="},"y":["Engajados","Rec\u00e9m-chegados","Parados","Cobran\u00e7a falhando"],"type":"bar"}],                        {"template":{"data":{"scatter":[{"type":"scatter"}]}},"margin":{"l":130,"r":24,"t":16,"b":40},"font":{"family":"Inter, system-ui, sans-serif","size":13,"color":"#52514e"},"legend":{"orientation":"h","y":1.08,"x":0},"hoverlabel":{"font":{"color":"#0b0b0b"},"bgcolor":"white"},"height":300,"paper_bgcolor":"#fcfcfb","plot_bgcolor":"#fcfcfb","hovermode":"closest","xaxis":{"showgrid":false,"linecolor":"#e6e5e0","ticks":"outside","tickcolor":"#e6e5e0","title":{"text":"% das sa\u00eddas do segmento em 60 dias"},"ticksuffix":"%"},"yaxis":{"title":{"text":""},"gridcolor":"rgba(0,0,0,0)","zeroline":false,"autorange":"reversed"},"barmode":"stack"},                        {"displaylogo": false, "responsive": true}                    )                };            </script>        </div><figcaption>Motivo do fim (<code>motivo_fim</code> de assinaturas) entre quem saiu em 60 dias.</figcaption></figure>
+<h3>Saída em 60 dias por segmento e plano (%)</h3><div class="rolagem"><table class="dataframe tab">
+  <thead>
+    <tr style="text-align: right;">
+      <th>plano</th>
+      <th>segmento</th>
+      <th>anual</th>
+      <th>mensal</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th></th>
+      <td>Engajados</td>
+      <td>2.1</td>
+      <td>12.6</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Recém-chegados</td>
+      <td>2.9</td>
+      <td>14.7</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Parados</td>
+      <td>19.1</td>
+      <td>46.7</td>
+    </tr>
+    <tr>
+      <th></th>
+      <td>Cobrança falhando</td>
+      <td>8.9</td>
+      <td>20.0</td>
+    </tr>
+  </tbody>
+</table></div>
+<ul><li><strong>Dentro do mesmo plano a ordem se mantém</strong>: no mensal, Parados saem 46,7% em 60 dias contra 12,6% dos Engajados; no anual, 19,1% contra 2,1%.</li><li><strong>Cobrança falhando é o único segmento com perda involuntária relevante</strong>: 32% das saídas por falha de pagamento, contra 10% nos Engajados.</li></ul>
+<h2>Escolha de k</h2>
+<p>O silhouette (amostra de 5.000) fica entre 0,20 e 0,25 para k de 2 a 7: os grupos se sobrepõem, como é comum em dados de comportamento. Entre os 3 ou 4 segmentos que o guia pede, k = 4 tem o maior silhouette (0,237). Com k = 5 o quinto grupo separa usuários Android com muitos chamados e GPS falho, e a saída desse grupo em 60 dias (7,6%) fica abaixo da média: não pede ação própria.</p>
+<h3>Inércia e silhouette por k</h3><div class="rolagem"><table class="dataframe tab">
+  <thead>
+    <tr style="text-align: right;">
+      <th>k</th>
+      <th>inercia</th>
+      <th>silhouette</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2</td>
+      <td>100,665</td>
+      <td>0.251</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>85,788</td>
+      <td>0.203</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>72,323</td>
+      <td>0.237</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>62,626</td>
+      <td>0.253</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>56,077</td>
+      <td>0.221</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>51,153</td>
+      <td>0.225</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2>A base hoje (30/09/2026)</h2>
+<p>Os 14.753 assinantes ativos em 30/09 recebem o segmento do centróide mais próximo, com a mesma padronização de 31/07 (sem reajustar o modelo).</p>
+<h3>Tamanho dos segmentos em 30/09</h3><div class="rolagem"><table class="dataframe tab">
+  <thead>
+    <tr style="text-align: right;">
+      <th>segmento</th>
+      <th>assinantes 30/09</th>
+      <th>% em 30/09</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Engajados</td>
+      <td>8,368</td>
+      <td>56.7</td>
+    </tr>
+    <tr>
+      <td>Recém-chegados</td>
+      <td>3,477</td>
+      <td>23.6</td>
+    </tr>
+    <tr>
+      <td>Parados</td>
+      <td>2,446</td>
+      <td>16.6</td>
+    </tr>
+    <tr>
+      <td>Cobrança falhando</td>
+      <td>462</td>
+      <td>3.1</td>
+    </tr>
+  </tbody>
+</table></div>
+<h2>Limitações</h2>
+<ul><li>Os segmentos são descritivos: a saída em 60 dias <strong>coincide</strong> com o perfil, não prova causa.</li><li>A campanha de 10/08/2026 tratou parte da base de 31/07; a saída de 60 dias inclui esse efeito.</li><li>Treinos vêm de <code>atividades.parquet</code>, que só cobre 2026; variáveis de engajamento não existem para datas anteriores.</li><li>Silhouette baixo (~0,24): as fronteiras entre segmentos são difusas, principalmente entre Engajados e Recém-chegados.</li><li>No anual, sair em 60 dias depende de a renovação cair na janela; compare segmentos dentro do mesmo plano (tabela acima).</li></ul>
+<h2>Perguntas para a próxima etapa</h2>
+<ul><li>Os segmentos devem entrar no modelo de churn como variável, ou o modelo usa as mesmas variáveis e o segmento fica só para a comunicação?</li><li>Acrescentar as variáveis de texto (objetivo do onboarding, intenção de sair no feed) quando a extração com IA estiver pronta: &quot;objetivo cumprido&quot; pode separar parte dos Parados.</li><li>Cruzar os segmentos com o resultado da campanha de ago/26 (uplift por segmento).</li></ul>
+</main></body></html>
