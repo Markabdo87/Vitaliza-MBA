@@ -53,6 +53,11 @@ def eixo_meses(fig, inicio, fim, passo=3):
     return fig
 
 
+def _pt(num):
+    """'12,345.6' -> '12.345,6' (separadores brasileiros nas tabelas)."""
+    return num.replace(",", "X").replace(".", ",").replace("X", ".")
+
+
 def _md(txt):
     txt = html.escape(txt)
     txt = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", txt)
@@ -96,10 +101,22 @@ class Pagina:
     def tabela(self, df, titulo="", formatos=None):
         df = df.copy()
         for col, fmt in (formatos or {}).items():
-            df[col] = df[col].map(lambda v: "" if v != v else fmt.format(v))
+            df[col] = df[col].map(lambda v: "" if v != v else _pt(fmt.format(v)))
         tab = df.to_html(index=False, border=0, classes="tab", na_rep="")
         cab = f"<h3>{html.escape(titulo)}</h3>" if titulo else ""
         self.blocos.append(f'{cab}<div class="rolagem">{tab}</div>')
+
+    def cartoes(self, itens):
+        """Cartões lado a lado (personas). itens: dicts com titulo, cor, destaque e linhas,
+        uma lista de pares (rótulo, texto)."""
+        html_cartoes = []
+        for c in itens:
+            dl = "".join(f"<dt>{html.escape(r)}</dt><dd>{_md(t)}</dd>" for r, t in c["linhas"])
+            html_cartoes.append(
+                f'<div class="cartao" style="border-top-color:{c["cor"]}">'
+                f'<h3>{html.escape(c["titulo"])}</h3><p class="destaque">{_md(c["destaque"])}</p>'
+                f"<dl>{dl}</dl></div>")
+        self.blocos.append(f'<div class="cartoes">{"".join(html_cartoes)}</div>')
 
     def salvar(self, nome):
         PASTA.mkdir(exist_ok=True)
@@ -123,6 +140,11 @@ table.tab {{ border-collapse:collapse; font-size:13px; font-variant-numeric:tabu
 table.tab th, table.tab td {{ padding:5px 10px; border-bottom:1px solid {GRADE}; text-align:right; }}
 table.tab th:first-child, table.tab td:first-child {{ text-align:left; }}
 table.tab th {{ color:{TEXTO_2}; font-weight:600; }}
+.cartoes {{ display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:12px; margin:12px 0; }}
+.cartao {{ background:#fff; border:1px solid {GRADE}; border-top:4px solid {GRADE}; border-radius:8px; padding:12px 14px; }}
+.cartao h3 {{ margin:0 0 2px; }} .cartao .destaque {{ color:{TEXTO_2}; font-size:13px; margin:0 0 8px; }}
+.cartao dl {{ margin:0; font-size:13px; }} .cartao dt {{ color:{TEXTO_2}; font-weight:600; margin-top:6px; }}
+.cartao dd {{ margin:0; }}
 </style></head><body><main>
 <h1>{html.escape(self.titulo)}</h1>
 <p class="sub">{_md(self.subtitulo)}</p>

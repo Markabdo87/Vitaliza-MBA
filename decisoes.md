@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro) · `L` segmentação (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -356,6 +356,30 @@ assinaturas, 2,1 a 3,6 nos outros métodos. Antecedência mediana (voluntárias 
 exatamente 42 dias antes do fim. Pesquisa: "objetivo cumprido" em 55,3% dos comentários com
 tema; dos 187 que marcaram `preco` e comentaram, 2 falam de cobrança.
 
+## Segmentação (ouro) (`2.prata/*` → `3.ouro/segmentos.csv`)
+
+Notebook: `notebooks/segmentos_ouro.py`. Grão: um assinante pagante ativo × data de referência
+(31/07/2026 e 30/09/2026); 28.785 linhas, 18 colunas. Artefato: `artefatos/04_segmentos.html`.
+Conceitos e debate de método: `memorial.md`, etapa 04. Segue o roteiro da aula 3 (29/10/2026).
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| L1 | Base do agrupamento | **Definir**: pagas ativas em 31/07/2026 (regra G1 aplicada a 01/08) com a renovação **não desligada** em 31/07 (regra K7 aplicada a 01/08). Quem já desligou fica fora e recebe o rótulo `Já desligou` | Pergunta da aula 3; quem desligou já decidiu (D02.10) e puxaria um grupo só por isso | 14.032 ativos · 11.688 no agrupamento (ligada 11.666, em carência 22), o mesmo número da aula · 2.344 já desligados (90% anuais) |
+| L2 | Saída para descrever os grupos | **Definir**: `saiu_60d` = evento `renovacao_automatica_desligada`, `cancelamento_web` ou `assinatura_expirada` entre 01/08 e 29/09/2026. Não entra no agrupamento | Mede a decisão de sair, como na aula ("pelos eventos"): o anual desliga meses antes de expirar (W4). Carência sozinha não conta (pode pagar) | 1.502 de 11.688 (12,9%; a aula mostra 12,5%) · vazio para `Já desligou` e para 30/09 |
+| L3 | Variáveis do agrupamento | **Usar** as quatro da aula, medidas até 31/07 em `atividades`: treinos por semana (12 semanas, 09/05–31/07, ÷ 12); dias sem treino (sem treino no arquivo: desde 01/01/2026 ou desde o início, o que vier depois); tempo de casa em dias; % dos treinos das 12 semanas em corrida, caminhada ou pedal (0 sem treino) | Aula 3; `atividades` começa em 01/01/2026, daí o teto de dias sem treino | medianas: 1,9 treino por semana, 2 dias sem treino, 267 dias de casa, 69% ao ar livre · 562 sem treino nas 12 semanas |
+| L4 | Escala e algoritmo | **Padronizar** (StandardScaler) e rodar k-means de k = 2 a 8, `n_init = 10`, `random_state = 0` | Sem padronizar, o tempo de casa (dias) dominaria a distância; semente fixa para refazer | nenhuma linha alterada |
+| L5 | Número de grupos | **k = 4** pelas quatro lentes: inércia dobra entre 4 e 5 (−7.522 de 3 para 4, −4.252 de 4 para 5); silhueta 0,43 (fraca; a maior é 0,59 em k = 2); Rand ajustado em 10 reamostras médio 0,999, mínimo 0,998 (k = 6: mínimo 0,63); outra semente 1,000; quatro grupos com ação diferente | Nenhuma lente decide sozinha (aula 3) | Parados 560 · Ativos ao ar livre 5.837 · Ativos em ambiente fechado 4.219 · Veteranos 1.072 |
+| L6 | Variáveis do grupo (até duas, aula 3) | **Testar e deixar de fora**: % de treinos ao ar livre com GPS falho, km por treino ao ar livre e conexões recíprocas; plano, canal e método também fora | Nenhuma muda os grupos (Rand 0,986–0,998 com os quatro) e todas baixam a silhueta (0,32–0,37). Variável 0/1 padronizada pesa demais na distância (aula 3) | ficam no perfil (colunas da tabela), não no agrupamento |
+| L7 | Nome dos grupos | **Definir por regra** sobre as medianas: maior dias sem treino = Parados; maior tempo de casa = Veteranos; dos dois restantes, maior % ao ar livre = Ativos ao ar livre | O k-means devolve números; a regra fixa o nome se a ordem dos rótulos mudar | o notebook para se a regra não separar os quatro |
+| L8 | Tamanho atual | **Classificar** os pagantes de 30/09/2026 com o mesmo padronizador e os mesmos centros, variáveis medidas até 30/09 | O relatório prioriza a base de hoje; a de 31/07 só serve para ver a saída | 14.753 ativos (= enunciado) · Parados 514 · Ao ar livre 6.327 · Ambiente fechado 4.616 · Veteranos 1.046 · Já desligou 2.250 |
+
+### Resultado de referência
+
+Saída em 60 dias (01/08–29/09/2026) por grupo: Parados 29,8% (todos anuais), Ativos ao ar livre
+14,0% (mensal 15,4%, anual 12,6%), Ativos em ambiente fechado 10,9% (12,8% e 8,7%), Veteranos 5,4%;
+média 12,9%. Mensal com até 90 dias de casa: 20,8% ao ar livre, 15,2% em ambiente fechado. Mensal
+no cartão: 17,2%. Já desligou: 32,3% expiraram em 60 dias, 6,9% religaram.
+
 ## Em aberto
 
 ### Usuários
@@ -504,3 +528,16 @@ tema; dos 187 que marcaram `preco` e comentaram, 2 falam de cobrança.
   trocar por taxa mensal se for para o ROI.
 - Tema da pesquisa por palavra-chave (W5): comparar com a extração por IA quando ela existir.
 - Debates D03.1–D03.4 do `memorial.md` estão como **proposto**.
+
+### Segmentação (ouro)
+
+- GPS falho: entre os mensais ao ar livre, quem teve treino com GPS falho saiu **menos** em ago–set
+  (11,8% × 16,6%), o contrário da etapa 02. Suspeita de seleção (quem teve a falha e saiu em julho
+  não está na base de 31/07): testar no modelo com a base de 30/06.
+- Alvo do modelo da semana 10: decisão de sair (L2, desligar ou expirar) ou perda (G1, expirar)?
+  Muda o anual, que desliga meses antes de expirar.
+- `Já desligou` (2.250 em 30/09, 93% anuais): decidir se entra no plano de intervenção como lista
+  de reversão.
+- Diferença para a referência da aula (12,5% de saída; parados 472): não sabemos a regra de borda da
+  aula; os grupos e as taxas batem dentro de poucos pontos.
+- Debates D04.1–D04.5 do `memorial.md`.

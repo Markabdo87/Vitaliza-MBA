@@ -184,9 +184,9 @@ escolha de estratificar antes de ranquear.
 | D02.5 | Anual × mensal na mesma comparação | juntos · por plano · por plano e vencimento | por plano **e** vencimento: só o anual que vence em jul–set entra na comparação | **proposto** (aplicado em K6) |
 | D02.6 | Valor-p com amostra grande | reportar e decidir por ele · usar o tamanho do efeito | tamanho do efeito como critério, valor-p como apoio | **proposto** |
 | D02.7 | AUC de categórica | taxa na própria base (atual) · taxa com validação cruzada | a atual serve para a EDA; para o modelo (semana 10), codificar com validação cruzada para não superestimar categorias pequenas | **aberto** |
-| D02.8 | GPS falho como driver | aceitar a diferença de +4,3 p.p. · controlar por tipo de treino (corrida ao ar livre) | controlar antes de chamar de driver: quem teve GPS falho é quem corria ao ar livre no android | **aberto** |
+| D02.8 | GPS falho como driver | aceitar a diferença de +4,3 p.p. · controlar por tipo de treino (corrida ao ar livre) | controlar antes de chamar de driver: quem teve GPS falho é quem corria ao ar livre no android. Na etapa 04, entre os mensais ao ar livre, quem teve GPS falho saiu **menos** em ago–set: o sinal não se sustenta fora de jul–set | **aberto** (enfraquecido na etapa 04) |
 | D02.10 | Renovação já desligada em 30/06 | ignorar · usar como variável · separar a análise entre ligados e desligados | as duas coisas: é informação disponível na data (sem vazamento) e vira variável; e a separação é medida também só entre os ligados, que ainda decidem. Para o modelo da semana 10, decidir se o alvo da intervenção é quem ainda está ligado | **proposto** (aplicado em K7) |
-| D02.9 | Eixos para a segmentação (aula 3) | todas as variáveis · só as que separam e não são redundantes | engajamento (um eixo), tempo de casa, plano × vencimento, experiência técnica (android × GPS falho), método de pagamento | **aberto** |
+| D02.9 | Eixos para a segmentação (aula 3) | todas as variáveis · só as que separam e não são redundantes | engajamento (um eixo), tempo de casa, plano × vencimento, experiência técnica (android × GPS falho), método de pagamento. Na etapa 04, as quatro da aula (engajamento em duas, tempo de casa, ar livre); GPS falho e as categóricas ficam no perfil | **proposto** (aplicado em L3, L6) |
 
 ### Referências da etapa
 
@@ -278,6 +278,98 @@ de casa, experiência técnica); a cobrança entra como um segmento operacional 
   customers. New York: Springer, 2008. (Cap. 24: churn voluntário e involuntário.)
 - GROVES, R. M. Nonresponse rates and nonresponse bias in household surveys. **Public Opinion
   Quarterly**, v. 70, n. 5, 2006.
+
+---
+
+## Etapa 04 · Segmentos de assinantes (`artefatos/04_segmentos.html`)
+
+**Pergunta** (aula 3). Entre os pagantes ativos em 31/07/2026, em quantos grupos os assinantes se
+dividem, o que distingue cada grupo e o que a Vitaliza faria diferente com cada um?
+
+**Para onde vai.** Os cartões de persona e a priorização do Customer Segmentation Report (semana
+5); na semana 10, o segmento entra no briefing da IA generativa e na leitura do modelo de risco.
+
+### Conceitos
+
+- **Aprendizado não supervisionado.** A clusterização agrupa assinantes parecidos **sem** olhar
+  quem saiu (JAMES et al., 2023). A saída só entra depois, para descrever os grupos. Se entrasse
+  antes, os grupos seriam um modelo de churn disfarçado.
+- **K-means.** Sorteia k centros, atribui cada ponto ao centro mais próximo, move cada centro para a
+  média do seu grupo e repete até nenhum ponto trocar (LLOYD, 1982). Garante que a inércia não sobe
+  entre voltas, não que chegou ao melhor resultado: daí o início k-means++ (ARTHUR; VASSILVITSKII,
+  2007), `n_init = 10` (dez inícios, fica o de menor inércia) e a semente fixa.
+- **Padronização.** Cada variável em desvios-padrão (z). Sem isso, a distância é dominada pela
+  variável de maior escala (tempo de casa em dias, até milhares) e as outras não contam.
+- **Variável 0/1 na distância.** Padronizada, uma categoria vira um salto enorme e o grupo passa a
+  ser a própria categoria. Plano, canal e método entram no **perfil**, não no agrupamento.
+- **Quatro lentes para escolher k.** Inércia (soma das distâncias ao centro, ao quadrado; cai
+  sempre, procura-se a dobra); silhueta, s = (b − a) ÷ max(a, b), com faixas de Kaufman e
+  Rousseeuw (até 0,25 sem estrutura, até 0,50 fraca, até 0,70 razoável); estabilidade pelo índice
+  de Rand ajustado (HUBERT; ARABIE, 1985) entre o agrupamento original e reamostras; e leitura de
+  negócio. Nenhuma decide sozinha.
+- **Cluster vira segmento quando tem consequência**: distinto (cabe numa frase), estável (se repete
+  em outra amostra), grande o bastante (vale uma ação própria) e acionável (a empresa faria algo
+  diferente com ele).
+- **Classificar a base nova com os mesmos centros.** O padronizador e os centros aprendidos em 31/07
+  classificam a base de 30/09. O segmento de hoje é comparável ao de 31/07, e a saída observada em
+  ago–set serve de referência para cada grupo.
+
+### Método
+
+1. Base de 31/07 sem quem já desligou a renovação (L1); saída em 60 dias pelos eventos (L2).
+2. Quatro variáveis da aula (L3), padronizadas; k-means de k = 2 a 8 (L4).
+3. Inércia e silhueta por k; estabilidade em 10 reamostras e com outra semente (L5).
+4. Teste das variáveis candidatas do grupo, uma a uma (L6).
+5. Perfil em medianas, saída com intervalo de Wilson, cruzamento com plano, tempo de casa e método;
+   classificação da base de 30/09 (L8); personas com hipótese de driver e prioridade.
+
+### O que a etapa mostrou
+
+- **A estrutura da aula se reproduz.** k = 4 dá Parados (560), Ativos ao ar livre (5.837), Ativos
+  em ambiente fechado (4.219) e Veteranos (1.072), com silhueta 0,43 e Rand 0,999, perto da
+  referência da aula (472, 5.927, 4.215 e 1.074; silhueta 0,44).
+- **A saída ordena os grupos.** Parados 29,8%, ao ar livre 14,0%, ambiente fechado 10,9%, veteranos
+  5,4% (média 12,9%). Os parados são todos anuais: nenhum mensal com a renovação ligada estava sem
+  treinar.
+- **Taxa × volume.** O grupo com a maior taxa é pequeno (514 em 30/09); o com mais saídas é o ao ar
+  livre (6.327 em 30/09, acima da média). A priorização olha as duas coisas.
+- **O que a etapa 02 achou aparece dentro dos grupos.** O mensal com até 90 dias de casa sai mais
+  em todo grupo (20,8% ao ar livre contra 13,2% depois); o mensal no cartão sai mais (17,2%).
+- **As variáveis do grupo não mudam os grupos.** GPS falho, km por treino e conexões recíprocas
+  deixam a partição igual (Rand ≥ 0,986) e baixam a silhueta. E o GPS falho, que separava na etapa
+  02, aqui vai no sentido contrário (D02.8).
+
+Leitura metodológica: a silhueta de 0,43 diz que os grupos são regiões de um contínuo, não ilhas.
+Isso não invalida a segmentação, que é estável e acionável, mas pede cuidado com quem está na
+fronteira: o segmento orienta a mensagem; quem recebe a ação é decidido pelo risco individual
+(modelo da semana 10).
+
+### Pontos em debate
+
+| # | Ponto | Opções | Proposta | Status |
+|---|---|---|---|---|
+| D04.1 | Quem entra no agrupamento | todos os ativos · só quem não desligou a renovação | só quem não desligou (como a aula); os desligados viram lista operacional de reversão | **proposto** (aplicado em L1) |
+| D04.2 | Saída que descreve os grupos | perda (G1, expirou) · decisão (desligou, cancelou ou expirou) | decisão, porque é o momento de agir; o alvo do modelo da semana 10 ainda está em aberto | **proposto** (aplicado em L2) |
+| D04.3 | k | 2 (maior silhueta) · 4 · 5 (dobra da inércia) | 4: estável e acionável; k = 2 só separa quem parou | **proposto** (aplicado em L5) |
+| D04.4 | Variáveis do grupo | somar até duas (aula) · ficar com as quatro | ficar com as quatro: as candidatas não mudam os grupos e pioram a silhueta | **proposto** (aplicado em L6) |
+| D04.5 | Plano no segmento | eixo do k-means · corte depois do grupo · segmento por plano | corte depois do grupo: as ofertas do CRM são por plano, mas como 0/1 o plano dominaria a distância | **proposto** |
+
+### Referências da etapa
+
+Aula 3 (29/10/2026), "Clusterização com k-means", trilha de Tecnologia.
+
+- ARTHUR, D.; VASSILVITSKII, S. k-means++: the advantages of careful seeding. In: ACM-SIAM SYMPOSIUM
+  ON DISCRETE ALGORITHMS, 18., 2007. **Proceedings** [...]. Philadelphia: SIAM, 2007. p. 1027-1035.
+- HUBERT, L.; ARABIE, P. Comparing partitions. **Journal of Classification**, v. 2, n. 1, p. 193-218,
+  1985.
+- JAMES, G.; WITTEN, D.; HASTIE, T.; TIBSHIRANI, R.; TAYLOR, J. **An introduction to statistical
+  learning**: with applications in Python. Cham: Springer, 2023. Cap. 12.
+- KAUFMAN, L.; ROUSSEEUW, P. J. **Finding groups in data**: an introduction to cluster analysis.
+  New York: Wiley, 1990.
+- LLOYD, S. P. Least squares quantization in PCM. **IEEE Transactions on Information Theory**, v. 28,
+  n. 2, p. 129-137, 1982.
+- ROUSSEEUW, P. J. Silhouettes: a graphical aid to the interpretation and validation of cluster
+  analysis. **Journal of Computational and Applied Mathematics**, v. 20, p. 53-65, 1987.
 
 ---
 

@@ -22,3 +22,4 @@ Tabelas:
 | `churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | mês × recorte × segmento (G1–G4) |
 | `assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026 (K1–K7) |
 | `saidas.csv` | `notebooks/saidas_ouro.py` | uma assinatura paga encerrada (W1–W5) |
+| `segmentos.csv` | `notebooks/segmentos_ouro.py` | um assinante pagante ativo × data de referência, com o segmento (L1–L8) |

@@ -173,7 +173,7 @@ Já confirmado:
   (`flag_sem_treino`), então contar linhas entre os anos mistura populações. `sessoes_app` muda
   de escala em mar/2026 (−45% por treino). Em 2026 subconta treinos de relógio frente a
   `atividades`.
-- **atividades:** desde 15/04/2026 o app grava `tipo` em inglês (`run`, `walk`…); treino de
+- **atividades:** o arquivo só cobre 01/01–30/09/2026 (não há treino de 2024–2025); desde 15/04/2026 o app grava `tipo` em inglês (`run`, `walk`…); treino de
   relógio chega duas vezes (relógio + app); GPS falho (`gps_ok = False`) só na versão nova do
   app, com distância sem sentido.
 - **Incidente técnico em mai–jun/2026:** pico de tickets de GPS/percurso não gravado
@@ -205,6 +205,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | mês × recorte × segmento | ago/24–set/26; churn = perdas ÷ ativos no dia 1 (G1), reproduz o enunciado; recortes total, plano, canal, plano_canal, metodo; gera `artefatos/01_churn_mensal.html` |
 | `dados/3.ouro/assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026 | 14.059 assinantes, `saiu` = fim entre 01/07 e 30/09/2026 (2.343, 16,7%) (K1); variáveis medidas até 30/06; compare dentro de `plano` e, no anual, só `vence_jul_set = 1` (K6); `renovacao_30jun` = renovação ligada/desligada em 30/06 (K7); gera `artefatos/02_quem_saiu.html` |
 | `dados/3.ouro/saidas.csv` | `notebooks/saidas_ouro.py` | uma assinatura paga encerrada (= um `user_id`) | 17.830 saídas de 07/07/2024 a 30/09/2026; `tipo_saida` voluntária/involuntária/devolução pelo `motivo_fim` (W2), a soma por mês = perdas do `churn_mensal` (W3); `antecedencia_dias` só nas voluntárias, pelo último desligamento (W4); `pesquisa_*` só para quem respondeu (site, jun–set/26); gera `artefatos/03_por_que_saem.html` |
+| `dados/3.ouro/segmentos.csv` | `notebooks/segmentos_ouro.py` | um assinante pagante ativo × `data_ref` (2026-07-31 ou 2026-09-30) | `segmento` = Parados, Ativos ao ar livre, Ativos em ambiente fechado, Veteranos (k-means k = 4 nas quatro variáveis da aula, ajustado em 31/07, L1–L5) ou Já desligou (renovação desligada, fora do agrupamento); `saiu_60d` só em 31/07 e fora de Já desligou (L2); 30/09 classificado com os mesmos centros (L8), 14.753 ativos; gera `artefatos/04_segmentos.html` |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas.
