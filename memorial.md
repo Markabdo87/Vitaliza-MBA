@@ -155,6 +155,12 @@ quais 2.343 (16,7%) saíram em jul–set/2026.
 - **Dois mundos de saída.** No mensal, o que mais separa é o tempo de casa (AUC 0,60): 31,2% de
   saída até 3 meses, 10,0% acima de 24 meses. No anual que vence, é o engajamento (dias com
   treino, AUC 0,78): 65,7% não renovaram sem treino no trimestre, 43,0% com treino.
+- **A decisão já estava tomada para muitos.** Pelos eventos, 734 dos 1.931 anuais que venciam
+  já estavam com a renovação desligada em 30/06, e 94,1% deles saíram (mediana de 2 dias com
+  treino em abr–jun, contra 22 de quem seguia com a renovação ligada). Só entre os ligados, a
+  AUC do engajamento cai de 0,78 para 0,67: o sinal sobrevive, mas parte dele era causalidade
+  reversa (K7). Outros 1.313 anuais que não venciam já tinham desligado: decididos a sair,
+  ainda pagando.
 - **Um sinal, três nomes.** Treinos, minutos e dias com treino têm ρ de Spearman ≥ 0,96: na
   segmentação entram como um eixo só.
 - **Suspeito técnico.** No mensal android, quem teve treino com GPS falho saiu 4,3 p.p. a mais
@@ -179,6 +185,7 @@ escolha de estratificar antes de ranquear.
 | D02.6 | Valor-p com amostra grande | reportar e decidir por ele · usar o tamanho do efeito | tamanho do efeito como critério, valor-p como apoio | **proposto** |
 | D02.7 | AUC de categórica | taxa na própria base (atual) · taxa com validação cruzada | a atual serve para a EDA; para o modelo (semana 10), codificar com validação cruzada para não superestimar categorias pequenas | **aberto** |
 | D02.8 | GPS falho como driver | aceitar a diferença de +4,3 p.p. · controlar por tipo de treino (corrida ao ar livre) | controlar antes de chamar de driver: quem teve GPS falho é quem corria ao ar livre no android | **aberto** |
+| D02.10 | Renovação já desligada em 30/06 | ignorar · usar como variável · separar a análise entre ligados e desligados | as duas coisas: é informação disponível na data (sem vazamento) e vira variável; e a separação é medida também só entre os ligados, que ainda decidem. Para o modelo da semana 10, decidir se o alvo da intervenção é quem ainda está ligado | **proposto** (aplicado em K7) |
 | D02.9 | Eixos para a segmentação (aula 3) | todas as variáveis · só as que separam e não são redundantes | engajamento (um eixo), tempo de casa, plano × vencimento, experiência técnica (android × GPS falho), método de pagamento | **aberto** |
 
 ### Referências da etapa

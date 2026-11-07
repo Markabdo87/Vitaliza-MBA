@@ -312,7 +312,7 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 ## Quem saiu em jul–set/2026 (ouro) (`2.prata/*` → `3.ouro/assinantes_30jun26.csv`)
 
 Notebook: `notebooks/assinantes_30jun26_ouro.py`. Grão: um assinante pagante ativo em
-30/06/2026; 14.059 linhas, 31 colunas. Artefato: `artefatos/02_quem_saiu.html`. Conceitos e
+30/06/2026; 14.059 linhas, 34 colunas. Artefato: `artefatos/02_quem_saiu.html`. Conceitos e
 debate de método: `memorial.md`, etapa 02.
 
 | # | Problema | Decisão | Motivo | Efeito na contagem |
@@ -323,13 +323,14 @@ debate de método: `memorial.md`, etapa 02.
 | K4 | Uma linha por assinante | **Resumir** cada log por `user_id` antes de juntar; junção à esquerda com `validate="one_to_one"` | Juntar log direto multiplica linhas (aula 2) | 14.059 linhas em todas as oito junções |
 | K5 | Chamado de GPS | **Definir**: texto do chamado (normalizado, sem acento) aproximado por difflib (corte 0,8) a uma das cinco mensagens-base do incidente (S, Em aberto) | A categoria do atendente erra em ~1/3 (S9) | 1.200 chamados de GPS até 30/06, os mesmos do pico de mai–jun |
 | K6 | Comparar coisas comparáveis no anual | **Estratificar** em mensal e anual que vence em jul–set (`vence_jul_set`: anual iniciado em jul, ago ou set) | O anual só sai no aniversário; o anual inteiro mede o calendário, não o comportamento | anual que vence: 1.931 (46,3% saíram) · anual que não vence: 6.281 (3 saídas, devoluções) · mensal: 5.847 (24,7%) |
+| K7 | Decisão já tomada em 30/06 | **Reconstruir** pelos eventos (fase assinatura, antes de 01/07, sem `flag_apos_fim`) a situação da renovação em 30/06: último evento entre início/renovação/religada (ligada), desligada/cancelamento_web (desligada) e carência; medir a separação também só entre quem estava com a renovação **ligada** | Aula 2, passo 5: "a renovação foi desligada antes ou depois do uso medido?". Uso baixo pode vir depois de desligar (causalidade reversa); o retrato de 01/10 não serve para 30/06 | ligada 11.711 · desligada 2.333 · em carência 15. Anual que vence: 734 desligados (94,1% saíram), 1.197 ligados (17,0%); mensal: 286 desligados (99,7%), 5.547 ligados (20,7%). AUC de dias com treino no anual que vence: 0,78 com todos, 0,67 só ligados. 1.313 anuais que não vencem já estavam com a renovação desligada |
 
 ### Resultado de referência
 
 Separação por AUC univariada dentro de cada estrato. Mensal: tempo de casa 0,60 (31,2% de
 saída até 3 meses de casa, 10,0% acima de 24 meses), dias com treino abr–jun 0,55. Anual que
 vence: dias com treino abr–jun 0,78 (65,7% não renovaram sem nenhum treino no trimestre, 43,0%
-com treino). Mensal android: 29,3% de saída com algum treino de GPS falho contra 25,0% sem.
+com treino); só entre quem estava com a renovação ligada em 30/06, 0,67 (K7). Mensal android: 29,3% de saída com algum treino de GPS falho contra 25,0% sem.
 
 ## Em aberto
 
