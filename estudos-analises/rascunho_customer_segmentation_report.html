@@ -178,7 +178,7 @@
     <p class="section-kicker">03 · Saída da segmentação</p>
     <h2>Personas a construir com evidências</h2>
     <p class="section-intro">O guia pede de três a quatro segmentos. Estes cartões são espaços de trabalho, não perfis encontrados nos dados. Manter apenas a quantidade que a análise sustentar.</p>
-    <div class="persona-grid">
+    <div class="persona-grid" id="kmeans-persona-slots">
       <article class="persona-card">
         <div class="persona-heading"><h3>Segmento A, nome a definir</h3><span class="persona-tag">Pendente</span></div>
         <dl class="field-list">
@@ -256,7 +256,7 @@
     <p class="section-kicker">06 · Base tecnológica</p>
     <h2>Evidências que a EDA precisa trazer</h2>
     <p class="section-intro">O relatório final deve ligar cada persona a gráficos e medidas reproduzíveis, gerados a partir do código do projeto.</p>
-    <ul class="eda-list">
+    <ul class="eda-list" id="eda-evidence-slots">
       <li><span class="item-label">População e preparo</span>Declarar unidade de análise, filtros, corte temporal, dados ausentes e exclusões.</li>
       <li><span class="item-label">Padrões de churn</span>Detalhar diferenças por plano, canal e variáveis comportamentais, com denominadores e período.</li>
       <li><span class="item-label">Engajamento e qualidade</span>Conferir comparabilidade das medidas de uso e separar sinais de problemas de cobertura ou medição.</li>
@@ -264,6 +264,20 @@
     </ul>
     <div class="callout" style="margin-top:16px">
       <p><strong>Sobre o método:</strong> a aula 3 aborda k-Means, mas o algoritmo e o número de grupos não estão definidos por este rascunho. A escolha deve ser justificada pelos dados e pela utilidade das personas.</p>
+    </div>
+    <h3 style="margin-top:24px">Entrada de resultados do K-Means e da EDA</h3>
+    <p>Quando a nova base estiver disponível, os notebooks gerarão os resultados reproduzíveis. Esta página receberá somente resumos agregados e gráficos, não linhas individuais do conjunto de dados.</p>
+    <div class="table-wrap" id="data-contract-slots">
+      <table>
+        <thead><tr><th>Origem</th><th>Resumo a produzir</th><th>Seções que alimenta</th></tr></thead>
+        <tbody>
+          <tr><td>K-Means</td><td>Identificador e tamanho do grupo, participação na base, variáveis que o caracterizam, churn no horizonte de 60 dias e limitações.</td><td>Personas, hipóteses de driver e plano de intervenção.</td></tr>
+          <tr><td>EDA</td><td>Pergunta, métrica e denominador, período e filtros, visualização, leitura do achado e ressalva.</td><td>Contexto e evidências de cada persona.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout" style="margin-top:16px">
+      <p><strong>Fluxo previsto:</strong> os notebooks processam a base de entrada e geram resultados; dados intermediários em <code>dados/3.ouro/</code> continuam fora do Git conforme a regra do projeto. Versionar o código e os artefatos HTML agregados. Preencher estes espaços somente depois de conferir o esquema da base e validar métricas e filtros.</p>
     </div>
   </section>
 
@@ -276,7 +290,7 @@
     </div>
     <h3 style="margin-top:24px">Matriz de intervenção a preencher</h3>
     <div class="table-wrap">
-      <table>
+      <table id="intervention-plan-slots">
         <thead><tr><th>Segmento</th><th>Elegibilidade e risco</th><th>Intervenção e comunicação</th><th>Medição</th></tr></thead>
         <tbody>
           <tr><td>A, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
