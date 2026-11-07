@@ -4,7 +4,7 @@ artefatos/02_quem_saiu.html.
 Pergunta (aula 2): entre quem pagava em 30/06/2026, quem saiu até 30/09 se comportava
 diferente de quem ficou? Quais características mais separam os dois grupos?
 
-Regras (decisões K1–K6 no decisoes.md; método e debate no memorial.md, etapa 02):
+Regras (decisões K1–K7 no decisoes.md; método e debate no memorial.md, etapa 02):
   1. Base: assinaturas.csv da prata com flag_cortesia = 0, inicio <= 30/06/2026 e data_fim
      vazia ou >= 01/07/2026 (mesma regra de "ativo no dia 1" da G1, aplicada a 01/07).
   2. saiu = 1 se data_fim cai entre 01/07 e 30/09/2026; senão 0 (ficou).
@@ -19,7 +19,12 @@ Regras (decisões K1–K6 no decisoes.md; método e debate no memorial.md, etapa
        - pagamentos (abr–jun): cobranças recusadas;
        - amizades (desde <= 30/06, sem flag_id_invalido): seguidores e conexões recíprocas;
        - feed_posts (abr–jun): posts;
-       - onboarding: dias por semana e nível declarados.
+       - onboarding: dias por semana e nível declarados;
+       - eventos_assinatura (fase assinatura, antes de 01/07, sem flag_apos_fim): situação
+         da renovação em 30/06 pelo último evento que a muda (assinatura_iniciada,
+         renovacao e renovacao_automatica_religada = ligada; renovacao_automatica_desligada
+         e cancelamento_web = desligada; periodo_carencia = em carência) e dias desde o
+         desligamento.
   4. Fora de propósito: campanha_ago26 (acontece dentro da janela de saída), versao_app de
      usuarios (retrato do corte) e pesquisa_saida (só existe para quem saiu).
   5. Separação de cada variável: AUC univariada (0,5 = não separa). Numérica: AUC do valor
@@ -30,6 +35,9 @@ Regras (decisões K1–K6 no decisoes.md; método e debate no memorial.md, etapa
      O anual só pode sair no aniversário: vence_jul_set = 1 para o anual iniciado em jul,
      ago ou set (aniversário dentro da janela) e para todo mensal. O estrato do anual é
      "anual que vence em jul–set"; o anual que não vence quase não sai (só devolução).
+  7. Decisão já tomada: quem estava com a renovação desligada em 30/06 quase sempre sai.
+     A separação é recalculada também só entre quem estava com a renovação ligada, que é
+     quem ainda decide na janela (causalidade reversa: uso baixo pode vir depois de desligar).
 
 Conferência com o 01_churn_mensal (o notebook para se não bater): a base é igual aos ativos
 no início de jul/2026 e as saídas de jul são as perdas de jul/2026 em churn_mensal.csv.
@@ -168,6 +176,23 @@ base["posts_abr_jun"] = base.posts_abr_jun.fillna(0)
 ob = pd.read_csv(PRATA / "onboarding.csv")[["user_id", "dias_por_semana", "nivel"]]
 base = junta(base, ob, "onboarding")
 
+MUDA_RENOVACAO = {
+    "assinatura_iniciada": "ligada", "renovacao": "ligada",
+    "renovacao_automatica_religada": "ligada", "renovacao_automatica_desligada": "desligada",
+    "cancelamento_web": "desligada", "periodo_carencia": "em carência",
+}
+ev = pd.read_csv(PRATA / "eventos_assinatura.csv", parse_dates=["data_hora_brt"],
+                 usecols=["user_id", "seq_usuario", "data_hora_brt", "evento", "fase", "flag_apos_fim"])
+ev = ev[(ev.fase == "assinatura") & (ev.data_hora_brt < FIM_REF) & (ev.flag_apos_fim == 0)
+        & ev.evento.isin(list(MUDA_RENOVACAO))]
+ult = ev.sort_values(["user_id", "seq_usuario"]).groupby("user_id").tail(1)
+ren = pd.DataFrame({"user_id": ult.user_id, "renovacao_30jun": ult.evento.map(MUDA_RENOVACAO),
+                    "dias_desde_desligamento": np.where(
+                        ult.evento.map(MUDA_RENOVACAO) == "desligada",
+                        (FIM_REF - ult.data_hora_brt).dt.days, np.nan)})
+base = junta(base, ren, "situação da renovação em 30/06")
+assert base.renovacao_30jun.notna().all(), "assinante da base sem evento de renovação antes de 01/07"
+
 base = base.drop(columns=["flag_inicio_antes_historico", "treinos_gps_falho"])
 OURO.mkdir(parents=True, exist_ok=True)
 base.to_csv(SAIDA, index=False)
@@ -196,6 +221,7 @@ CAT = {
     "sem_treino_abr_jun": "sem treino abr–jun", "teve_chamado": "abriu chamado",
     "chamado_gps": "chamado de GPS", "teve_recusa": "teve cobrança recusada",
     "inicio_antes_historico": "início antes de jul/24",
+    "renovacao_30jun": "renovação em 30/06",
 }
 
 
@@ -242,8 +268,10 @@ ESTRATOS = {
     "mensal": base.plano == "mensal",
     "anual que vence": (base.plano == "anual") & (base.vence_jul_set == 1),
 }
+ligada = base.renovacao_30jun == "ligada"
 sep = separacao(base)
 sep_plano = {e: separacao(base[m]) for e, m in ESTRATOS.items()}
+sep_ligada = {e: separacao(base[m & ligada]) for e, m in ESTRATOS.items()}
 print(sep[["variável", "AUC", "sentido", "n"]].round(3).to_string(index=False))
 for e, s in sep_plano.items():
     print(f"\n{e}:\n" + s[["variável", "AUC", "sentido"]].head(8).round(3).to_string(index=False))
@@ -288,7 +316,7 @@ p = Pagina(
     "02 · Quem saiu se comportava diferente?",
     "Entre os pagantes ativos em 30/06/2026, o que separa quem saiu até 30/09 de quem ficou.",
     "fonte: `dados/3.ouro/assinantes_30jun26.csv`, gerada por "
-    "`notebooks/assinantes_30jun26_ouro.py` (decisões K1–K6) · método em `memorial.md`, etapa 02",
+    "`notebooks/assinantes_30jun26_ouro.py` (decisões K1–K7) · método em `memorial.md`, etapa 02",
 )
 p.texto(f"""
 **Regra.** Base: as {br(N, 0)} assinaturas pagas ativas em 30/06/2026 (as mesmas dos ativos no
@@ -320,11 +348,42 @@ p.texto(f"""
   em jul–set**. Olhar o anual inteiro mede o calendário, não o comportamento.
 """)
 
+p.secao("Segundo corte: a decisão já estava tomada em 30/06?")
+ESTR_ROT = pd.Series("anual que não vence", index=base.index).mask(an_vence, "anual que vence").mask(mens, "mensal")
+ren = (base.assign(estrato=ESTR_ROT).groupby(["estrato", "renovacao_30jun"]).saiu
+       .agg(["size", "sum"]).reset_index()
+       .rename(columns={"renovacao_30jun": "renovação em 30/06", "size": "assinantes", "sum": "saíram"}))
+ren["saída (%)"] = 100 * ren["saíram"] / ren["assinantes"]
+p.tabela(ren, "Saída em jul–set pela situação da renovação em 30/06 (reconstruída pelos eventos)",
+         {"assinantes": "{:,.0f}", "saíram": "{:,.0f}", "saída (%)": "{:.1f}"})
+r = ren.set_index(["estrato", "renovação em 30/06"])
+des_an = r.loc[("anual que vence", "desligada")]
+des_nao = r.loc[("anual que não vence", "desligada")]
+med_dias = base[an_vence].groupby("renovacao_30jun").dias_treino_abr_jun.median()
+auc_dias = lambda s: s.set_index("coluna").loc["dias_treino_abr_jun", "AUC"]
+p.texto(f"""
+- No anual que vence, {br(des_an['assinantes'], 0)} dos {br(an_vence.sum(), 0)} já estavam com a
+  renovação desligada em 30/06, e **{br(des_an['saída (%)'])}% deles saíram**. No mensal, quem
+  tinha desligado saiu quase todo ({br(r.loc[('mensal', 'desligada'), 'saída (%)'])}%).
+- Quem desligou treinava pouco: mediana de {br(med_dias['desligada'], 0)} dias com treino em
+  abr–jun no anual que vence, contra {br(med_dias['ligada'], 0)} de quem seguia com a renovação
+  ligada. Parte do sinal "parou de treinar" é a decisão já tomada (causalidade reversa): por
+  isso a separação também é medida **só entre quem estava com a renovação ligada**, que é quem
+  ainda decidia na janela.
+- Só com a renovação ligada, o engajamento continua separando no anual que vence (AUC
+  {br(auc_dias(sep_ligada['anual que vence']), 2)}, contra {br(auc_dias(sep_plano['anual que vence']), 2)}
+  com todos): o sinal sobrevive, mas menor.
+- {br(des_nao['assinantes'], 0)} anuais que **não** venciam em jul–set já tinham desligado a
+  renovação em 30/06: decidiram sair e seguem pagando até o vencimento.
+""")
+
 p.secao("O que mais separa quem saiu de quem ficou")
 comp = sep[["variável", "tipo", "AUC"]].rename(columns={"AUC": "AUC base"})
 for e, s in sep_plano.items():
     comp = comp.merge(s[["variável", "AUC", "sentido"]].rename(
         columns={"AUC": f"AUC {e}", "sentido": f"sentido {e}"}), on="variável", how="left")
+    comp = comp.merge(sep_ligada[e][["variável", "AUC"]].rename(
+        columns={"AUC": f"AUC {e} · renovação ligada"}), on="variável", how="left")
 comp = comp.sort_values("AUC mensal", ascending=False)
 top = comp[comp["variável"] != "plano"].head(12).iloc[::-1]
 f = go.Figure()
@@ -338,12 +397,13 @@ f.update_xaxes(range=[0.45, 0.85], title_text="AUC univariada")
 f.update_layout(barmode="group", hovermode="closest", margin=dict(l=220, t=48))
 p.figura(f, "AUC de cada variável sozinha para separar saiu × ficou, dentro de cada estrato "
             "(0,5 = não separa, 1 = separa todos). Ordem: AUC no mensal.")
-p.tabela(comp, "AUC na base inteira e dentro de cada estrato",
+p.tabela(comp, "AUC na base inteira, em cada estrato e só entre quem estava com a renovação ligada",
          {c: "{:.3f}" for c in comp.columns if c.startswith("AUC")})
 p.texto("""
 **Como ler.** AUC é a chance de um assinante que saiu, sorteado, ter valor "mais de saída" que
 um que ficou. Na base inteira, o plano domina e mistura os dois mundos; dentro dos estratos
-aparece o que de fato separa cada um.
+aparece o que de fato separa cada um. A coluna "renovação ligada" tira quem já tinha decidido
+sair em 30/06: o que continua separando ali é sinal de aviso, não de decisão tomada.
 """)
 p.tabela(sep.drop(columns=["coluna"]), "Detalhe na base inteira: centro, dispersão e efeito",
          {"AUC": "{:.3f}", "efeito": "{:.3f}", "p": "{:.1e}", "n": "{:,.0f}"})
@@ -465,10 +525,12 @@ p.texto(f"""
 - **O que o dado diz.** Há dois mundos de saída: no mensal, quem acabou de chegar sai mais
   ({br(m_tc.iloc[0])}% até 3 meses de casa contra {br(m_tc.iloc[4])}% acima de 2 anos); no anual,
   quem chega ao vencimento sem treinar não renova ({br(sem_an.loc[True])}% sem treino no
-  trimestre contra {br(sem_an.loc[False])}% com treino).
+  trimestre contra {br(sem_an.loc[False])}% com treino), e {br(des_an['assinantes'], 0)} anuais já
+  tinham desligado a renovação antes da janela.
 - **O que ele não diz.** Que pouco uso ou pouco tempo de casa **causam** a saída: tempo de casa
-  carrega viés de sobrevivência, e uso baixo pode ser consequência de quem já decidiu sair
-  (causalidade reversa).
+  carrega viés de sobrevivência, e parte do uso baixo vem depois de desligar a renovação
+  (causalidade reversa). Só entre quem seguia com a renovação ligada o engajamento é aviso
+  (AUC {br(auc_dias(sep_ligada['anual que vence']), 2)} no anual que vence).
 - **A próxima pergunta.** Esses dois sinais, mais android com GPS falho e método de pagamento,
   formam segmentos distintos quando cruzados, ou são o mesmo grupo visto de ângulos diferentes?
 """)
