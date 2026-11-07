@@ -118,6 +118,10 @@ Regras das camadas:
 - Ao criar uma tabela nova, registre-a em "Tabelas prontas" abaixo.
 - `artefatos/00_historia_da_eda.html` resume as páginas 01–04 (EDA da semana 5, no lugar do
   mini deck); é gerada por `notebooks/eda_historia.py`, que lê o ouro e não cria tabela.
+- Ouro lê a prata com `ler_prata` (`notebooks/_ouro.py`): para com mensagem clara se o
+  arquivo ou uma coluna sumiu e avisa se a prata é mais velha que o notebook que a gera.
+  Nenhum número da página fica fixo no código: texto e rótulos saem do cálculo, para o ouro
+  continuar certo quando um colega atualizar a prata.
 - Ouro com gráfico gera também uma página em `artefatos/NN_<tabela>.html` (helper
   `notebooks/_artefato.py`). As páginas vão para o git, para o grupo abrir sem rodar nada;
   só têm agregados. A análise anda uma etapa por vez: gera, discute com o grupo, registra
@@ -209,6 +213,9 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/3.ouro/assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026 | 14.059 assinantes, `saiu` = fim entre 01/07 e 30/09/2026 (2.343, 16,7%) (K1); variáveis medidas até 30/06; compare dentro de `plano` e, no anual, só `vence_jul_set = 1` (K6); `renovacao_30jun` = renovação ligada/desligada em 30/06 (K7); gera `artefatos/02_quem_saiu.html` |
 | `dados/3.ouro/saidas.csv` | `notebooks/saidas_ouro.py` | uma assinatura paga encerrada (= um `user_id`) | 17.830 saídas de 07/07/2024 a 30/09/2026; `tipo_saida` voluntária/involuntária/devolução pelo `motivo_fim` (W2), a soma por mês = perdas do `churn_mensal` (W3); `antecedencia_dias` só nas voluntárias, pelo último desligamento (W4); `pesquisa_*` só para quem respondeu (site, jun–set/26); gera `artefatos/03_por_que_saem.html` |
 | `dados/3.ouro/segmentos.csv` | `notebooks/segmentos_ouro.py` | um assinante pagante ativo × `data_ref` (2026-07-31 ou 2026-09-30) | `segmento` = Parados, Ativos ao ar livre, Ativos em ambiente fechado, Veteranos (k-means k = 4 nas quatro variáveis da aula, ajustado em 31/07, L1–L5) ou Já desligou (renovação desligada, fora do agrupamento); `saiu_60d` só em 31/07 e fora de Já desligou (L2); 30/09 classificado com os mesmos centros (L8), 14.753 ativos; gera `artefatos/04_segmentos.html` |
+| `dados/3.ouro/pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | mês × meio de pagamento | jul/24–set/26; aprovadas, devoluções (no mês do lançamento) e recusadas; `valor_bruto` = aprovado − devolvido; soma set/26 = referência abaixo |
+| `dados/3.ouro/segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | assinante × data de referência (31/07 e 30/09/26) | k-means k = 4 em 9 variáveis de comportamento (N1–N7); `segmento`, variáveis, plano/canal/sistema e `saiu_60d` (só em 31/07); gera `artefatos/05_segmentos_kmeans.html` |
+| `dados/3.ouro/conciliacao_segmentos.csv` | `notebooks/conciliacao_segmentos_ouro.py` | segmento L × segmento N × data de referência | cruza `segmentos.csv` (L1–L8) com `segmentos_kmeans.csv` (N1–N7); assinantes e saída em 60 dias pelas duas réguas (decisão e fim); alimenta o Customer Segmentation Report (R1) |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas.

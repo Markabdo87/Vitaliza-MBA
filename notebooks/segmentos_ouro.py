@@ -105,7 +105,7 @@ def monta(ref):
         b[c] = b[c].fillna(0)
 
     b["treinos_semana"] = b.treinos_12s / 12
-    desde = np.maximum(b.inicio, INICIO_ARQUIVO)
+    desde = b.inicio.clip(lower=INICIO_ARQUIVO)
     b["dias_sem_treino"] = np.where(b.ultimo_treino.notna(), (ref - b.ultimo_treino).dt.days,
                                     (ref - desde).dt.days).astype(int)
     b["tempo_casa_dias"] = (ref - b.inicio).dt.days
