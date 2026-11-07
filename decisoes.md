@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -309,6 +309,28 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 2,63% → 3,33% (+0,70 p.p.); loja 5,38% → 6,34%; site 6,15% → 7,26%; Google Play 5,35% →
 6,71% (+1,36 p.p.) contra App Store 5,40% → 5,98% (+0,57 p.p.).
 
+## Quem saiu em jul–set/2026 (ouro) (`2.prata/*` → `3.ouro/assinantes_30jun26.csv`)
+
+Notebook: `notebooks/assinantes_30jun26_ouro.py`. Grão: um assinante pagante ativo em
+30/06/2026; 14.059 linhas, 31 colunas. Artefato: `artefatos/02_quem_saiu.html`. Conceitos e
+debate de método: `memorial.md`, etapa 02.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| K1 | Base e desfecho | **Definir**: base = pagas (`flag_cortesia = 0`) com `inicio` ≤ 30/06/2026 e `data_fim` vazia ou ≥ 01/07/2026; saiu = `data_fim` entre 01/07 e 30/09/2026 | Pergunta da aula 2; mesma regra de ativo da G1 aplicada a 01/07, então a base é a de jul/26 do `01_churn_mensal` | 14.059 assinantes (= ativos no início de jul/26) · 2.343 saíram (16,7%) · saídas de jul = perdas de jul/26. O notebook para se não bater |
+| K2 | Data das variáveis | **Definir**: tudo medido até 30/06/2026; uso, posts e cobranças recusadas em abr–jun/2026 | Sem vazamento: a janela de saída começa em 01/07. Fica de fora `campanha_ago26` (dentro da janela), `versao_app` (retrato do corte) e `pesquisa_saida` (só existe para quem saiu) | nenhuma linha alterada |
+| K3 | Fonte de engajamento | **Usar** `atividades` (treino a treino), não `uso_mensal` | `uso_mensal` subconta treinos de relógio em 2026 (M9) | assinante sem treino em abr–jun = 0 (não nulo): 746 na base |
+| K4 | Uma linha por assinante | **Resumir** cada log por `user_id` antes de juntar; junção à esquerda com `validate="one_to_one"` | Juntar log direto multiplica linhas (aula 2) | 14.059 linhas em todas as oito junções |
+| K5 | Chamado de GPS | **Definir**: texto do chamado (normalizado, sem acento) aproximado por difflib (corte 0,8) a uma das cinco mensagens-base do incidente (S, Em aberto) | A categoria do atendente erra em ~1/3 (S9) | 1.200 chamados de GPS até 30/06, os mesmos do pico de mai–jun |
+| K6 | Comparar coisas comparáveis no anual | **Estratificar** em mensal e anual que vence em jul–set (`vence_jul_set`: anual iniciado em jul, ago ou set) | O anual só sai no aniversário; o anual inteiro mede o calendário, não o comportamento | anual que vence: 1.931 (46,3% saíram) · anual que não vence: 6.281 (3 saídas, devoluções) · mensal: 5.847 (24,7%) |
+
+### Resultado de referência
+
+Separação por AUC univariada dentro de cada estrato. Mensal: tempo de casa 0,60 (31,2% de
+saída até 3 meses de casa, 10,0% acima de 24 meses), dias com treino abr–jun 0,55. Anual que
+vence: dias com treino abr–jun 0,78 (65,7% não renovaram sem nenhum treino no trimestre, 43,0%
+com treino). Mensal android: 29,3% de saída com algum treino de GPS falho contra 25,0% sem.
+
 ## Em aberto
 
 ### Usuários
@@ -438,3 +460,12 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 - Anual: medir a taxa de não renovação (venceu no mês e não renovou). A taxa mensal sobre
   toda a base anual dilui o efeito.
 - Janeiro alto nos dois anos (6,4% e 7,4%): conferir se é vencimento de anuais.
+
+### Quem saiu em jul–set/2026 (ouro)
+
+- Debates do `memorial.md` (D02.1–D02.6) estão como **proposto**: o grupo confirma a janela
+  30/06 + jul–set, a fonte `atividades`, o trimestre abr–jun e o uso do tamanho do efeito.
+- Separar a saída voluntária da involuntária na base K1 (`motivo_fim`): a recusa de cobrança
+  separa pouco no total.
+- GPS falho no android mensal (+4,3 p.p.): testar se sobrevive ao tipo de treino (quem corre ao
+  ar livre) antes de chamar de driver.

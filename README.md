@@ -33,12 +33,14 @@ e completa no guia em `documentos/`.
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
 │   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
 │   └── 3.ouro/     # tabelas de análise — gerado pelos notebooks, fora do git
-└── notebooks/        # um notebook por tabela: <arquivo>_<camada>.py
+├── notebooks/        # um notebook por tabela: <arquivo>_<camada>.py
+├── decisoes.md       # decisões e premissas que mudam números
+└── memorial.md       # memorial descritivo: conceitos e métodos de cada etapa
 ```
 
 ## Como rodar
 
-Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly). A partir da raiz:
+Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly, scipy). A partir da raiz:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
@@ -66,6 +68,7 @@ para gerar as tabelas.
 | `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | respostas de saída com comentário bruto para a extração com IA |
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | chamados com tempo de resolução, resolvidos depois do corte e abandonados marcados |
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | churn mensal por plano, canal e método, ago/24–set/26, conferido com o enunciado · gráficos em `artefatos/01_churn_mensal.html` |
+| `dados/3.ouro/assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026, com a saída em jul–set/26 e as variáveis até 30/06 · gráficos em `artefatos/02_quem_saiu.html` |
 
 As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
 cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).

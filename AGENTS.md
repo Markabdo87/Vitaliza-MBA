@@ -80,7 +80,7 @@ correspondente quando a situação aparecer):
 | **Git** | Ao abrir a sessão, puxe o que o grupo subiu. Ao fechar, commit + `pull --rebase` + push (com confirmação) + handoff na seção "Em aberto" do `decisoes.md` | `git-do-grupo` |
 | **`decisoes.md`** | Log de toda decisão e premissa que muda um número: limpeza, premissa de negócio, definição de métrica, escolha de análise. ID, motivo e efeito numérico. Não se apaga linha antiga, risca e aponta para a nova | `registrar-decisao` |
 | **Camadas** | bronze (imutável) → prata (limpa, mesmo grão) → ouro (cruzada/agregada). Cada tabela tem um notebook que a gera do zero | `camadas-de-dados` |
-| **Análise** | Uma etapa por vez: confere a métrica no glossário, gera ouro + página em `artefatos/`, confere com o enunciado, mostra, discute, registra e só então segue | `etapa-de-analise` |
+| **Análise** | Uma etapa por vez: confere a métrica no glossário, gera ouro + página em `artefatos/`, confere com o enunciado, mostra, discute, registra e só então segue. Cada etapa atualiza também o `memorial.md` (conceitos, ferramentas e pontos em debate) | `etapa-de-analise` |
 
 Ciclo de uma limpeza: perfila a bronze → decide cada problema → escreve
 `notebooks/<arquivo>_prata.py` com as regras na docstring → roda e mede → registra no
@@ -102,6 +102,7 @@ dados/
 └── 3.ouro/     # tabelas de análise (cruzamentos, agregados, base de modelagem, scores)
 notebooks/      # um notebook por tabela gerada: <tabela>_<camada>.py
 decisoes.md     # ★ fonte da verdade: decisões, premissas e pendências ("Em aberto")
+memorial.md     # memorial descritivo: conceitos e debate de método, etapa por etapa
 .claude/        # settings do projeto, hook de início de sessão e skills
 ```
 
@@ -202,6 +203,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | uma resposta | 643 respostas de 641 contas, só de quem cancelou pelo site, 01/06–30/09/2026; `comentario` é texto bruto para a extração com IA; `motivo_principal` diverge do comentário em 220 de 452 casos com tema (Q7); `flag_resposta_repetida` marca 2 contas com duas respostas |
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | um chamado | 4.422 chamados de 3.989 contas, 01/07/2025–30/09/2026, `aberto_em` em Brasília; `texto_cliente` é texto bruto para a extração com IA; `categoria_atendente` diverge do texto em 33,6% (S9); para variável de modelo trate `flag_resolvido_pos_corte = 1` como aberto; `flag_aberto_antigo` marca chamados abandonados |
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | mês × recorte × segmento | ago/24–set/26; churn = perdas ÷ ativos no dia 1 (G1), reproduz o enunciado; recortes total, plano, canal, plano_canal, metodo; gera `artefatos/01_churn_mensal.html` |
+| `dados/3.ouro/assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026 | 14.059 assinantes, `saiu` = fim entre 01/07 e 30/09/2026 (2.343, 16,7%) (K1); variáveis medidas até 30/06; compare dentro de `plano` e, no anual, só `vence_jul_set = 1` (K6); gera `artefatos/02_quem_saiu.html` |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas.
