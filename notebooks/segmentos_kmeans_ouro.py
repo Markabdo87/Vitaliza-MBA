@@ -44,6 +44,7 @@ import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 
 from _artefato import CORES, Pagina, layout_padrao
@@ -257,6 +258,38 @@ f.update_layout(hovermode="closest", margin=dict(l=140))
 f.update_yaxes(autorange="reversed", gridcolor="rgba(0,0,0,0)")
 p.figura(f, "Centróides em desvios-padrão da média da base (laranja = acima, azul = abaixo). "
             "A escala corta em ±2; recusas do segmento Cobrança falhando ficam em +5,5.")
+
+# Dispersão em 2D: os 9 eixos padronizados projetados nos 2 componentes principais (PCA),
+# amostra de assinantes por segmento e os 4 centróides do k-means projetados no mesmo plano.
+pca = PCA(n_components=2, random_state=SEED).fit(z_tr)
+pts = pca.transform(z_tr[amostra])
+cen = pca.transform(km.cluster_centers_)
+seg_amostra = treino.segmento.values[amostra]
+var = pca.explained_variance_ratio_ * 100
+f = go.Figure()
+for s in ORDEM:
+    m = seg_amostra == s
+    f.add_trace(go.Scattergl(x=pts[m, 0], y=pts[m, 1], mode="markers", name=s,
+                             marker=dict(color=COR[s], size=4, opacity=0.35),
+                             hovertemplate=f"{s}<extra></extra>"))
+for i, s in rot.items():
+    f.add_trace(go.Scatter(x=[cen[i, 0]], y=[cen[i, 1]], mode="markers+text", showlegend=False,
+                           marker=dict(symbol="x", size=18, color=COR[s],
+                                       line=dict(width=2, color="#0b0b0b")),
+                           text=[f"<b>{s}</b>"],
+                           textposition={"Engajados": "top left",
+                                         "Cobrança falhando": "bottom right"}.get(s, "top center"),
+                           textfont=dict(color="#0b0b0b", size=12),
+                           hovertemplate=f"centróide · {s}<extra></extra>"))
+layout_padrao(f, f"componente 2 ({br(var[1], 0)}% da variância)", altura=480)
+f.update_xaxes(title_text=f"componente 1 ({br(var[0], 0)}% da variância)", showgrid=True,
+               gridcolor="#e6e5e0", zeroline=False)
+f.update_layout(hovermode="closest")
+p.figura(f, f"Assinantes (amostra de {br(len(amostra), 0)}) e centróides (×) projetados nos dois "
+            f"componentes principais das nove variáveis padronizadas, que juntos explicam "
+            f"{br(var.sum(), 0)}% da variação. O k-means agrupa nas nove dimensões; a projeção "
+            "em 2D sobrepõe grupos que lá estão separados: Cobrança falhando fica sobre "
+            "Engajados porque se separa só pelas recusas (ver o mapa de calor acima).")
 
 fmt = {c: "{:,.1f}" for c in P.columns} | {c: "{:,.0f}" for c in ["assinantes 31/07", "assinantes 30/09"]}
 p.tabela(P.reset_index().rename(columns={"segmento": "segmento"}), "Perfil (medianas, exceto %, e recusas em média)", fmt)
