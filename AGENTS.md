@@ -115,6 +115,10 @@ Regras das camadas:
 - Cada notebook gera sua tabela do zero, roda da raiz e documenta as regras na docstring.
   Pode ser `.py` ou Jupyter (`.ipynb`), a gosto de quem escreve: o que importa é rodar do zero.
 - Ao criar uma tabela nova, registre-a em "Tabelas prontas" abaixo.
+- Ouro lê a prata com `ler_prata` (`notebooks/_ouro.py`): para com mensagem clara se o
+  arquivo ou uma coluna sumiu e avisa se a prata é mais velha que o notebook que a gera.
+  Nenhum número da página fica fixo no código: texto e rótulos saem do cálculo, para o ouro
+  continuar certo quando um colega atualizar a prata.
 - Ouro com gráfico gera também uma página em `artefatos/NN_<tabela>.html` (helper
   `notebooks/_artefato.py`). As páginas vão para o git, para o grupo abrir sem rodar nada;
   só têm agregados. A análise anda uma etapa por vez: gera, discute com o grupo, registra

@@ -322,6 +322,7 @@ Notebook: `notebooks/segmentos_kmeans_ouro.py`. Grão: assinante × data de refe
 | K4 | Plano, canal, sistema | **Não usar** no agrupamento; só para descrever os segmentos | O anual só sai na renovação: com plano no k-means o segmento repetiria o plano | — |
 | K5 | Número de segmentos | **k = 4** (k-means++, 20 inicializações, `random_state = 7`) | Guia pede 3–4 segmentos; entre 3 e 4, k = 4 tem o maior silhouette (0,237; k = 3: 0,203). k = 5 (0,253) separa Android com GPS falho, que sai 7,6%, abaixo da média | — |
 | K6 | Nome dos segmentos | **Rotular** pelo traço do centróide: maior recusa = Cobrança falhando; mais dias sem treino = Parados; menos meses de assinatura = Recém-chegados; o restante = Engajados | Rótulo estável se a ordem dos clusters mudar | — |
+| K7 | Prioridade e rótulo quando a prata muda | **Definir**: prioridade "ação imediata" se o segmento sai em 60 dias ≥ 1,5 × a média da base, senão "monitorar". Rótulo de K6 só vale se o centróide está a ≥ 1 desvio da média na variável; grupo sem rótulo vira "Grupo n". k recalculado pela regra de K5 a cada execução | O ouro é refeito quando os colegas atualizam a prata: prioridade, rótulos, k e todo número da página saem do cálculo, não do código | Recém-chegados (9,4% contra limite de 15,7%) passa de "ação imediata" (escolha manual anterior) para "monitorar"; demais iguais |
 
 ### Resultado de referência
 
