@@ -332,6 +332,25 @@ Base de 31/07/2026, saída em 60 dias: Engajados 8.218 (58,6%) saem 6,8% · Rec�
 mensal, Parados saem 46,7% contra 12,6% dos Engajados. Base de 30/09: 8.368 · 3.477 · 2.446 ·
 462.
 
+## Conciliação dos segmentos (ouro) (`3.ouro/segmentos.csv` + `3.ouro/segmentos_kmeans.csv` → `3.ouro/conciliacao_segmentos.csv`)
+
+Notebook: `notebooks/conciliacao_segmentos_ouro.py`. Grão: segmento L × segmento K × data de
+referência (31/07 e 30/09/2026), 36 linhas. Usa o `segmentos.csv` da Douglas (ramo
+`feat/eda-etapa-02`, decisões L1–L8), que ainda não está no main. Página:
+`estudos-analises/rascunho_customer_segmentation_report.html`, seção 04.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| R1 | Duas segmentações k-means para o mesmo relatório | **Usar** os quatro grupos de L (renovação ligada, quatro variáveis da aula) como personas e a saída por decisão de L2; **usar** "Já desligou" (L) e "Cobrança falhando" (K) como listas operacionais; "Recém-chegados" (K) vira recorte (mensal com até 90 dias) dentro dos Ativos; "Parados" e "Engajados" de K ficam só no cruzamento. Prioridade: ação imediata se a saída em 60 dias ≥ 1,5 × a média **ou** o grupo tem o maior número esperado de saídas (taxa × base de 30/09) | Mesma base de 14.032 em 31/07, mas eixos diferentes (Rand ajustado 0,046 sem "Já desligou"). Em K, 58% dos Parados já tinham desligado a renovação (causalidade reversa, K7 da etapa "quem saiu"); L separa estável (Rand 0,999 em reamostras, silhueta 0,43). Recusas e treino dos últimos 30 dias, que só K tem, separam a cobrança. A saída por decisão chega meses antes do fim no anual (1.502 decidiram, 711 já tinham `data_fim` na janela) | Personas em 30/09: Parados 514 · Ativos ao ar livre 6.327 · Ativos em ambiente fechado 4.616 · Veteranos 1.046 (12.503). Listas: Já desligou 2.250 · Cobrança falhando 462 (se sobrepõe às personas). Ação imediata: Parados (29,8%) e Ativos ao ar livre (≈ 887 saídas) |
+
+### Resultado de referência
+
+31/07/2026: 558 dos 560 Parados (L) estão nos Parados de K. Dos 1.422 mensais ativos (L) com
+até 90 dias de casa, 1.104 estão em Recém-chegados (K). Cobrança falhando (K): 54% no cartão;
+193 nos Ativos ao ar livre e 189 nos de ambiente fechado. Dentro dos Ativos ao ar livre, quem
+está em Parados de K (pouco treino nos últimos 30 dias) sai 25,9% pela decisão, contra 11,7%
+dos Engajados.
+
 ## Em aberto
 
 ### Usuários
@@ -468,3 +487,15 @@ mensal, Parados saem 46,7% contra 12,6% dos Engajados. Base de 30/09: 8.368 · 3
 - Decidir se o segmento entra no modelo de churn como variável ou fica só para comunicação.
 - Reajustar quando a extração com IA trouxer objetivo do onboarding e intenção de sair no feed.
 - Cruzar segmentos com o resultado da campanha de ago/26 (uplift por segmento).
+
+### Conciliação dos segmentos (ouro)
+
+- Os IDs K1–K7 colidem: no main são do k-means de nove variáveis; no ramo
+  `feat/eda-etapa-02` são da etapa "quem saiu". Ao integrar o ramo, renumerar um dos dois
+  conjuntos (e as citações no `AGENTS.md`, nas páginas e no relatório).
+- Numeração das páginas também colide: `02_segmentos_kmeans.html` (main) e `02_quem_saiu.html`
+  (ramo). Decidir a ordem ao integrar.
+- `segmentos_ouro.py` usa `np.maximum` entre data e `Timestamp`, que quebra no pandas 2.x
+  (roda no 3.1.1 do `requirements.txt`). Trocar por `b.inicio.clip(lower=INICIO_ARQUIVO)`
+  deixa o notebook independente da versão.
+- Validar R1 com o grupo (Camila, Douglas) antes de fechar o relatório de 15/11.
