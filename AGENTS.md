@@ -94,7 +94,7 @@ O `.claude/settings.json` bloqueia edição da bronze, leitura de `.env`, `push 
 
 ```
 documentos/        # fontes oficiais do curso em PDF: enunciado, dicionário, guia de entregas
-estudos-analises/  # estudos e relatórios do grupo (não oficiais)
+estudos-analises/  # relatório de segmentação (Camila) e memorial técnico (gerado por notebooks/memorial_tecnico.py)
 artefatos/         # páginas HTML com os gráficos do ouro, geradas pelos notebooks (vão para o git)
 dados/
 ├── 1.bronze/   # arquivos como vieram do curso. NUNCA editar.
@@ -136,6 +136,8 @@ for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # ouro + ar
 .venv/bin/python notebooks/conciliacao_segmentos.py                   # cruza os dois k-means (lê o ouro)
 .venv/bin/python notebooks/eda_historia.py                            # página-resumo 00 (lê o ouro)
 .venv/bin/python notebooks/conferencias.py                             # confere tudo
+.venv/bin/python notebooks/confere_relatorio.py                       # confere o relatório contra o ouro
+.venv/bin/python notebooks/memorial_tecnico.py                        # memorial técnico (estudos-analises/)
 ```
 Os notebooks de prata usam a biblioteca padrão do Python 3, menos `atividades_prata.py`, que
 lê parquet e precisa do `pyarrow`. Os de ouro usam `pandas` e `plotly` e rodam com o venv

@@ -50,6 +50,8 @@ for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ou
 .venv/bin/python notebooks/conciliacao_segmentos.py                   # cruza os dois k-means (lê o ouro)
 .venv/bin/python notebooks/eda_historia.py                            # página-resumo da EDA (00)
 .venv/bin/python notebooks/conferencias.py                             # confere contagens e números de referência
+.venv/bin/python notebooks/confere_relatorio.py                       # confere o relatório contra o ouro
+.venv/bin/python notebooks/memorial_tecnico.py                        # memorial técnico (estudos-analises/)
 ```
 
 Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
