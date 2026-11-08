@@ -9,7 +9,8 @@ Uso dentro de um notebook de ouro:
     p.tabela(df, "Título da tabela")
     p.salvar("01_churn_mensal.html")
 
-As páginas carregam o plotly.js de CDN (precisa de internet para abrir) e não têm dado
+O plotly.js vai embutido na página (~4,8 MB): ela abre offline, no Drive e em
+visualizadores que bloqueiam scripts externos. As páginas não têm dado
 sensível: só agregados do ouro. Cores: paleta categórica validada para daltonismo, sempre
 na mesma ordem.
 """
@@ -93,7 +94,7 @@ class Pagina:
                 self.blocos.append(f"<p>{_md(' '.join(linhas))}</p>")
 
     def figura(self, fig, legenda=""):
-        div = fig.to_html(full_html=False, include_plotlyjs="cdn" if self._primeira_fig else False,
+        div = fig.to_html(full_html=False, include_plotlyjs=self._primeira_fig,
                           config={"displaylogo": False, "responsive": True})
         self._primeira_fig = False
         leg = f"<figcaption>{_md(legenda)}</figcaption>" if legenda else ""
