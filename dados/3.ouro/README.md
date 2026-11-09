@@ -1,4 +1,4 @@
-# Ouro — tabelas de análise
+# Ouro — Tabelas de análise
 
 Tabelas prontas para responder às perguntas do case, montadas a partir da prata (nunca da
 bronze). Aqui as tabelas são cruzadas pelo `user_id` e agregadas. Exemplos do que deve
