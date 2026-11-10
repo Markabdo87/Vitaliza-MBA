@@ -12,8 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) ·
-  `R` recusas de cobrança (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro) · `L` segmentação (ouro) · `N` segmentos k-means de nove variáveis (ouro) · `R` recusas de cobrança (ouro) · `X` conciliação dos segmentos (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -311,12 +310,122 @@ Média mensal de churn, 2025 → jan–set/2026: mensal 8,97% → 10,83% (+1,86 
 2,63% → 3,33% (+0,70 p.p.); loja 5,38% → 6,34%; site 6,15% → 7,26%; Google Play 5,35% →
 6,71% (+1,36 p.p.) contra App Store 5,40% → 5,98% (+0,57 p.p.).
 
+## Quem saiu em jul–set/2026 (ouro) (`2.prata/*` → `3.ouro/assinantes_30jun26.csv`)
+
+Notebook: `notebooks/assinantes_30jun26_ouro.py`. Grão: um assinante pagante ativo em
+30/06/2026; 14.059 linhas, 34 colunas. Artefato: `artefatos/02_quem_saiu.html`. Conceitos e
+debate de método: `memorial.md`, etapa 02.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| K1 | Base e desfecho | **Definir**: base = pagas (`flag_cortesia = 0`) com `inicio` ≤ 30/06/2026 e `data_fim` vazia ou ≥ 01/07/2026; saiu = `data_fim` entre 01/07 e 30/09/2026 | Pergunta da aula 2; mesma regra de ativo da G1 aplicada a 01/07, então a base é a de jul/26 do `01_churn_mensal` | 14.059 assinantes (= ativos no início de jul/26) · 2.343 saíram (16,7%) · saídas de jul = perdas de jul/26. O notebook para se não bater |
+| K2 | Data das variáveis | **Definir**: tudo medido até 30/06/2026; uso, posts e cobranças recusadas em abr–jun/2026 | Sem vazamento: a janela de saída começa em 01/07. Fica de fora `campanha_ago26` (dentro da janela), `versao_app` (retrato do corte) e `pesquisa_saida` (só existe para quem saiu) | nenhuma linha alterada |
+| K3 | Fonte de engajamento | **Usar** `atividades` (treino a treino), não `uso_mensal` | `uso_mensal` subconta treinos de relógio em 2026 (M9) | assinante sem treino em abr–jun = 0 (não nulo): 746 na base |
+| K4 | Uma linha por assinante | **Resumir** cada log por `user_id` antes de juntar; junção à esquerda com `validate="one_to_one"` | Juntar log direto multiplica linhas (aula 2) | 14.059 linhas em todas as oito junções |
+| K5 | Chamado de GPS | **Definir**: texto do chamado (normalizado, sem acento) aproximado por difflib (corte 0,8) a uma das cinco mensagens-base do incidente (S, Em aberto) | A categoria do atendente erra em ~1/3 (S9) | 1.200 chamados de GPS até 30/06, os mesmos do pico de mai–jun |
+| K6 | Comparar coisas comparáveis no anual | **Estratificar** em mensal e anual que vence em jul–set (`vence_jul_set`: anual iniciado em jul, ago ou set) | O anual só sai no aniversário; o anual inteiro mede o calendário, não o comportamento | anual que vence: 1.931 (46,3% saíram) · anual que não vence: 6.281 (3 saídas, devoluções) · mensal: 5.847 (24,7%) |
+| K7 | Decisão já tomada em 30/06 | **Reconstruir** pelos eventos (fase assinatura, antes de 01/07, sem `flag_apos_fim`) a situação da renovação em 30/06: último evento entre início/renovação/religada (ligada), desligada/cancelamento_web (desligada) e carência; medir a separação também só entre quem estava com a renovação **ligada** | Aula 2, passo 5: "a renovação foi desligada antes ou depois do uso medido?". Uso baixo pode vir depois de desligar (causalidade reversa); o retrato de 01/10 não serve para 30/06 | ligada 11.711 · desligada 2.333 · em carência 15. Anual que vence: 734 desligados (94,1% saíram), 1.197 ligados (17,0%); mensal: 286 desligados (99,7%), 5.547 ligados (20,7%). AUC de dias com treino no anual que vence: 0,78 com todos, 0,67 só ligados. 1.313 anuais que não vencem já estavam com a renovação desligada |
+
+### Resultado de referência
+
+Separação por AUC univariada dentro de cada estrato. Mensal: tempo de casa 0,60 (31,2% de
+saída até 3 meses de casa, 10,0% acima de 24 meses), dias com treino abr–jun 0,55. Anual que
+vence: dias com treino abr–jun 0,78 (65,7% não renovaram sem nenhum treino no trimestre, 43,0%
+com treino); só entre quem estava com a renovação ligada em 30/06, 0,67 (K7). Mensal android: 29,3% de saída com algum treino de GPS falho contra 25,0% sem.
+
+## Por que saem (ouro) (`2.prata/*` → `3.ouro/saidas.csv`)
+
+Notebook: `notebooks/saidas_ouro.py`. Grão: uma assinatura paga encerrada (= um `user_id`);
+17.830 linhas, 07/07/2024–30/09/2026. Artefato: `artefatos/03_por_que_saem.html`. Conceitos e
+debate de método: `memorial.md`, etapa 03.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| W1 | Quais saídas | **Definir**: assinaturas com `flag_cortesia = 0` e `data_fim` preenchida | Mesma base paga da G2 | 17.830 saídas |
+| W2 | Tipo de saída | **Definir** pelo `motivo_fim` da prata: voluntária = `renovacao_desligada`; involuntária = `falha_pagamento`; devolução = `chargeback` ou `reembolso` | Separa decisão do cliente, falha de cobrança e dinheiro devolvido, que pedem ações diferentes (Em aberto da G) | voluntária 16.145 · involuntária 1.321 · devolução 364 |
+| W3 | Churn por tipo | **Usar** a regra G1 por tipo; ago/24–set/26 (G3) | A soma dos tipos tem de ser o churn do `01_churn_mensal` | soma = perdas da G1 em todos os 26 meses; o notebook para se não bater |
+| W4 | Antecedência do aviso | **Definir** (só voluntária): dias entre o **último** `renovacao_automatica_desligada` e a `data_fim`; desligamento que chega depois do fim (`flag_apos_fim`, loja) conta como 0 e fica em `flag_aviso_apos_fim` | É a janela para intervir. O último desligamento é o que valeu; aviso atrasado da loja (E8) não é antecedência negativa | 91 saídas voluntárias de 2026 com aviso depois do fim (= 0 dia) |
+| W5 | Tema da pesquisa de saída | **Usar** a função `tema` de `pesquisa_saida_prata.py` (palavra-chave, a mesma do diagnóstico Q7); conta que respondeu duas vezes vale a resposta mais recente | Mesmo critério da prata, sem segunda regra. Extração com IA fica para a etapa de variáveis de texto | 641 contas (643 respostas); 353 delas já expiraram até 30/09 |
+
+### Resultado de referência
+
+Média mensal 2025 → jan–set/2026: voluntária 5,12% → 6,09% (+0,97 p.p.), involuntária 0,43%
+→ 0,46%, devolução 0,07% → 0,07%. Mensal voluntária 8,04% → 9,83% (+1,79 p.p.); anual
+voluntária 2,51% → 3,16%. Falha de pagamento em jan–set/26: mensal no cartão 10,7 por 100
+assinaturas, 2,1 a 3,6 nos outros métodos. Antecedência mediana (voluntárias de 2026): mensal
+14 dias (loja 14, site 15), anual 157 (loja 151, site 175); 287 anuais (12,8%) desligaram
+exatamente 42 dias antes do fim. Pesquisa: "objetivo cumprido" em 55,3% dos comentários com
+tema; dos 187 que marcaram `preco` e comentaram, 2 falam de cobrança.
+
+## Segmentação (ouro) (`2.prata/*` → `3.ouro/segmentos.csv`)
+
+Notebook: `notebooks/segmentos_ouro.py`. Grão: um assinante pagante ativo × data de referência
+(31/07/2026 e 30/09/2026); 28.785 linhas, 18 colunas. Artefato: `artefatos/04_segmentos.html`.
+Conceitos e debate de método: `memorial.md`, etapa 04. Segue o roteiro da aula 3 (29/10/2026).
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| L1 | Base do agrupamento | **Definir**: pagas ativas em 31/07/2026 (regra G1 aplicada a 01/08) com a renovação **não desligada** em 31/07 (regra K7 aplicada a 01/08). Quem já desligou fica fora e recebe o rótulo `Já desligou` | Pergunta da aula 3; quem desligou já decidiu (D02.10) e puxaria um grupo só por isso | 14.032 ativos · 11.688 no agrupamento (ligada 11.666, em carência 22), o mesmo número da aula · 2.344 já desligados (90% anuais) |
+| L2 | Saída para descrever os grupos | **Definir**: `saiu_60d` = evento `renovacao_automatica_desligada`, `cancelamento_web` ou `assinatura_expirada` entre 01/08 e 29/09/2026. Não entra no agrupamento | Mede a decisão de sair, como na aula ("pelos eventos"): o anual desliga meses antes de expirar (W4). Carência sozinha não conta (pode pagar) | 1.502 de 11.688 (12,9%; a aula mostra 12,5%) · vazio para `Já desligou` e para 30/09 |
+| L3 | Variáveis do agrupamento | **Usar** as quatro da aula, medidas até 31/07 em `atividades`: treinos por semana (12 semanas, 09/05–31/07, ÷ 12); dias sem treino (sem treino no arquivo: desde 01/01/2026 ou desde o início, o que vier depois); tempo de casa em dias; % dos treinos das 12 semanas em corrida, caminhada ou pedal (0 sem treino) | Aula 3; `atividades` começa em 01/01/2026, daí o teto de dias sem treino | medianas: 1,9 treino por semana, 2 dias sem treino, 267 dias de casa, 69% ao ar livre · 562 sem treino nas 12 semanas |
+| L4 | Escala e algoritmo | **Padronizar** (StandardScaler) e rodar k-means de k = 2 a 8, `n_init = 10`, `random_state = 0` | Sem padronizar, o tempo de casa (dias) dominaria a distância; semente fixa para refazer | nenhuma linha alterada |
+| L5 | Número de grupos | **k = 4** pelas quatro lentes: inércia dobra entre 4 e 5 (−7.522 de 3 para 4, −4.252 de 4 para 5); silhueta 0,43 (fraca; a maior é 0,59 em k = 2); Rand ajustado em 10 reamostras médio 0,999, mínimo 0,998 (k = 6: mínimo 0,63); outra semente 1,000; quatro grupos com ação diferente | Nenhuma lente decide sozinha (aula 3) | Parados 560 · Ativos ao ar livre 5.837 · Ativos em ambiente fechado 4.219 · Veteranos 1.072 |
+| L6 | Variáveis do grupo (até duas, aula 3) | **Testar e deixar de fora**: % de treinos ao ar livre com GPS falho, km por treino ao ar livre e conexões recíprocas; plano, canal e método também fora | Nenhuma muda os grupos (Rand 0,986–0,998 com os quatro) e todas baixam a silhueta (0,32–0,37). Variável 0/1 padronizada pesa demais na distância (aula 3) | ficam no perfil (colunas da tabela), não no agrupamento |
+| L7 | Nome dos grupos | **Definir por regra** sobre as medianas: maior dias sem treino = Parados; maior tempo de casa = Veteranos; dos dois restantes, maior % ao ar livre = Ativos ao ar livre | O k-means devolve números; a regra fixa o nome se a ordem dos rótulos mudar | o notebook para se a regra não separar os quatro |
+| L8 | Tamanho atual | **Classificar** os pagantes de 30/09/2026 com o mesmo padronizador e os mesmos centros, variáveis medidas até 30/09 | O relatório prioriza a base de hoje; a de 31/07 só serve para ver a saída | 14.753 ativos (= enunciado) · Parados 514 · Ao ar livre 6.327 · Ambiente fechado 4.616 · Veteranos 1.046 · Já desligou 2.250 |
+
+### Resultado de referência
+
+Saída em 60 dias (01/08–29/09/2026) por grupo: Parados 29,8% (todos anuais), Ativos ao ar livre
+14,0% (mensal 15,4%, anual 12,6%), Ativos em ambiente fechado 10,9% (12,8% e 8,7%), Veteranos 5,4%;
+média 12,9%. Mensal com até 90 dias de casa: 20,8% ao ar livre, 15,2% em ambiente fechado. Mensal
+no cartão: 17,2%. Já desligou: 32,3% expiraram em 60 dias, 6,9% religaram.
+## Segmentos k-means (ouro) (prata → `3.ouro/segmentos_kmeans.csv`)
+
+Notebook: `notebooks/segmentos_kmeans_ouro.py`. Grão: assinante × data de referência
+(31/07/2026 e 30/09/2026), 28.785 linhas. Artefato: `artefatos/05_segmentos_kmeans.html`.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| N1 | Quem segmentar | **Definir**: assinaturas pagas (`flag_cortesia = 0`) ativas no fim da data de referência (`inicio <= ref` e `data_fim` vazia ou depois de `ref`) | O relatório da semana 5 segmenta a base que pode sair | 14.032 em 31/07/26 · 14.753 em 30/09/26 |
+| N2 | Data de ajuste | **Ajustar** o k-means em 31/07/2026 e medir a saída nos 60 dias seguintes (`data_fim` de 01/08 a 29/09/26); em 30/09 só **atribuir** o centróide mais próximo, com a padronização de 31/07 | Em 30/09 o horizonte de 60 dias ainda não aconteceu; 31/07 é a última data com 60 dias observados até o corte | saída em 60 dias da base de 31/07: 10,5% |
+| N3 | Variáveis | **Usar** nove variáveis de comportamento até `ref`: treinos em 30 dias, tendência (30 dias contra os 60 anteriores), dias sem treinar (teto 120), sessões no app (média de 3 meses), conexões recíprocas, posts em 90 dias, chamados + treinos com GPS falho em 90 dias, recusas em 180 dias, meses de assinatura. Contagens em `log1p`, z-score com média e desvio de 31/07 | Só informação até a data de referência; treinos de `atividades` (sem `flag_inicio_repetido`), que conta o relógio que `uso_mensal` subconta (M9) | — |
+| N4 | Plano, canal, sistema | **Não usar** no agrupamento; só para descrever os segmentos | O anual só sai na renovação: com plano no k-means o segmento repetiria o plano | — |
+| N5 | Número de segmentos | **k = 4** (k-means++, 20 inicializações, `random_state = 7`) | Guia pede 3–4 segmentos; entre 3 e 4, k = 4 tem o maior silhouette (0,237; k = 3: 0,203). k = 5 (0,253) separa Android com GPS falho, que sai 7,6%, abaixo da média | — |
+| N6 | Nome dos segmentos | **Rotular** pelo traço do centróide: maior recusa = Cobrança falhando; mais dias sem treino = Parados; menos meses de assinatura = Recém-chegados; o restante = Engajados | Rótulo estável se a ordem dos clusters mudar | — |
+| N7 | Prioridade e rótulo quando a prata muda | **Definir**: prioridade "ação imediata" se o segmento sai em 60 dias ≥ 1,5 × a média da base, senão "monitorar". Rótulo de N6 só vale se o centróide está a ≥ 1 desvio da média na variável; grupo sem rótulo vira "Grupo n". k recalculado pela regra de N5 a cada execução | O ouro é refeito quando os colegas atualizam a prata: prioridade, rótulos, k e todo número da página saem do cálculo, não do código | Recém-chegados (9,4% contra limite de 15,7%) passa de "ação imediata" (escolha manual anterior) para "monitorar"; demais iguais |
+
+### Resultado de referência
+
+Base de 31/07/2026, saída em 60 dias: Engajados 8.218 (58,6%) saem 6,8% · Recém-chegados
+2.614 (18,6%) saem 9,4% · Parados 2.755 (19,6%, 93% anual) saem 20,9% · Cobrança falhando
+445 (3,2%, 90% mensal, 64% site) saem 18,9%, 32% das saídas por falha de pagamento. No
+mensal, Parados saem 46,7% contra 12,6% dos Engajados. Base de 30/09: 8.368 · 3.477 · 2.446 ·
+462.
+
+## Conciliação dos segmentos (ouro) (`3.ouro/segmentos.csv` + `3.ouro/segmentos_kmeans.csv` → `3.ouro/conciliacao_segmentos.csv`)
+
+Notebook: `notebooks/conciliacao_segmentos.py`. Grão: segmento L × segmento N × data de
+referência (31/07 e 30/09/2026), 36 linhas. Cruza `segmentos.csv` (decisões L1–L8) com `segmentos_kmeans.csv` (N1–N7). Página:
+`estudos-analises/rascunho_customer_segmentation_report.html`, seção 04.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| X1 | Duas segmentações k-means para o mesmo relatório | **Usar** os quatro grupos de L (renovação ligada, quatro variáveis da aula) como personas e a saída por decisão de L2; **usar** "Já desligou" (L) e "Cobrança falhando" (N) como listas operacionais; "Recém-chegados" (N) vira recorte (mensal com até 90 dias) dentro dos Ativos; "Parados" e "Engajados" de N ficam só no cruzamento. Prioridade: ação imediata se a saída em 60 dias ≥ 1,5 × a média **ou** o grupo tem o maior número esperado de saídas (taxa × base de 30/09) | Mesma base de 14.032 em 31/07, mas eixos diferentes (Rand ajustado 0,046 sem "Já desligou"). Em N, 58% dos Parados já tinham desligado a renovação (causalidade reversa, K7 da etapa "quem saiu"); L separa estável (Rand 0,999 em reamostras, silhueta 0,43). Recusas e treino dos últimos 30 dias, que só N tem, separam a cobrança. A saída por decisão chega meses antes do fim no anual (1.502 decidiram, 711 já tinham `data_fim` na janela) | Personas em 30/09: Parados 514 · Ativos ao ar livre 6.327 · Ativos em ambiente fechado 4.616 · Veteranos 1.046 (12.503). Listas: Já desligou 2.250 · Cobrança falhando 462 (se sobrepõe às personas). Ação imediata: Parados (29,8%) e Ativos ao ar livre (≈ 887 saídas) |
+
+### Resultado de referência
+
+31/07/2026: 558 dos 560 Parados (L) estão nos Parados de N. Dos 1.422 mensais ativos (L) com
+até 90 dias de casa, 1.104 estão em Recém-chegados (N). Cobrança falhando (N): 54% no cartão;
+193 nos Ativos ao ar livre e 189 nos de ambiente fechado. Dentro dos Ativos ao ar livre, quem
+está em Parados de N (pouco treino nos últimos 30 dias) sai 25,9% pela decisão, contra 11,7%
+dos Engajados.
 ## Recusas de cobrança (ouro) (`2.prata/pagamentos.csv` + `2.prata/assinaturas.csv` → `3.ouro/recusas_cobranca.csv`)
 
 Notebook: `notebooks/recusas_cobranca_ouro.py`. Grão: uma cobrança recusada; jul/2024–set/2026,
 3.250 linhas de 3.013 assinantes. Saídas: `dados/3.ouro/recusas_cobranca.csv`, a planilha
 `dados/3.ouro/recusas_cobranca.xlsx` (abas `recusas`, `resumo_mensal`, `resumo_canal`,
-`regras`) e o artefato `artefatos/02_recusas_cobranca.html`.
+`regras`) e o artefato `artefatos/06_recusas_cobranca.html`.
 
 | # | Problema | Decisão | Motivo | Efeito na contagem |
 |---|---|---|---|---|
@@ -466,9 +575,69 @@ quebrar. Rode depois de mexer em qualquer notebook.
 
 ### Churn mensal (ouro)
 
-- Separar a perda voluntária (renovação desligada, cancelamento) da involuntária (falha de
+- ~~Separar a perda voluntária (renovação desligada, cancelamento) da involuntária (falha de
   pagamento, carência) e da devolução (chargeback, reembolso), usando os eventos anteriores
-  ao fim (E5, E8).
+  ao fim (E5, E8).~~ Feito pelo `motivo_fim` em W2–W3: a subida de 2026 é voluntária.
 - Anual: medir a taxa de não renovação (venceu no mês e não renovou). A taxa mensal sobre
   toda a base anual dilui o efeito.
 - Janeiro alto nos dois anos (6,4% e 7,4%): conferir se é vencimento de anuais.
+- A G1 registra média de 5,68% (2025) e 6,67% (jan–set/26), mas a tabela `churn_mensal.csv` atual dá
+  5,62% e 6,62% (média dos 12 e dos 9 meses de `churn_pct`, recorte total), que arredondam para os
+  5,6% e 6,6% do enunciado. Conferir de onde veio o 5,68/6,67 e corrigir a G1 (riscando a antiga).
+  Conferido em 07/11/2026 ao montar a `00_historia_da_eda.html`.
+
+### Quem saiu em jul–set/2026 (ouro)
+
+- Debates do `memorial.md` (D02.1–D02.6) estão como **proposto**: o grupo confirma a janela
+  30/06 + jul–set, a fonte `atividades`, o trimestre abr–jun e o uso do tamanho do efeito.
+- Separar a saída voluntária da involuntária na base K1 (`motivo_fim`): a recusa de cobrança
+  separa pouco no total. Tipos definidos em W2; falta aplicar na base K1 (etapa 04).
+- GPS falho no android mensal (+4,3 p.p.): testar se sobrevive ao tipo de treino (quem corre ao
+  ar livre) antes de chamar de driver.
+
+### Por que saem (ouro)
+
+- Anual: 287 desligamentos (12,8%) exatamente 42 dias antes do fim, na loja e no site. Conferir
+  se há lembrete de renovação ou e-mail de aviso nessa data (não está no enunciado nem no
+  dicionário).
+- Taxa involuntária por método usa denominador de período (ativos em algum dia de jan–set/26):
+  trocar por taxa mensal se for para o ROI.
+- Tema da pesquisa por palavra-chave (W5): comparar com a extração por IA quando ela existir.
+- Debates D03.1–D03.4 do `memorial.md` estão como **proposto**.
+
+### Segmentação (ouro)
+
+- GPS falho: entre os mensais ao ar livre, quem teve treino com GPS falho saiu **menos** em ago–set
+  (11,8% × 16,6%), o contrário da etapa 02. Suspeita de seleção (quem teve a falha e saiu em julho
+  não está na base de 31/07): testar no modelo com a base de 30/06.
+- Alvo do modelo da semana 10: decisão de sair (L2, desligar ou expirar) ou perda (G1, expirar)?
+  Muda o anual, que desliga meses antes de expirar.
+- `Já desligou` (2.250 em 30/09, 93% anuais): decidir se entra no plano de intervenção como lista
+  de reversão.
+- Diferença para a referência da aula (12,5% de saída; parados 472): não sabemos a regra de borda da
+  aula; os grupos e as taxas batem dentro de poucos pontos.
+- Debates D04.1–D04.5 do `memorial.md`.
+
+### Segmentos k-means (ouro)
+
+- Discutir com o grupo os quatro segmentos e os rótulos antes do Segmentation Report (15/11).
+- Decidir se o segmento entra no modelo de churn como variável ou fica só para comunicação.
+- Reajustar quando a extração com IA trouxer objetivo do onboarding e intenção de sair no feed.
+- Cruzar segmentos com o resultado da campanha de ago/26 (uplift por segmento).
+
+### Conciliação dos segmentos (ouro)
+
+- ~~Os IDs K1–K7 colidem entre o k-means de nove variáveis e a etapa "quem saiu".~~ Resolvido
+  na integração de 07/11: o k-means de nove variáveis passou a N1–N7; K fica com "quem saiu".
+- ~~Numeração das páginas colide (`02_segmentos_kmeans` × `02_quem_saiu`).~~ Resolvido na
+  integração: a página do k-means de nove variáveis é `05_segmentos_kmeans.html` e a de
+  recusas de cobrança, `06_recusas_cobranca.html`.
+- ~~A letra R da conciliação colide com R1–R5 (recusas de cobrança).~~ Resolvido na
+  integração: a conciliação passou a X1.
+- ~~O laço `notebooks/*_ouro.py` roda em ordem alfabética: `assinantes_30jun26_ouro.py` lê o
+  `churn_mensal.csv` antes de ele existir, e a conciliação lê os dois k-means.~~ Resolvido na
+  integração: `churn_mensal_ouro.py` roda antes do laço e a conciliação virou
+  `conciliacao_segmentos.py`, rodado depois (instruções no `AGENTS.md` e no `README.md`).
+- ~~`segmentos_ouro.py` quebra no pandas 2.x (`np.maximum` entre data e `Timestamp`).~~
+  Trocado por `b.inicio.clip(lower=INICIO_ARQUIVO)` na integração; mesmo resultado.
+- Validar X1 com o grupo (Camila, Douglas) antes de fechar o relatório de 15/11.

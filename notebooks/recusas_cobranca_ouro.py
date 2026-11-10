@@ -1,5 +1,5 @@
 """Prata -> ouro: recusas_cobranca (uma linha por cobrança recusada) + planilha .xlsx +
-artefatos/02_recusas_cobranca.html.
+artefatos/06_recusas_cobranca.html.
 
 Histórico de todos os casos de cobrança recusada e do que aconteceu depois de cada um.
 
@@ -24,7 +24,7 @@ Regras (decisões R1–R5 no decisoes.md):
 Saídas:
   dados/3.ouro/recusas_cobranca.csv   uma linha por recusa
   dados/3.ouro/recusas_cobranca.xlsx  abas: recusas · resumo_mensal · resumo_canal · regras
-  artefatos/02_recusas_cobranca.html  só agregados
+  artefatos/06_recusas_cobranca.html  só agregados
 
 Conferência (o notebook para se não bater): 3.250 recusas; toda perdida tem
 motivo_fim = falha_pagamento e as 1.321 assinaturas com esse motivo são perdidas daqui.
@@ -215,5 +215,5 @@ tab["taxa_recuperacao_pct"] = tab.taxa_recuperacao_pct.map(lambda v: br(v, 1))
 pg.tabela(tab, "Por canal, método e plano")
 pg.tabela(dias_fim.astype(int).reset_index().rename(columns={"median": "mediana"}),
           "Dias entre a recusa e o fim da assinatura, nas perdidas")
-destino = pg.salvar("02_recusas_cobranca.html")
+destino = pg.salvar("06_recusas_cobranca.html")
 print(f"artefato: {destino.relative_to(RAIZ)}")

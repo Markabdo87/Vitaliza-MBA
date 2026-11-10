@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Rascunho de trabalho do Customer Segmentation Report da Vitaliza, com resultados de segmentação pendentes de validação.">
+  <meta name="description" content="Customer Segmentation Report da Vitaliza: quatro personas, duas listas operacionais e a conciliação das duas segmentações k-means do grupo.">
   <title>Customer Segmentation Report | Vitaliza</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,6 +95,22 @@
     .source-list { margin: 14px 0 0; padding-left: 22px; }
     .source-list li { margin: 7px 0; }
     .footer-note { padding-top: 22px; font-size: 13px; }
+    .bar-fill.coral { background: var(--coral); }
+    .bar-fill.cinza { background: var(--cinza-escuro); }
+    .bar-label small { display: block; font-weight: 300; font-size: 12px; }
+    .persona-tag.acao { border-color: var(--coral); color: var(--coral); }
+    .persona-card.lista { background: var(--cinza-claro); }
+    .persona-stats { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 2px; font-size: 13px; }
+    .persona-stats b { font-size: 22px; font-family: var(--titulo); display: block; line-height: 1.1; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0 0; }
+    .kpi { padding: 14px 16px; border: 1px solid var(--cinza-medio); }
+    .kpi b { display: block; font-family: var(--titulo); font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+    .kpi span { font-size: 13px; }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+    td.forte { background: #d8ecec; font-weight: 700; }
+    td.medio { background: #edf5f5; }
+    .legend { display: flex; flex-wrap: wrap; gap: 14px; margin: 0 0 10px; font-size: 13px; }
+    .legend i { display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -1px; }
     @media (max-width: 760px) {
       .page-inner { padding: 20px 18px 48px; }
       h1 { font-size: 34px; }
@@ -105,6 +121,7 @@
       .bar-label { grid-column: 1 / -1; }
       .axis { margin-left: 0; margin-right: 70px; }
       .persona-grid, .priority-grid, .eda-list, .limits-list { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 420px) {
       .masthead { align-items: center; }
@@ -127,221 +144,323 @@
     <div class="masthead-copy">
       <p class="eyebrow">Case Vitaliza · MBA em IA e Dados para Negócios · Módulo 2</p>
       <h1>Customer Segmentation Report</h1>
-      <p class="subtitle">Relatório de trabalho para organizar evidências, hipóteses e decisões de segmentação.</p>
+      <p class="subtitle">Quem são os assinantes da Vitaliza, quanto cada grupo sai e onde agir primeiro.</p>
     </div>
     <img class="logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTkiIGhlaWdodD0iNTQiIHZpZXdCb3g9IjAgMCA5OSA1NCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGcgY2xpcC1wYXRoPSJ1cmwoI2NsaXAwXzM4MDJfMTE4MSkiPgo8cGF0aCBkPSJNNzUuMDM0MiAzMS43NzE4Qzc1Ljc4NzcgMzEuNzcxOCA3Ni4zOTg2IDMwLjkwMDcgNzYuMzk4NiAyOS44MjYxQzc2LjM5ODYgMjguNzUxNSA3NS43ODc3IDI3Ljg4MDQgNzUuMDM0MiAyNy44ODA0Qzc0LjI4MDggMjcuODgwNCA3My42Njk5IDI4Ljc1MTUgNzMuNjY5OSAyOS44MjYxQzczLjY2OTkgMzAuOTAwNyA3NC4yODA4IDMxLjc3MTggNzUuMDM0MiAzMS43NzE4WiIgZmlsbD0iI0ZGNDU0NSIvPgo8cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTgxLjYwOTggMS4zODUwMkM4MS40MDYxIDEuNDY5NDUgODAuNTk1MiAxLjcxNTA2IDgwLjg5ODggMS4yNDY4NkM4MS4yNzkzIDAuNzM2NDQ5IDgxLjg4MjYgMC4zOTg3MzQgODIuNDU5MSAwLjE0OTI4NEM4Mi42MzIxIDAuMDgwMjA2MSA4My41MDgzIC0wLjE5OTk0NSA4My4yMzU0IDAuMjQ5MDY0QzgyLjg1NSAwLjc4NjMzOSA4Mi4yMDE2IDEuMTI3ODkgODEuNjEzNiAxLjM4NTAyTTcwLjQyNjIgMjYuMTI2NUM2OS42NjUyIDI2LjI1NyA2OS41OTk5IDI1LjA5MDQgNjkuNjM4MyAyNC41ODc2QzY5LjcxNTIgMjMuODYyMyA2OS45ODQyIDIyLjg0MTUgNzAuNzM3NSAyMi41NDIyQzcxLjUxNzYgMjIuMzI3MiA3MS42MDYgMjMuNTI0NiA3MS41NzE0IDI0LjAzMTJDNzEuNDk4NCAyNC43NTY1IDcxLjIyOTQgMjUuODg4NiA3MC40MjYyIDI2LjEyNjVaTTc1LjU5OTEgNi4yNzQyMkM3NS4yMzQgNi40ODUzIDc0LjkxNSA2LjQwNDcgNzUuMTYwOSA1Ljk2NzIxQzc1LjUwNjggNS4zOTUzOSA3Ni4wMjE4IDQuOTE1NjggNzYuNTkwNiA0LjU3NDEzQzc2LjkxMzQgNC4zODk5MiA3Ny4zNDc3IDQuMzU5MjIgNzcuMDk0MSA0LjgyMzU4Qzc2LjczNjYgNS40MTg0MiA3Ni4xOTA5IDUuOTE3MzIgNzUuNjAyOSA2LjI3ODA2TTgxLjU3MTMgMjQuMjE5MkM4MC40NjA3IDI0LjMxNTIgNzkuNzk1OCAyMy4zMjUgNzkuODIyNyAyMi4zMDQyQzc5LjkxNDkgMjEuMjAyOCA4MC42NTI4IDIwLjEyMDYgODEuNzc4OSAxOS44ODI2QzgyLjg5NzIgMTkuNzMzIDgzLjYxMjEgMjAuNjk2MiA4My42MDQ0IDIxLjczNjJDODMuNTI3NSAyMi44NzIyIDgyLjc1MTIgMjQuMDIzNSA4MS41NzEzIDI0LjIxNTRNODUuMzM3NyAyLjA2NDI5Qzg1LjAxODcgMi4xNTYzOSA4My45ODQ5IDIuMzI1MjUgODQuMjQ2MiAxLjY5NTg3Qzg0LjU4MDYgMS4wNTQ5OCA4NS4zNjg0IDAuNjk0MjM1IDg2LjAyOTQgMC40ODdDODYuMzI1MyAwLjQwMjU3MSA4Ny4zODYxIDAuMTk5MTc0IDg3LjE4MjQgMC44MTMyMDNDODYuODc4OCAxLjQ4ODYzIDg2LjAwMjUgMS44NTcwNSA4NS4zMzc3IDIuMDY4MTJNODEuOTY3MiAxNy44OTQ3QzgwLjcwMjggMTguMDkwNCA3OS44MzA0IDE3LjEyNzIgNzkuOTYxMSAxNS44OTUzQzgwLjE4NzggMTQuNTQ4MyA4MS4yMzMxIDEzLjM3MzkgODIuNTU1MiAxMy4wMjA5QzgzLjc5MjcgMTIuNzcxNCA4NC43NzI3IDEzLjYxOTUgODQuNjg4MiAxNC44NzgzQzg0LjQ5OTggMTYuMzAyMSA4My4zNyAxNy41NzYyIDgxLjk2MzQgMTcuODk0N004OS4zODA3IDE2LjEyNTVDODguMzIgMTYuMjI1MyA4Ny4zMDU0IDE1LjU2MTQgODcuMzUxNSAxNC40MjE2Qzg3LjQ4MjEgMTMuMjY2NSA4OC40ODkgMTIuNDEwNyA4OS41OTk3IDEyLjIxODhDOTAuNjQxMiAxMi4wOTk4IDkxLjY3ODkgMTIuNzEzOSA5MS42ODI3IDEzLjgzODNDOTEuNTk4MiAxNS4wNDMzIDkwLjUyOTggMTUuOTQ1MiA4OS4zODA3IDE2LjEyMTdNODQuMTMwOSA1LjY3MTcxQzgzLjQ3NzYgNS44NDQ0IDgyLjI3ODUgNS44MDk4NiA4Mi41ODk4IDQuODMxMjVDODIuOTg5NSAzLjg0MTEzIDg0LjA2MTcgMy4yMDQwOCA4NS4wMzc5IDIuODkzMjNDODUuNjM3NCAyLjcyODIxIDg2LjkyMSAyLjY1OTEzIDg2LjY5ODEgMy42MjYyMkM4Ni4zNDg0IDQuNjg5MjYgODUuMTQxNiA1LjM2MDg1IDg0LjEzNDcgNS42NzE3MU04Mi44NTExIDExLjI2MzJDODEuNzAyIDExLjUxNjUgODAuNTI2IDEwLjk1MjQgODAuODA2NiA5LjYzMjE5QzgxLjIwMjQgOC4yNDI5NSA4Mi40NzgzIDcuMjAyOTQgODMuODI3MyA2Ljc5MjMxQzg0LjkwMzQgNi41MTk4MyA4Ni4yMzMxIDYuODk1OTMgODYuMDQ4NiA4LjIzMTQ0Qzg1LjcyMiA5LjczMTk3IDg0LjI4MDggMTAuODY3OSA4Mi44NTExIDExLjI2N005Ni44OTQxIDguMTMxNjZDOTYuMDMzMiA4LjE5MzA2IDk0Ljc5MTggNy44MTMxMyA5NC43NzI2IDYuNzc2OTZDOTQuODU3MiA1Ljc2MzgxIDk1Ljk5NDggNS4yNzI1OSA5Ni44Nzg3IDUuMTkyQzk3LjY4OTYgNS4xNDk3OCA5OC45NjU1IDUuNDY4MzEgOTkuMDA3OCA2LjQ3Mzc4Qzk5LjA1MzkgNy41MTM3OSA5Ny43NTQ5IDguMDcwMjYgOTYuODkwMiA4LjEzMTY2TTkwLjUzMzYgMy44NzU2N0M4OS45OTE3IDMuOTYwMSA4OC44MDQyIDMuOTQwOTEgODguOTQ2NCAzLjExNTgxQzg5LjE3MzEgMi4zMDk5IDkwLjE3NjIgMS45MTg0NSA5MC45MjE4IDEuNzcyNjJDOTEuNDUyMSAxLjY4ODE5IDkyLjYxMjggMS42ODA1MiA5Mi41NTUxIDIuNDc4NzZDOTIuMzg5OSAzLjMzMDcyIDkxLjI4MyAzLjczMzY4IDkwLjUzMzYgMy44NzU2N1pNODkuODA3MyA5LjYzNjAzQzg4LjcyMzUgOS43NzQxOSA4Ny4yNDM5IDkuMzUyMDQgODcuMzkzNyA4LjAwMTE4Qzg3LjY1ODkgNi42NzcxOCA4OS4wMjcxIDUuODcxMjcgOTAuMjY0NiA1LjYzMzMzQzkxLjMwOTkgNS40Nzk4MiA5Mi43OTcyIDUuODIxMzggOTIuNzcwMyA3LjEzMDAzQzkyLjYwODkgOC41NDYxMyA5MS4wODMyIDkuNDA5NjEgODkuODA3MyA5LjYzNjAzTTcxLjA0NDkgMjAuODQ5N0M3MC4xMjI2IDIxLjE0OTEgNzAuMTE0OSAxOS44MDk3IDcwLjIxNDggMTkuMjM0MUM3MC40MTg1IDE4LjI1OTMgNzAuOTE0MiAxNy4xMjcyIDcxLjg0NDMgMTYuNjQzNkM3Mi43ODIgMTYuMjQ4NCA3Mi44NjY2IDE3LjUxNDggNzIuNzYyOCAxOC4xMzY1QzcyLjU1OTEgMTkuMTM4MSA3Mi4wNTE4IDIwLjQxNjEgNzEuMDQ0OSAyMC44NDk3Wk02OC4xNTg3IDIxLjY3MUM2Ny42MDE0IDIxLjkxMjggNjcuNzMyMSAyMC44MDc1IDY3Ljc3ODIgMjAuNTM4OUM2Ny45MTI3IDE5Ljg5NDIgNjguMTU4NyAxOS4wODQ0IDY4LjczNTIgMTguNjk2OEM2OS4zMDc4IDE4LjM4OTggNjkuMTk2MyAxOS40ODM1IDY5LjE0NjQgMTkuNzY3NUM2OS4wMTE5IDIwLjQxNjEgNjguNzY5OCAyMS4zMTQxIDY4LjE1NDggMjEuNjcxTTczLjk2MTkgOS44ODE2NEM3My4zMjAxIDEwLjIzMDkgNzMuMTIwMiA5Ljc0NzMyIDczLjM2NjIgOS4xNzU1MUM3My43NjU5IDguMzM1MDYgNzQuNDIzMSA3LjU5MDU1IDc1LjIxODYgNy4xMDMxNkM3NS43OTg5IDYuNzc2OTYgNzYuMTkwOSA3LjA0MTc2IDc1LjkyMTkgNy42ODY0OUM3NS41MDY4IDguNTY5MTYgNzQuNzk5NyA5LjM3ODkxIDczLjk2MTkgOS44ODE2NE03Mi4yMTcxIDE1LjEyMzlDNzEuMjY0IDE1LjU2MTQgNzEuMjMzMiAxNC40MjE2IDcxLjQyOTIgMTMuNzc2OUM3MS44MDIgMTIuNjc5MyA3Mi41MTY4IDExLjU5MzIgNzMuNTMxNCAxMC45ODY5Qzc0LjQ1IDEwLjUwNzIgNzQuNjc2NyAxMS4zODk5IDc0LjQ2MTUgMTIuMTQ1OUM3NC4wODEgMTMuMzA0OSA3My4zMTYyIDE0LjUyNTIgNzIuMjE3MSAxNS4xMjM5TTY3LjQxMzEgMTcuNTcyNEM2Ny4wMjUgMTcuODcxNyA2Ny4yMzYzIDE2Ljk1MDYgNjcuMjgyNSAxNi44MDFDNjcuNDY2OSAxNi4yMjUzIDY3LjcyMDYgMTUuNjAzNiA2OC4xNzAyIDE1LjE4MTVDNjguNTc3NiAxNC44NDM4IDY4LjM4MTYgMTUuNzE0OSA2OC4zMjc4IDE1Ljg5MTRDNjguMTM1NiAxNi40Nzg2IDY3Ljg4NTggMTcuMTUwMiA2Ny40MTMxIDE3LjU3MjRNNzEuMDA2NSAxMS41NTQ5QzcwLjU2NDUgMTEuODY1NyA3MC42Mzc1IDExLjMyMDggNzAuNzY0NCAxMS4wMjkxQzcxLjA0MTEgMTAuNDM0MyA3MS40MzY5IDkuODY2MjkgNzEuOTU5NiA5LjQ2MzM0QzcyLjM4NjIgOS4xNTYzMiA3Mi40MDE1IDkuNTgyMyA3Mi4yNTE3IDkuOTIwMDJDNzEuOTYzNCAxMC41MzQgNzEuNTUyMiAxMS4xMzY2IDcxLjAwNjUgMTEuNTU0OVpNNjkuMjQ2MyAxNi42NTlDNjguNTU4NCAxNy4wNzM1IDY4Ljc2NTkgMTUuODc5OSA2OC44Njk3IDE1LjU0MjJDNjkuMTU0MSAxNC42ODI2IDY5LjYxNTMgMTMuNzc2OSA3MC4zNTMxIDEzLjIxMjdDNzEuMDQ4OCAxMi43NDQ2IDcwLjkyOTYgMTMuNzg0NiA3MC44MDY2IDE0LjE5NTJDNzAuNTA2OSAxNS4wODU1IDcwLjAzOCAxNi4wOTQ4IDY5LjI0NjMgMTYuNjU1MU03NC45OTE4IDI1Ljk2OTJDNzMuODczNSAyNi4wOTIgNzMuNTA0NSAyNC44MDI1IDczLjU1MDcgMjMuOTE2QzczLjY1MDYgMjIuODUzIDc0LjIwNCAyMS41ODY2IDc1LjMxNDcgMjEuMjYwNEM3Ni40NTk5IDIxLjAzMzkgNzYuODkwNCAyMi4zMjcyIDc2Ljg1MTkgMjMuMjM2OEM3Ni43NTk3IDI0LjMyNjcgNzYuMTgzMiAyNS43MTk3IDc0Ljk5MTggMjUuOTY5MlpNNzUuNDc5OSAxOS43ODI5Qzc0LjE4ODYgMjAuMDc4NCA3My43Njk3IDE4LjcyNzUgNzMuOTMxMSAxNy42OTUyQzc0LjIwMDEgMTYuMzU5NiA3NS4wNTcyIDE0Ljk4OTYgNzYuMzcxNSAxNC40NzkyQzc3LjY1MTMgMTQuMDgwMSA3OC4yMjc4IDE1LjI3NzQgNzguMDg1NiAxNi4zODY1Qzc3LjgzNTggMTcuNzk0OSA3Ni45MDk2IDE5LjMzNzcgNzUuNDc5OSAxOS43ODY3TTc4LjIyMDEgNy45ODE5OUM3Ny40NTE1IDguMjg1MTcgNzYuNjgyOCA4LjAyODA0IDc3LjA1NTYgNy4xMDdDNzcuNTUxNCA2LjA0NzggNzguNTI3NiA1LjIxMTE4IDc5LjU3NjcgNC43Mjc2NEM4MC4yNDE2IDQuNDUxMzIgODEuMjUyNCA0LjQ3NDM1IDgwLjkxMDMgNS40NDE0NUM4MC40MjYxIDYuNTgxMjQgNzkuMzMwOCA3LjQ5MDc3IDc4LjIxNjMgNy45ODU4M003Ni42MjEzIDEzLjM1NDdDNzUuNDUzIDEzLjc0MjMgNzQuODg0MiAxMi44MzY3IDc1LjE4NCAxMS43NjU5Qzc1LjYyOTggMTAuNDIyOCA3Ni42NzkgOS4yMjkyNCA3Ny45NzggOC42NTM1OEM3OS4wNTc5IDguMjM5MTEgNzkuODk5NiA4Ljg0MTYzIDc5LjYyNjcgMTAuMDA4M0M3OS4yMDAxIDExLjQ1NTEgNzguMDI3OSAxMi43OTQ0IDc2LjYyMTMgMTMuMzU0N1pNNzkuODk5NiA0LjA2NzU2Qzc5LjUwNzYgNC4yMzI1OCA3OC43MDA1IDQuMzUxNTQgNzkuMDQyNSAzLjcwMjk4Qzc5LjQ2OTEgMi45OTMwMSA4MC4yMTQ3IDIuNDgyNTkgODAuOTU2NCAyLjE0ODcyQzgxLjI4NyAyLjAxMDU2IDgyLjIyMDggMS43OTE4MSA4MS45MDk1IDIuNDQwMzhDODEuNDg2OCAzLjE4ODczIDgwLjY2NDQgMy43MjIxNiA3OS44OTk2IDQuMDcxMzkiIGZpbGw9IiNGRjQ1NDUiLz4KPHBhdGggZD0iTTEuMzY0MzIgMzEuNzcxOEMyLjExNzgyIDMxLjc3MTggMi43Mjg2NSAzMC45MDA3IDIuNzI4NjUgMjkuODI2MUMyLjcyODY1IDI4Ljc1MTUgMi4xMTc4MiAyNy44ODA0IDEuMzY0MzIgMjcuODgwNEMwLjYxMDgyOSAyNy44ODA0IDAgMjguNzUxNSAwIDI5LjgyNjFDMCAzMC45MDA3IDAuNjEwODI5IDMxLjc3MTggMS4zNjQzMiAzMS43NzE4WiIgZmlsbD0iI0ZGNDU0NSIvPgo8cGF0aCBkPSJNMi40NjM4NSAzNS42NDc5SDAuMjYxNzE5VjUzLjczNDlIMi40NjM4NVYzNS42NDc5WiIgZmlsbD0iIzJFMjY0MCIvPgo8cGF0aCBkPSJNOC4yOTM5NSAzNi42NjkxQzkuODEyIDM2LjAyNDQgMTIuNTA5OSAzNS4zNDEzIDE1LjczODIgMzUuMzQxM0MyMC4wNjU2IDM1LjM0MTMgMjMuMDY3MSAzNi43ODQzIDIzLjA2NzEgNDIuNTQ0NlY1My43MzE1SDIwLjg2NDlWNDIuNTgzQzIwLjg2NDkgMzguMTQ2NyAxOC43NzgxIDM3LjQyNTIgMTUuNzM4MiAzNy40MjUyQzEzLjQ1OTIgMzcuNDI1MiAxMS44MjU4IDM3Ljc2NjcgMTAuNDk2MSAzOC4yOTYzVjUzLjcyNzZIOC4yOTM5NVYzNi42NjUzVjM2LjY2OTFaIiBmaWxsPSIjMkUyNjQwIi8+CjxwYXRoIGQ9Ik0yOC4yOTc5IDI4LjA5NTdIMzAuNVYzNS42NDgzSDM4LjA5NDFWMzcuNzMyMUgzMC41VjQ3LjQ0MTRDMzAuNSA1MC45Mjk5IDMyLjA1NjUgNTEuOTE2MiAzNC4zMzU1IDUxLjkxNjJDMzUuODUzNSA1MS45MTYyIDM3LjQ4NjkgNTEuNTc0NiAzOC41NTE0IDUxLjA0NUwzOC44OTM1IDUzLjA5NDRDMzcuNzU1OSA1My42MjQgMzYuMDQ1NyA1NC4wMDM5IDM0LjM3MzkgNTQuMDAzOUMzMC44NDIgNTQuMDAzOSAyOC4yOTc5IDUyLjI5NjEgMjguMjk3OSA0Ny40NDUzVjI4LjA5OTVWMjguMDk1N1oiIGZpbGw9IiMyRTI2NDAiLz4KPHBhdGggZD0iTTU3LjIwOTggNDUuNTgwMkg0NC40NTA1VjQ1LjczMzdDNDQuNDUwNSA1MC4xMzE3IDQ2Ljg3OTQgNTEuOTUwOCA1MC44MzAyIDUxLjk1MDhDNTMuMDMyMyA1MS45NTA4IDU1LjE5NiA1MS4zODI4IDU2LjYwMjYgNTAuNjIzTDU2LjkwNjIgNTIuNjcyM0M1NS4xNjE0IDUzLjU0MzQgNTMuMDcwOCA1NC4wMDAxIDUwLjc5MTggNTQuMDAwMUM0NS4wOTYyIDU0LjAwMDEgNDIuMjEgNTEuMTU2NCA0Mi4yMSA0NC42NzA3QzQyLjIxIDM5LjUxMjkgNDQuMDcwMSAzNS4zNDEzIDQ5Ljk1NzggMzUuMzQxM0M1NC42NjU3IDM1LjM0MTMgNTcuNTEzNSAzNy45OTcgNTcuNTEzNSA0My4xODk0QzU3LjUxMzUgNDMuOTg3NiA1Ny40MzY2IDQ0Ljg1ODggNTcuMjA5OCA0NS41ODAyTTQ0LjQ1MDUgNDMuNjQ2MUg1NS40MjI4VjQzLjQ1OEM1NS40MjI4IDM5LjA2IDUzLjIyMDYgMzcuMzUyMyA0OS45MTU1IDM3LjM1MjNDNDYuNjEwNCAzNy4zNTIzIDQ0LjQ0NjcgMzkuMDYgNDQuNDQ2NyA0My40NThWNDMuNjQ2MUg0NC40NTA1WiIgZmlsbD0iIzJFMjY0MCIvPgo8cGF0aCBkPSJNNjIuMzQ0NyAyOC4wNjFINjQuNTQ2OVY0OC41NzczQzY0LjU0NjkgNTEuMTk0NiA2NS40MTkzIDUxLjg3NzcgNjYuNzQ5IDUxLjg3NzdDNjcuNTA5OSA1MS44Nzc3IDY4LjA3ODcgNTEuNzYyNSA2OC41MzIyIDUxLjUzNjFMNjguODc0MyA1My41NDcxQzY4LjM3ODUgNTMuNzczNSA2Ny42NTk4IDUzLjkyNyA2Ni42NzIxIDUzLjkyN0M2NC4yMDQ4IDUzLjkyNyA2Mi4zNDQ3IDUyLjY3NTkgNjIuMzQ0NyA0OC44NDU5VjI4LjA2NDlWMjguMDYxWiIgZmlsbD0iIzJFMjY0MCIvPgo8cGF0aCBkPSJNNzYuMTM3NyAzNS42NDc5SDczLjkzNTVWNTMuNzM0OUg3Ni4xMzc3VjM1LjY0NzlaIiBmaWxsPSIjMkUyNjQwIi8+CjwvZz4KPGRlZnM+CjxjbGlwUGF0aCBpZD0iY2xpcDBfMzgwMl8xMTgxIj4KPHJlY3Qgd2lkdGg9Ijk5IiBoZWlnaHQ9IjU0IiBmaWxsPSIjMkUyNjQwIi8+CjwvY2xpcFBhdGg+CjwvZGVmcz4KPC9zdmc+Cg==" alt="Marca Inteli">
   </header>
 
   <div class="status-note" role="note" aria-label="Status do documento">
-    <p><strong>Rascunho de trabalho, análise em andamento.</strong> Os segmentos, os drivers de churn e a priorização ainda não foram consolidados. Os campos pendentes são intencionais, para evitar apresentar hipótese como resultado.</p>
+    <p><strong>Versão conciliada, em revisão do grupo.</strong> Reúne a EDA e o k-means de quatro variáveis da Douglas (páginas 00 a 04, decisões L1–L8) e o k-means de nove variáveis (página 05_segmentos_kmeans, decisões N1–N7), cruzados assinante por assinante (decisão X1). As taxas de saída são históricas (ago–set/2026) e descrevem os grupos; não são previsão.</p>
   </div>
 
   <dl class="meta-grid" aria-label="Informações da entrega">
     <div class="meta-item"><dt>Trilha</dt><dd>Negócios, com evidências de EDA</dd></div>
-    <div class="meta-item"><dt>Data de corte dos dados</dt><dd>30/09/2026</dd></div>
+    <div class="meta-item"><dt>Data de corte dos dados</dt><dd>30/09/2026 · 14.753 assinantes pagantes ativos</dd></div>
     <div class="meta-item"><dt>Prazo informado no guia</dt><dd>15/11/2026, 23h59</dd></div>
   </dl>
 
   <section id="resumo">
     <p class="section-kicker">01 · Síntese</p>
     <h2>Resumo executivo</h2>
-    <p class="section-intro">A síntese final deve responder, com dados, quais grupos de clientes são úteis para decisão, como diferem em comportamento e que evidências sustentam cada hipótese de churn.</p>
-    <div class="callout">
-      <p><strong>Texto a fechar depois da EDA:</strong> resumir o principal padrão observado, a lógica de segmentação, a prioridade preliminar e a principal ressalva. Não nomear personas nem atribuir causas antes de validar os resultados.</p>
+    <p class="section-intro">O churn mensal subiu de 5,6% para 6,6%, e a alta é de <strong>saída voluntária</strong> (+0,97 p.p. ao mês), concentrada no <strong>mensal</strong> (+1,86 p.p.). Quem sai avisa antes: cerca de 14 dias no mensal e 5 meses no anual.</p>
+    <div class="kpi-grid">
+      <div class="kpi"><b>4</b><span>personas de comportamento entre os 12.503 assinantes com a renovação ligada em 30/09</span></div>
+      <div class="kpi"><b>2</b><span>listas operacionais: 2.250 que já desligaram a renovação e 462 com cobrança falhando</span></div>
+      <div class="kpi"><b>5,4% a 29,8%</b><span>saída em 60 dias, de Veteranos a Parados (média 12,9%)</span></div>
+      <div class="kpi"><b>≈ 887</b><span>saídas em 60 dias nos Ativos ao ar livre se a taxa de ago–set se repetir: o maior volume</span></div>
+    </div>
+    <div class="callout" style="margin-top:18px">
+      <p><strong>Prioridade preliminar.</strong> Ação imediata: <strong>Parados</strong> (maior taxa) e <strong>Ativos ao ar livre</strong> (maior volume, a começar pelo mensal com até 90 dias de casa). Ações operacionais à parte: reverter quem <strong>já desligou</strong> a renovação e consertar a <strong>cobrança</strong> no cartão. Monitorar: Ativos em ambiente fechado e Veteranos.</p>
+      <p><strong>Principal ressalva.</strong> Os grupos cortam um contínuo (silhueta 0,43) e as taxas são históricas: dizem onde olhar, não quanto uma ação reduziria a saída. O efeito de cada ação vai ser medido com grupo de controle.</p>
     </div>
   </section>
 
   <section id="contexto">
-    <p class="section-kicker">02 · Evidência já registrada</p>
-    <h2>Contexto de churn documentado</h2>
-    <p class="section-intro">Este é o ponto de partida já registrado no projeto, não uma conclusão sobre os segmentos.</p>
+    <p class="section-kicker">02 · O que a EDA mostra</p>
+    <h2>Por que o churn subiu</h2>
+    <p class="section-intro">Seis achados da EDA (páginas 00 a 03) que sustentam a segmentação. Cruzamentos indicam associação, não causa.</p>
     <div class="chart-card">
-      <p class="chart-title">Média mensal de churn da base paga</p>
-      <p class="chart-caption">Comparação descritiva dos períodos: ano completo de 2025 e janeiro a setembro de 2026.</p>
-      <div class="bar-row">
-        <div class="bar-label">2025</div>
-        <div class="bar-track" role="img" aria-label="5,6 por cento, em escala de zero a oito por cento"><div class="bar-fill" style="width:70%"></div></div>
-        <div class="bar-value">5,6%</div>
-      </div>
-      <div class="bar-row">
-        <div class="bar-label">Jan a set/2026</div>
-        <div class="bar-track" role="img" aria-label="6,6 por cento, em escala de zero a oito por cento"><div class="bar-fill" style="width:82.5%"></div></div>
-        <div class="bar-value">6,6%</div>
-      </div>
-      <div class="axis" aria-hidden="true"><span>0%</span><span>2%</span><span>4%</span><span>6%</span><span>8%</span></div>
-      <p class="source-note"><strong>Regra e fonte:</strong> perdas de assinaturas pagas no mês divididas pelos assinantes pagantes ativos no primeiro dia do mês, com cortesias internas excluídas. Valores arredondados, conforme o registro do projeto em <code>decisoes.md</code> (G1) e <code>artefatos/01_churn_mensal.html</code>. Os períodos têm durações diferentes e a comparação não identifica causa.</p>
-      <div class="button-row"><a class="button-link" href="../artefatos/01_churn_mensal.html" target="_blank" rel="noopener">Abrir a série de churn no repositório</a></div>
+      <p class="chart-title">Churn mensal médio da base paga</p>
+      <p class="chart-caption">Média mensal de 2025 contra jan–set/2026, total e por plano e por tipo de saída.</p>
+      <div class="legend" aria-hidden="true"><span><i style="background:var(--cinza-escuro)"></i>2025</span><span><i style="background:var(--verde-escuro)"></i>jan–set/2026</span></div>
+      <div class="bar-row"><div class="bar-label">Total · 2025</div><div class="bar-track" role="img" aria-label="5,62 por cento"><div class="bar-fill cinza" style="width:28.1%"></div></div><div class="bar-value">5,62%</div></div>
+      <div class="bar-row"><div class="bar-label">Total · jan–set/26</div><div class="bar-track" role="img" aria-label="6,62 por cento"><div class="bar-fill" style="width:33.1%"></div></div><div class="bar-value">6,62%</div></div>
+      <div class="bar-row"><div class="bar-label">Mensal, voluntária · 2025</div><div class="bar-track" role="img" aria-label="8,04 por cento"><div class="bar-fill cinza" style="width:40.2%"></div></div><div class="bar-value">8,04%</div></div>
+      <div class="bar-row"><div class="bar-label">Mensal, voluntária · jan–set/26</div><div class="bar-track" role="img" aria-label="9,83 por cento"><div class="bar-fill" style="width:49.2%"></div></div><div class="bar-value">9,83%</div></div>
+      <div class="bar-row"><div class="bar-label">Anual, voluntária · 2025</div><div class="bar-track" role="img" aria-label="2,51 por cento"><div class="bar-fill cinza" style="width:12.6%"></div></div><div class="bar-value">2,51%</div></div>
+      <div class="bar-row"><div class="bar-label">Anual, voluntária · jan–set/26</div><div class="bar-track" role="img" aria-label="3,16 por cento"><div class="bar-fill" style="width:15.8%"></div></div><div class="bar-value">3,16%</div></div>
+      <div class="bar-row"><div class="bar-label">Involuntária (falha de pagamento) · 2025</div><div class="bar-track" role="img" aria-label="0,43 por cento"><div class="bar-fill cinza" style="width:2.2%"></div></div><div class="bar-value">0,43%</div></div>
+      <div class="bar-row"><div class="bar-label">Involuntária · jan–set/26</div><div class="bar-track" role="img" aria-label="0,46 por cento"><div class="bar-fill" style="width:2.3%"></div></div><div class="bar-value">0,46%</div></div>
+      <div class="axis" aria-hidden="true"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span></div>
+      <p class="source-note"><strong>Regra e fonte:</strong> perdas de assinaturas pagas no mês ÷ ativos no dia 1 (G1), cortesias fora; tipo de saída pelo <code>motivo_fim</code> (W1). Os totais reproduzem o enunciado (5,6% e 6,6%). <code>artefatos/01_churn_mensal.html</code> e <code>03_por_que_saem.html</code>.</p>
     </div>
+    <ul class="eda-list">
+      <li><span class="item-label">1. A alta é voluntária e do mensal</span>Voluntária de 5,12% para 6,09% ao mês; involuntária estável (0,43% → 0,46%). Mensal +1,86 p.p., anual +0,70 p.p. O reajuste do mensal (R$ 34,90 → R$ 39,90 em 01/03/26) coincide com a alta, mas não foi testado como causa.</li>
+      <li><span class="item-label">2. Quem sai avisa</span>Entre desligar a renovação e expirar: mediana de 14 dias no mensal e 157 dias no anual. No anual, é uma janela de meses para tentar reverter.</li>
+      <li><span class="item-label">3. No mensal, pesa o tempo de casa</span>31,2% de saída com até 3 meses de casa, contra 10,0% acima de 24 meses (assinantes de 30/06, saída até 30/09). A primeira experiência é o ponto fraco.</li>
+      <li><span class="item-label">4. No anual que vence, pesa o treino</span>Quem treina pouco no trimestre antes do aniversário não renova (AUC 0,78; 0,67 só entre quem estava com a renovação ligada).</li>
+      <li><span class="item-label">5. "Objetivo cumprido" é o motivo que não está na lista</span>55,3% dos comentários com tema na pesquisa de saída ("era só até a prova"). Dos 187 que marcaram <code>preco</code> e comentaram, só 2 falam de dinheiro. Só cobre o site.</li>
+      <li><span class="item-label">6. A falha de cobrança mora no cartão</span>No mensal, 10,7 saídas involuntárias por 100 assinaturas no cartão, contra 2,1 a 3,6 nos outros métodos (jan–set/26).</li>
+    </ul>
   </section>
 
   <section id="personas">
     <p class="section-kicker">03 · Saída da segmentação</p>
-    <h2>Personas a construir com evidências</h2>
-    <p class="section-intro">O guia pede de três a quatro segmentos. Estes cartões são espaços de trabalho, não perfis encontrados nos dados. Manter apenas a quantidade que a análise sustentar.</p>
-    <div class="persona-grid" id="kmeans-persona-slots">
+    <h2>Quatro personas e duas listas operacionais</h2>
+    <p class="section-intro">As personas vêm do k-means de quatro variáveis (treinos por semana, dias sem treino, tempo de casa e % ao ar livre) nos 11.688 pagantes de 31/07/2026 com a renovação ligada; os pagantes de 30/09 recebem o grupo do centro mais próximo. As duas listas são regras de entrada, não grupos de comportamento.</p>
+    <div class="chart-card">
+      <p class="chart-title">Saída em 60 dias por persona (01/08 a 29/09/2026)</p>
+      <p class="chart-caption">Desligou a renovação, cancelou no site ou expirou. Entre parênteses, o intervalo de Wilson 95%. Média da base com renovação ligada: 12,9%.</p>
+      <div class="bar-row"><div class="bar-label">Parados<small>514 em 30/09 · IC 26,2–33,7</small></div><div class="bar-track" role="img" aria-label="29,8 por cento"><div class="bar-fill coral" style="width:85.1%"></div></div><div class="bar-value">29,8%</div></div>
+      <div class="bar-row"><div class="bar-label">Ativos ao ar livre<small>6.327 em 30/09 · IC 13,1–14,9</small></div><div class="bar-track" role="img" aria-label="14,0 por cento"><div class="bar-fill coral" style="width:40%"></div></div><div class="bar-value">14,0%</div></div>
+      <div class="bar-row"><div class="bar-label">Ativos em ambiente fechado<small>4.616 em 30/09 · IC 10,0–11,9</small></div><div class="bar-track" role="img" aria-label="10,9 por cento"><div class="bar-fill" style="width:31.1%"></div></div><div class="bar-value">10,9%</div></div>
+      <div class="bar-row"><div class="bar-label">Veteranos<small>1.046 em 30/09 · IC 4,2–6,9</small></div><div class="bar-track" role="img" aria-label="5,4 por cento"><div class="bar-fill" style="width:15.4%"></div></div><div class="bar-value">5,4%</div></div>
+      <div class="axis" aria-hidden="true"><span>0%</span><span>7%</span><span>14%</span><span>21%</span><span>28%</span><span>35%</span></div>
+      <p class="source-note"><strong>Regra e fonte:</strong> <code>dados/3.ouro/segmentos.csv</code>, gerada por <code>notebooks/segmentos_ouro.py</code> (L1–L8); página <code>artefatos/04_segmentos.html</code>. Coral = ação imediata.</p>
+    </div>
+
+    <div class="persona-grid" style="margin-top:18px">
       <article class="persona-card">
-        <div class="persona-heading"><h3>Segmento A, nome a definir</h3><span class="persona-tag">Pendente</span></div>
+        <div class="persona-heading"><h3>Parados</h3><span class="persona-tag acao">Ação imediata · maior taxa</span></div>
+        <div class="persona-stats"><span><b>514</b>em 30/09 (4,8% em 31/07)</span><span><b>29,8%</b>saída em 60 dias</span><span><b>100%</b>anual</span></div>
         <dl class="field-list">
-          <div><dt>Perfil e necessidade</dt><dd>A preencher com variáveis observadas.</dd></div>
-          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
-          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
-          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+          <div><dt>Perfil e necessidade</dt><dd>Paga o anual e não treina. Precisa de um motivo para voltar antes do aniversário.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>0 treino por semana, 194 dias sem treino e 18 meses de casa (medianas).</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Perda de rotina ou objetivo cumprido ("era só até a prova"). No anual, quem não treina não renova.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Taxa 2,3 vezes a média. O k-means de nove variáveis põe 558 dos 560 no seu próprio grupo "Parados": as duas segmentações concordam aqui. Grupo pequeno, intervalo largo.</dd></div>
+          <div><dt>Direção da ação</dt><dd>Reativar antes da renovação: plano de treino personalizado (sem custo direto); 1 mês grátis só perto do aniversário, com controle sorteado.</dd></div>
         </dl>
       </article>
       <article class="persona-card">
-        <div class="persona-heading"><h3>Segmento B, nome a definir</h3><span class="persona-tag">Pendente</span></div>
+        <div class="persona-heading"><h3>Ativos ao ar livre</h3><span class="persona-tag acao">Ação imediata · maior volume</span></div>
+        <div class="persona-stats"><span><b>6.327</b>em 30/09 (49,9% em 31/07)</span><span><b>14,0%</b>saída em 60 dias</span><span><b>49%</b>mensal</span></div>
         <dl class="field-list">
-          <div><dt>Perfil e necessidade</dt><dd>A preencher com variáveis observadas.</dd></div>
-          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
-          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
-          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+          <div><dt>Perfil e necessidade</dt><dd>Corre, caminha ou pedala 2 vezes por semana, muitas vezes com uma data marcada. Precisa do próximo objetivo antes de cumprir o atual.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>2,0 treinos por semana, 81% ao ar livre, 7 meses de casa (medianas).</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Treino com data marcada (prova, evento): cumprido o objetivo, sai. O mensal com até 90 dias de casa sai 20,8%.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>≈ 887 saídas em 60 dias se a taxa se repetir. No cruzamento: 1.403 são "Recém-chegados" no outro k-means (16,0% de saída); 390 que treinavam no trimestre mas pararam no último mês saem 25,9%; 193 com cobrança falhando saem 20,7%.</dd></div>
+          <div><dt>Direção da ação</dt><dd>Próximo desafio antes do fim do atual (nova prova, novo plano). Desconto de 3 meses no mensal só se o teste mostrar efeito.</dd></div>
         </dl>
       </article>
       <article class="persona-card">
-        <div class="persona-heading"><h3>Segmento C, nome a definir</h3><span class="persona-tag">Pendente</span></div>
+        <div class="persona-heading"><h3>Ativos em ambiente fechado</h3><span class="persona-tag">Monitorar</span></div>
+        <div class="persona-stats"><span><b>4.616</b>em 30/09 (36,1% em 31/07)</span><span><b>10,9%</b>saída em 60 dias</span><span><b>53%</b>mensal</span></div>
         <dl class="field-list">
-          <div><dt>Perfil e necessidade</dt><dd>A preencher com variáveis observadas.</dd></div>
-          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
-          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
-          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+          <div><dt>Perfil e necessidade</dt><dd>Força, funcional ou yoga 2 vezes por semana. Busca progressão na rotina.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>2,0 treinos por semana, 15% ao ar livre, 7 meses de casa (medianas).</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Rotina estável. O risco está no mensal recém-chegado (15,2%) e na cobrança do cartão.</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Abaixo da média. No cruzamento: 164 que pararam no último mês saem 16,5%; 189 com cobrança falhando saem 15,3%.</dd></div>
+          <div><dt>Direção da ação</dt><dd>Conteúdo e progressão de treino (sem custo); ação só no mensal novo e na troca de método para quem paga no cartão.</dd></div>
         </dl>
       </article>
       <article class="persona-card">
-        <div class="persona-heading"><h3>Segmento D, opcional</h3><span class="persona-tag">Só se sustentado</span></div>
+        <div class="persona-heading"><h3>Veteranos</h3><span class="persona-tag">Monitorar</span></div>
+        <div class="persona-stats"><span><b>1.046</b>em 30/09 (9,2% em 31/07)</span><span><b>5,4%</b>saída em 60 dias</span><span><b>63%</b>anual</span></div>
         <dl class="field-list">
-          <div><dt>Perfil e necessidade</dt><dd>Usar somente se um quarto grupo for interpretável.</dd></div>
-          <div><dt>Comportamentos que o distinguem</dt><dd>A preencher com medidas e fontes.</dd></div>
-          <div><dt>Hipótese de driver de churn</dt><dd>Em aberto, validar antes de afirmar.</dd></div>
-          <div><dt>Evidência e confiança</dt><dd>Registrar números, notebook e limitações.</dd></div>
+          <div><dt>Perfil e necessidade</dt><dd>Quase 5 anos de casa e hábito formado. Quer reconhecimento, não desconto.</dd></div>
+          <div><dt>Comportamentos que o distinguem</dt><dd>2,2 treinos por semana e 4,8 anos de casa (medianas).</dd></div>
+          <div><dt>Hipótese de driver de churn</dt><dd>Hábito formado; parte é sobrevivência (só ficou quem gosta).</dd></div>
+          <div><dt>Evidência e confiança</dt><dd>Menos da metade da média. Oferta para quem ficaria de qualquer jeito é custo sem retorno.</dd></div>
+          <div><dt>Direção da ação</dt><dd>Reconhecimento e indicação de amigos, sem desconto.</dd></div>
+        </dl>
+      </article>
+      <article class="persona-card lista">
+        <div class="persona-heading"><h3>Lista: já desligou a renovação</h3><span class="persona-tag acao">Reversão</span></div>
+        <div class="persona-stats"><span><b>2.250</b>em 30/09</span><span><b>32,3%</b>expiraram em 60 dias</span><span><b>93%</b>anual</span></div>
+        <dl class="field-list">
+          <div><dt>Quem é</dt><dd>Desligou a renovação e segue pagando e usando até o fim do período. Treina pouco: mediana de 0,25 treino por semana no anual.</dd></div>
+          <div><dt>Por que é uma lista, não persona</dt><dd>A decisão já foi tomada; uso baixo aqui pode ser consequência, não causa (causalidade reversa). 68% deles caem em "Parados" no k-means de nove variáveis.</dd></div>
+          <div><dt>Janela</dt><dd>No anual, mediana de 157 dias até expirar; só 6,9% religaram sozinhos em 60 dias.</dd></div>
+          <div><dt>Direção da ação</dt><dd>Contato de reversão no anual com meses de antecedência, com controle sorteado.</dd></div>
+        </dl>
+      </article>
+      <article class="persona-card lista">
+        <div class="persona-heading"><h3>Lista: cobrança falhando</h3><span class="persona-tag acao">Operacional</span></div>
+        <div class="persona-stats"><span><b>462</b>em 30/09</span><span><b>18,9%</b>terminaram em 60 dias</span><span><b>90%</b>mensal</span></div>
+        <dl class="field-list">
+          <div><dt>Quem é</dt><dd>Treina como a média, mas teve cobrança recusada nos últimos 180 dias. 54% pagam no cartão.</dd></div>
+          <div><dt>De onde vem</dt><dd>Grupo do k-means de nove variáveis (recusas a 5,5 desvios da média). Atravessa as personas: 193 estão nos Ativos ao ar livre e 189 nos de ambiente fechado.</dd></div>
+          <div><dt>Driver</dt><dd>Churn involuntário (cartão vencido, sem limite): 32% das saídas do grupo são por falha de pagamento, contra 1% a 12% nos demais.</dd></div>
+          <div><dt>Direção da ação</dt><dd>Aviso de cartão, retentativa e troca para Pix Automático; sem desconto.</dd></div>
         </dl>
       </article>
     </div>
   </section>
 
-  <section id="hipoteses">
-    <p class="section-kicker">04 · Interpretação</p>
-    <h2>Hipóteses de driver e validação</h2>
-    <p class="section-intro">Preencher uma linha por segmento mantido. Cruzamentos observacionais indicam associação; não demonstram causalidade.</p>
+  <section id="conciliacao">
+    <p class="section-kicker">04 · Conciliação</p>
+    <h2>Duas segmentações, uma leitura</h2>
+    <p class="section-intro">O grupo rodou dois k-means sobre a mesma base de 14.032 pagantes de 31/07/2026. Eles cortam a base por eixos diferentes (índice de Rand ajustado 0,05, sem "Já desligou"): um olha <em>o que</em> e <em>há quanto tempo</em> a pessoa treina; o outro, engajamento recente, cobrança e novidade. O relatório usa o primeiro para as personas e o segundo para as listas e recortes.</p>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Segmento</th><th>Hipótese a testar</th><th>Evidência que sustentará a leitura</th><th>Ressalva</th></tr></thead>
+        <thead><tr><th></th><th>Personas (k-means de 4 variáveis)</th><th>k-means de 9 variáveis</th></tr></thead>
         <tbody>
-          <tr><td>A, B ou C</td><td>Pendente de análise</td><td>Diferença observável, medida, período e notebook de origem</td><td>Cobertura, viés ou mudança de medição</td></tr>
-          <tr><td>Outro segmento</td><td>Pendente de análise</td><td>Diferença observável, medida, período e notebook de origem</td><td>Cobertura, viés ou mudança de medição</td></tr>
-          <tr><td>D, se houver</td><td>Pendente de análise</td><td>Diferença observável, medida, período e notebook de origem</td><td>Cobertura, viés ou mudança de medição</td></tr>
+          <tr><td><strong>Base</strong></td><td>11.688 com a renovação ligada; 2.344 já desligados ficam à parte</td><td>Todos os 14.032 pagantes</td></tr>
+          <tr><td><strong>Variáveis</strong></td><td>Treinos/semana (12 semanas), dias sem treino, tempo de casa, % ao ar livre</td><td>Treinos em 30 dias, tendência, dias sem treinar, sessões, conexões, posts, chamados + GPS falho, recusas, meses de assinatura</td></tr>
+          <tr><td><strong>Saída em 60 dias</strong></td><td>Decisão: desligou, cancelou ou expirou (12,9%)</td><td>Fim da assinatura, <code>data_fim</code> (10,5%)</td></tr>
+          <tr><td><strong>Qualidade</strong></td><td>Silhueta 0,43; Rand em reamostras 0,999</td><td>Silhueta 0,24 (9 dimensões; não comparável direto)</td></tr>
+          <tr><td><strong>Decisões</strong></td><td>L1–L8 · <code>segmentos_ouro.py</code></td><td>N1–N7 · <code>segmentos_kmeans_ouro.py</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-card">
+      <p class="chart-title">Assinantes de 31/07/2026 nas duas segmentações</p>
+      <p class="chart-caption">Linhas: personas. Colunas: k-means de 9 variáveis. Entre parênteses, a saída em 60 dias pela decisão (desligou, cancelou ou expirou).</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th></th><th class="num">Engajados</th><th class="num">Recém-chegados</th><th class="num">Parados</th><th class="num">Cobrança falhando</th><th class="num">Total</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Parados</strong></td><td class="num">0</td><td class="num">0</td><td class="num forte">558 (29,6%)</td><td class="num">2</td><td class="num">560</td></tr>
+            <tr><td><strong>Ativos ao ar livre</strong></td><td class="num forte">3.851 (11,7%)</td><td class="num medio">1.403 (16,0%)</td><td class="num">390 (25,9%)</td><td class="num">193 (20,7%)</td><td class="num">5.837</td></tr>
+            <tr><td><strong>Ativos em ambiente fechado</strong></td><td class="num forte">2.859 (10,2%)</td><td class="num medio">1.007 (11,1%)</td><td class="num">164 (16,5%)</td><td class="num">189 (15,3%)</td><td class="num">4.219</td></tr>
+            <tr><td><strong>Veteranos</strong></td><td class="num forte">976 (4,9%)</td><td class="num">3</td><td class="num">56 (10,7%)</td><td class="num">37 (10,8%)</td><td class="num">1.072</td></tr>
+            <tr><td><strong>Já desligou</strong> (lista)</td><td class="num">532</td><td class="num">201</td><td class="num forte">1.587</td><td class="num">24</td><td class="num">2.344</td></tr>
+            <tr><td><strong>Total</strong></td><td class="num">8.218</td><td class="num">2.614</td><td class="num">2.755</td><td class="num">445</td><td class="num">14.032</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="source-note"><strong>Regra e fonte:</strong> <code>dados/3.ouro/conciliacao_segmentos.csv</code>, gerada por <code>notebooks/conciliacao_segmentos.py</code> (X1), que só cruza as duas tabelas de ouro. Os "Já desligou" não têm taxa de decisão: já tinham decidido.</p>
+    </div>
+    <ul class="eda-list">
+      <li><span class="item-label">Os "Parados" de nove variáveis misturam dois públicos</span>Dos 2.755, 1.587 (58%) já tinham desligado a renovação. Separados, os que ainda estão com a renovação ligada (1.168) saem 25,6% pela decisão. Por isso as personas tiram quem já decidiu.</li>
+      <li><span class="item-label">As duas réguas de saída medem momentos diferentes</span>Dos 1.502 que decidiram sair entre 01/08 e 29/09, só 711 já tinham a assinatura encerrada no período: o anual decide meses antes de expirar. A régua da decisão é a que serve para agir a tempo.</li>
+      <li><span class="item-label">"Recém-chegados" é o mensal novo das personas</span>Dos 1.422 mensais ativos com até 90 dias de casa, 1.104 estão em "Recém-chegados". Vira recorte dentro de Ativos ao ar livre e em ambiente fechado, não persona à parte.</li>
+      <li><span class="item-label">Cobrança e queda recente só aparecem com nove variáveis</span>Recusas e treinos dos últimos 30 dias não entram nas quatro variáveis da aula. Viram lista operacional (cobrança) e sinal de alerta dentro das personas (parou no último mês).</li>
+    </ul>
+  </section>
+
+  <section id="hipoteses">
+    <p class="section-kicker">05 · Interpretação</p>
+    <h2>Hipóteses de driver e validação</h2>
+    <p class="section-intro">Uma linha por persona ou lista. Cruzamentos observacionais indicam associação; não demonstram causalidade.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Segmento</th><th>Hipótese a testar</th><th>Evidência que sustenta a leitura</th><th>Ressalva</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Parados</strong></td><td>Perda de rotina ou objetivo cumprido leva a não renovar o anual</td><td>29,8% de saída em 60 dias; AUC 0,78 dos dias com treino no anual que vence (etapa 02); "objetivo cumprido" em 55,3% dos comentários com tema</td><td>Grupo pequeno (560); pesquisa só cobre o site</td></tr>
+          <tr><td><strong>Ativos ao ar livre</strong></td><td>Treino com data marcada: cumprida a prova, sai; o mensal novo ainda não formou hábito</td><td>14,0% de saída; 20,8% no mensal com até 90 dias; 31,2% de saída no mensal com até 3 meses de casa (etapa 02)</td><td>Viés de sobrevivência no tempo de casa; GPS falho não se confirmou como driver (11,8% com falha × 16,6% sem)</td></tr>
+          <tr><td><strong>Ativos em ambiente fechado</strong></td><td>Rotina estável; risco concentrado no mensal novo e no cartão</td><td>10,9% de saída; 15,2% no mensal com até 90 dias; cartão no mensal 17,2%</td><td>Taxa abaixo da média; ação ampla seria custo</td></tr>
+          <tr><td><strong>Veteranos</strong></td><td>Hábito formado protege da saída</td><td>5,4% de saída, menos da metade da média</td><td>Sobrevivência: só ficou quem gosta</td></tr>
+          <tr><td><strong>Já desligou</strong></td><td>No anual, a janela até expirar permite reverter parte das saídas</td><td>157 dias de aviso (mediana); 6,9% religam sozinhos em 60 dias</td><td>Efeito de um contato ainda não medido</td></tr>
+          <tr><td><strong>Cobrança falhando</strong></td><td>Saída involuntária evitável com régua de cobrança e troca de método</td><td>10,7 saídas involuntárias por 100 no mensal no cartão (etapa 03); 32% das saídas do grupo por falha de pagamento</td><td>Recusa não é saída: 81% do grupo continuou assinante em 60 dias</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <section id="prioridade">
-    <p class="section-kicker">05 · Decisão preliminar</p>
+    <p class="section-kicker">06 · Decisão preliminar</p>
     <h2>Prioridade: agir ou monitorar</h2>
-    <p class="section-intro">A classificação só será preenchida depois de comparar risco, tamanho do grupo, evidência e possibilidade de intervenção. Nenhum segmento está alocado nesta versão.</p>
-    <div class="priority-grid">
+    <p class="section-intro">Critério: <strong>ação imediata</strong> quando o grupo sai pelo menos 1,5 vez a média (19,3% em 60 dias) <em>ou</em> concentra o maior número esperado de saídas; as duas listas são ações operacionais. Abaixo disso, monitorar.</p>
+    <div class="chart-card">
+      <p class="chart-title">Saídas em 60 dias se a taxa de ago–set se repetir na base de 30/09</p>
+      <p class="chart-caption">Taxa de cada persona × assinantes em 30/09. Ordem de grandeza, não previsão.</p>
+      <div class="bar-row"><div class="bar-label">Ativos ao ar livre</div><div class="bar-track" role="img" aria-label="887 saídas"><div class="bar-fill coral" style="width:88.7%"></div></div><div class="bar-value">887</div></div>
+      <div class="bar-row"><div class="bar-label">Ativos em ambiente fechado</div><div class="bar-track" role="img" aria-label="502 saídas"><div class="bar-fill" style="width:50.2%"></div></div><div class="bar-value">502</div></div>
+      <div class="bar-row"><div class="bar-label">Parados</div><div class="bar-track" role="img" aria-label="153 saídas"><div class="bar-fill coral" style="width:15.3%"></div></div><div class="bar-value">153</div></div>
+      <div class="bar-row"><div class="bar-label">Veteranos</div><div class="bar-track" role="img" aria-label="57 saídas"><div class="bar-fill" style="width:5.7%"></div></div><div class="bar-value">57</div></div>
+      <div class="axis" aria-hidden="true"><span>0</span><span>250</span><span>500</span><span>750</span><span>1.000</span></div>
+    </div>
+    <div class="priority-grid" style="margin-top:18px">
       <article class="priority-card">
         <h3>Ação imediata</h3>
-        <p>Critério proposto: evidência consistente e relevante, hipótese verificável e ação viável de curto prazo.</p>
-        <p class="pending-line"><strong>Segmentos:</strong> ainda não definidos.</p>
+        <p><strong>Parados</strong>: maior taxa (29,8%). <strong>Ativos ao ar livre</strong>: maior volume, a começar pelo mensal com até 90 dias de casa.</p>
+        <p class="pending-line"><strong>Operacional:</strong> lista de reversão de quem já desligou (2.250) e régua de cobrança (462).</p>
       </article>
       <article class="priority-card monitor">
         <h3>Monitorar</h3>
-        <p>Critério proposto: sinal que merece acompanhamento, mas cuja evidência, estabilidade ou possibilidade de ação ainda precisa de validação.</p>
-        <p class="pending-line"><strong>Segmentos:</strong> ainda não definidos.</p>
+        <p><strong>Ativos em ambiente fechado</strong>: abaixo da média, ação só no mensal novo e no cartão. <strong>Veteranos</strong>: oferta seria custo sem retorno.</p>
+        <p class="pending-line"><strong>Gatilho de alerta:</strong> parou de treinar no último mês (saída de 16,5% a 25,9% dentro dos ativos).</p>
       </article>
     </div>
   </section>
 
   <section id="eda">
-    <p class="section-kicker">06 · Base tecnológica</p>
-    <h2>Evidências que a EDA precisa trazer</h2>
-    <p class="section-intro">O relatório final deve ligar cada persona a gráficos e medidas reproduzíveis, gerados a partir do código do projeto.</p>
-    <ul class="eda-list" id="eda-evidence-slots">
-      <li><span class="item-label">População e preparo</span>Declarar unidade de análise, filtros, corte temporal, dados ausentes e exclusões.</li>
-      <li><span class="item-label">Padrões de churn</span>Detalhar diferenças por plano, canal e variáveis comportamentais, com denominadores e período.</li>
-      <li><span class="item-label">Engajamento e qualidade</span>Conferir comparabilidade das medidas de uso e separar sinais de problemas de cobertura ou medição.</li>
-      <li><span class="item-label">Segmentação</span>Justificar variáveis, método, escala e quantidade de grupos; perfilar os grupos e verificar se são interpretáveis.</li>
+    <p class="section-kicker">07 · Base tecnológica</p>
+    <h2>De onde vem cada número</h2>
+    <p class="section-intro">Todo número desta página sai de notebooks que rodam do zero a partir da bronze. Esta página traz só agregados.</p>
+    <ul class="eda-list">
+      <li><span class="item-label">População e preparo</span>Pagantes sem cortesias; corte 30/09/2026; horários em Brasília; duplicatas e fusos tratados na prata (<code>decisoes.md</code>, seções U a Z).</li>
+      <li><span class="item-label">Padrões de churn</span>Churn mensal por plano, canal e tipo de saída; antecedência do aviso; pesquisa de saída (páginas 01 e 03; decisões G e W).</li>
+      <li><span class="item-label">Engajamento e qualidade</span>Quem saiu em jul–set por tempo de casa, treino e GPS, com a situação da renovação reconstruída pelos eventos (página 02; decisões K da etapa "quem saiu").</li>
+      <li><span class="item-label">Segmentação</span>Dois k-means e o cruzamento entre eles (página 04 e 05_segmentos_kmeans; decisões L, N e X1).</li>
     </ul>
-    <div class="callout" style="margin-top:16px">
-      <p><strong>Sobre o método:</strong> a aula 3 aborda k-Means, mas o algoritmo e o número de grupos não estão definidos por este rascunho. A escolha deve ser justificada pelos dados e pela utilidade das personas.</p>
-    </div>
-    <h3 style="margin-top:24px">Entrada de resultados do K-Means e da EDA</h3>
-    <p>Quando a nova base estiver disponível, os notebooks gerarão os resultados reproduzíveis. Esta página receberá somente resumos agregados e gráficos, não linhas individuais do conjunto de dados.</p>
-    <div class="table-wrap" id="data-contract-slots">
+    <div class="table-wrap" style="margin-top:16px">
       <table>
-        <thead><tr><th>Origem</th><th>Resumo a produzir</th><th>Seções que alimenta</th></tr></thead>
+        <thead><tr><th>Notebook</th><th>Tabela de ouro</th><th>Página</th></tr></thead>
         <tbody>
-          <tr><td>K-Means</td><td>Identificador e tamanho do grupo, participação na base, variáveis que o caracterizam, churn no horizonte de 60 dias e limitações.</td><td>Personas, hipóteses de driver e plano de intervenção.</td></tr>
-          <tr><td>EDA</td><td>Pergunta, métrica e denominador, período e filtros, visualização, leitura do achado e ressalva.</td><td>Contexto e evidências de cada persona.</td></tr>
+          <tr><td><code>churn_mensal_ouro.py</code></td><td><code>churn_mensal.csv</code></td><td><code>01_churn_mensal.html</code></td></tr>
+          <tr><td><code>assinantes_30jun26_ouro.py</code></td><td><code>assinantes_30jun26.csv</code></td><td><code>02_quem_saiu.html</code></td></tr>
+          <tr><td><code>saidas_ouro.py</code></td><td><code>saidas.csv</code></td><td><code>03_por_que_saem.html</code></td></tr>
+          <tr><td><code>segmentos_ouro.py</code></td><td><code>segmentos.csv</code></td><td><code>04_segmentos.html</code></td></tr>
+          <tr><td><code>segmentos_kmeans_ouro.py</code></td><td><code>segmentos_kmeans.csv</code></td><td><code>05_segmentos_kmeans.html</code></td></tr>
+          <tr><td><code>recusas_cobranca_ouro.py</code></td><td><code>recusas_cobranca.csv</code></td><td><code>06_recusas_cobranca.html</code></td></tr>
+          <tr><td><code>conciliacao_segmentos.py</code></td><td><code>conciliacao_segmentos.csv</code></td><td>esta página, seção 04</td></tr>
+          <tr><td><code>eda_historia.py</code></td><td>lê o ouro acima</td><td><code>00_historia_da_eda.html</code> (mini deck)</td></tr>
         </tbody>
       </table>
-    </div>
-    <div class="callout" style="margin-top:16px">
-      <p><strong>Fluxo previsto:</strong> os notebooks processam a base de entrada e geram resultados; dados intermediários em <code>dados/3.ouro/</code> continuam fora do Git conforme a regra do projeto. Versionar o código e os artefatos HTML agregados. Preencher estes espaços somente depois de conferir o esquema da base e validar métricas e filtros.</p>
     </div>
   </section>
 
   <section id="intervencao">
-    <p class="section-kicker">07 · Desdobramento para a semana 10</p>
+    <p class="section-kicker">08 · Desdobramento para a semana 10</p>
     <h2>Plano de intervenção de risco (Churn)</h2>
-    <p class="section-intro">A entrega da semana 10 pede ligar segmentos de risco a uma intervenção, comunicação e retorno esperado. O prazo informado no guia é 20/12/2026. Esta seção é uma estrutura de trabalho: nenhum segmento, oferta, limiar de risco ou ROI está fechado.</p>
+    <p class="section-intro">A entrega da semana 10 (20/12/2026) liga segmentos de risco a uma intervenção, comunicação e retorno esperado. Os segmentos já estão definidos; oferta final, limiar de risco e ROI dependem do modelo e do uplift da campanha de ago/26.</p>
     <div class="callout">
-      <p><strong>Dependências:</strong> concluir a segmentação e a EDA, validar o modelo de risco para o horizonte de 60 dias e só então escolher a quem contatar. O score, por si só, não define uma oferta nem demonstra que a intervenção funcionará.</p>
+      <p><strong>Linha única:</strong> persona → score de risco do modelo (quem, dentro do grupo, sai até 29/11/2026) → oferta → prompt da mensagem com persona, score e variáveis do cliente.</p>
     </div>
-    <h3 style="margin-top:24px">Matriz de intervenção a preencher</h3>
+    <h3 style="margin-top:24px">Matriz de intervenção</h3>
     <div class="table-wrap">
-      <table id="intervention-plan-slots">
+      <table>
         <thead><tr><th>Segmento</th><th>Elegibilidade e risco</th><th>Intervenção e comunicação</th><th>Medição</th></tr></thead>
         <tbody>
-          <tr><td>A, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
-          <tr><td>B, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
-          <tr><td>C, nome a definir</td><td>Score de churn em 60 dias e critério de entrada, após validação do modelo.</td><td>Oferta, canal e mensagem coerentes com a evidência do segmento, ainda não definidos.</td><td>Retenção em 60 dias, uplift incremental e custo por pessoa contatada.</td></tr>
-          <tr><td>D, se a análise sustentar</td><td>Definir somente se houver um quarto grupo interpretável e útil.</td><td>Não presumir que o grupo precise da mesma oferta dos demais.</td><td>Comparar resultado e custo separadamente, se houver amostra suficiente.</td></tr>
+          <tr><td><strong>Parados</strong></td><td>Todos (taxa 29,8%); score para ordenar pela data do aniversário</td><td>Plano de treino personalizado; 1 mês grátis perto da renovação</td><td>Renovação no aniversário, tratado × controle</td></tr>
+          <tr><td><strong>Ativos ao ar livre</strong></td><td>Mensal com até 90 dias e score alto; quem parou no último mês</td><td>Próximo desafio ou prova; desconto de 3 meses só se o uplift sustentar</td><td>Saída em 60 dias, uplift, custo por retido</td></tr>
+          <tr><td><strong>Ativos em ambiente fechado</strong></td><td>Só mensal novo com score alto</td><td>Progressão de treino (conteúdo)</td><td>Saída em 60 dias contra controle</td></tr>
+          <tr><td><strong>Veteranos</strong></td><td>Sem contato pago</td><td>Reconhecimento e indicação</td><td>Indicações, sem meta de retenção</td></tr>
+          <tr><td><strong>Já desligou</strong></td><td>Anual, ordenado pelos dias até expirar</td><td>Contato de reversão</td><td>Religamento, tratado × controle</td></tr>
+          <tr><td><strong>Cobrança falhando</strong></td><td>Recusa nos últimos 180 dias</td><td>Aviso de cartão e troca para Pix Automático</td><td>Saída involuntária evitada</td></tr>
         </tbody>
       </table>
     </div>
     <div class="priority-grid" style="margin-top:18px">
       <article class="priority-card">
         <h3>Desenho de teste</h3>
-        <p>Definir grupo tratado e comparação adequada antes do contato. A campanha de ago/2026 pode informar a análise de uplift; abertura e clique medem atenção, não retenção.</p>
-        <p class="pending-line"><strong>Resultado do teste:</strong> pendente de análise.</p>
+        <p>Grupo de controle sorteado em toda ação. A campanha de ago/2026 dá o primeiro uplift por segmento; abertura e clique medem atenção, não retenção.</p>
+        <p class="pending-line"><strong>Resultado do teste:</strong> pendente (uplift por segmento).</p>
       </article>
       <article class="priority-card">
         <h3>Economia da intervenção</h3>
-        <p>Estimar o benefício incremental de retenção e subtrair o custo total da ação, incluindo oferta, contato, tokens de IA e infraestrutura.</p>
-        <p><strong>Estrutura do cálculo:</strong> ROI = (benefício incremental atribuível à intervenção menos custo total da intervenção) dividido pelo custo total da intervenção. Preencher após validar as premissas.</p>
+        <p>ROI = (benefício incremental atribuível à intervenção − custo total) ÷ custo total, com oferta, contato, tokens de IA e infraestrutura, pelas premissas da seção 03 do enunciado.</p>
         <p class="pending-line"><strong>ROI, payback e premissas:</strong> pendentes de quantificação.</p>
       </article>
-    </div>
-    <div class="callout" style="margin-top:18px">
-      <p><strong>Indicadores a fechar:</strong> taxa de retenção, uplift contra a comparação, custo por cliente contatado e payback. O cálculo deve usar as premissas de negócio da seção 03 do enunciado e custos de tecnologia efetivamente estimados, sem supor conversão ou efeito da oferta.</p>
     </div>
   </section>
 
   <section id="limites">
-    <p class="section-kicker">08 · Leitura responsável</p>
-    <h2>Limitações conhecidas para manter visíveis</h2>
+    <p class="section-kicker">09 · Leitura responsável</p>
+    <h2>Limitações conhecidas</h2>
     <ul class="limits-list">
-      <li><span class="item-label">Corte dos dados</span>O corte oficial é 30/09/2026. Não usar informação posterior ao corte em variáveis ou conclusões sobre o período.</li>
-      <li><span class="item-label">Histórico de churn</span>O histórico começa em jul/2024; na série mensal, ago a dez/2024 têm viés de sobrevivência e exigem cautela.</li>
-      <li><span class="item-label">Uso mensal</span>A contagem de sessões mudou em mar/2026 e a cobertura de meses sem treino varia. Comparações precisam respeitar as flags documentadas.</li>
-      <li><span class="item-label">Pesquisa de saída</span>As respostas são autosselecionadas e vêm de cancelamentos pelo site. Não generalizar automaticamente para toda a base.</li>
-      <li><span class="item-label">Suporte e GPS</span>O pico de chamados de GPS em maio e junho de 2026 é uma pista para investigar, não prova de que o incidente causou churn.</li>
-      <li><span class="item-label">Correlação e causa</span>Diferenças entre segmentos ajudam a formular hipóteses. Causalidade exige desenho de validação apropriado.</li>
+      <li><span class="item-label">Estrutura fraca</span>Silhueta 0,43: os grupos cortam um contínuo, e quem está na fronteira muda de grupo com pouca mudança de comportamento.</li>
+      <li><span class="item-label">Taxa histórica</span>A saída de ago–set/2026 descreve o grupo; não é previsão nem efeito de ação. Inclui a campanha de 10/08/2026, que tratou parte da base.</li>
+      <li><span class="item-label">Duas réguas de saída</span>Decisão (12,9%) e fim da assinatura (10,5%) dão números diferentes para o mesmo grupo; cada tabela diz qual usa.</li>
+      <li><span class="item-label">Sobrevivência e seleção</span>A base de 31/07 não tem quem saiu antes; o tempo de casa carrega viés de sobrevivência.</li>
+      <li><span class="item-label">Pesquisa de saída</span>Só site, jun–set/2026, autosselecionada; a loja (dois terços das saídas) não diz por quê.</li>
+      <li><span class="item-label">Treinos só de 2026</span><code>atividades</code> começa em 01/2026; a contagem de sessões mudou em mar/2026.</li>
     </ul>
   </section>
 
   <section id="fontes">
-    <p class="section-kicker">09 · Referências</p>
+    <p class="section-kicker">10 · Referências</p>
     <h2>Fontes e atualização</h2>
-    <p>Base de trabalho: documentos oficiais e decisões registradas no repositório Vitaliza-MBA. A estrutura deste HTML está alinhada ao escopo da entrega da semana 5; valores e segmentos devem ser atualizados após a análise e a discussão do grupo.</p>
     <ul class="source-list">
-      <li><code>AGENTS.md</code>, escopo da entrega, corte e limites metodológicos.</li>
-      <li><code>decisoes.md</code>, decisões de limpeza e métrica de churn (G1).</li>
-      <li><code>artefatos/01_churn_mensal.html</code>, visualização já existente de churn.</li>
-      <li><code>notebooks/</code>, código de preparo e análise atualmente versionado.</li>
+      <li><code>documentos/</code>: enunciado (seções 02 e 03), dicionário de dados e guia de entregas.</li>
+      <li><code>decisoes.md</code>: G (churn mensal), K (quem saiu), W (por que saem), L (personas), N (k-means de 9 variáveis), R (recusas de cobrança) e X1 (conciliação).</li>
+      <li><code>memorial.md</code>: método e debate de cada etapa da EDA.</li>
+      <li><code>artefatos/00_historia_da_eda.html</code> a <code>06_recusas_cobranca.html</code>.</li>
     </ul>
-    <p class="footer-note"><strong>Atualizado em 07/11/2026.</strong> Este arquivo é um rascunho interno, não substitui os notebooks de EDA nem o mini deck. O botão para a série de churn usa um caminho relativo do repositório; se o HTML for enviado sozinho para outro local, esse link não acompanhará o arquivo.</p>
+    <div class="button-row"><a class="button-link" href="../artefatos/00_historia_da_eda.html" target="_blank" rel="noopener">Abrir a história da EDA</a><a class="button-link" href="../artefatos/04_segmentos.html" target="_blank" rel="noopener">Abrir os segmentos</a></div>
+    <p class="footer-note"><strong>Atualizado em 07/11/2026.</strong> Os links usam caminhos relativos do repositório; se o HTML for enviado sozinho, eles não acompanham o arquivo.</p>
   </section>
 </div>
 </main>

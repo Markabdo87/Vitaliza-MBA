@@ -28,23 +28,30 @@ e completa no guia em `documentos/`.
 ```
 ├── documentos/          # PDFs oficiais: enunciado, dicionário de dados, guia de entregas do M2
 ├── estudos-analises/    # estudos e relatórios do grupo (não oficiais)
-├── artefatos/           # páginas HTML com os gráficos do ouro (abra no navegador)
+├── artefatos/           # páginas HTML com os gráficos do ouro; comece por 00_historia_da_eda.html
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
 │   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
 │   └── 3.ouro/     # tabelas de análise — gerado pelos notebooks, fora do git
-└── notebooks/        # um notebook por tabela: <arquivo>_<camada>.py
+├── notebooks/        # um notebook por tabela: <arquivo>_<camada>.py
+├── decisoes.md       # decisões e premissas que mudam números
+└── memorial.md       # memorial descritivo: conceitos e métodos de cada etapa
 ```
 
 ## Como rodar
 
-Requer Python 3 e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly, openpyxl). A partir da raiz:
+Requer Python 3.11 ou mais novo e as bibliotecas de `requirements.txt` (pyarrow, pandas, scikit-learn, plotly, scipy, openpyxl). A partir da raiz:
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
 for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # gera toda a prata
+.venv/bin/python notebooks/churn_mensal_ouro.py                       # antes do laço: assinantes_30jun26 lê o churn_mensal
 for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ouro e os artefatos
+.venv/bin/python notebooks/conciliacao_segmentos.py                   # cruza os dois k-means (lê o ouro)
+.venv/bin/python notebooks/eda_historia.py                            # página-resumo da EDA (00)
 .venv/bin/python notebooks/conferencias.py                             # confere contagens e números de referência
+.venv/bin/python notebooks/confere_relatorio.py                       # confere o relatório contra o ouro
+.venv/bin/python notebooks/memorial_tecnico.py                        # memorial técnico (estudos-analises/)
 ```
 
 Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
@@ -67,7 +74,12 @@ para gerar as tabelas.
 | `dados/2.prata/pesquisa_saida.csv` | `notebooks/pesquisa_saida_prata.py` | respostas de saída com comentário bruto para a extração com IA |
 | `dados/2.prata/tickets_suporte.csv` | `notebooks/tickets_suporte_prata.py` | chamados com tempo de resolução, resolvidos depois do corte e abandonados marcados |
 | `dados/3.ouro/churn_mensal.csv` | `notebooks/churn_mensal_ouro.py` | churn mensal por plano, canal e método, ago/24–set/26, conferido com o enunciado · gráficos em `artefatos/01_churn_mensal.html` |
-| `dados/3.ouro/recusas_cobranca.csv` (+ `.xlsx`) | `notebooks/recusas_cobranca_ouro.py` | histórico de cada cobrança recusada e seu desfecho (recuperada, perdida, em aberto), jul/24–set/26 · gráficos em `artefatos/02_recusas_cobranca.html` |
+| `dados/3.ouro/assinantes_30jun26.csv` | `notebooks/assinantes_30jun26_ouro.py` | um assinante pagante ativo em 30/06/2026, com a saída em jul–set/26 e as variáveis até 30/06 · gráficos em `artefatos/02_quem_saiu.html` |
+| `dados/3.ouro/saidas.csv` | `notebooks/saidas_ouro.py` | uma assinatura paga encerrada, com o tipo de saída, a antecedência do aviso e a pesquisa de saída · gráficos em `artefatos/03_por_que_saem.html` |
+| `dados/3.ouro/segmentos.csv` | `notebooks/segmentos_ouro.py` | um assinante pagante ativo em 31/07 ou 30/09/2026, com as variáveis do k-means e o segmento · gráficos e personas em `artefatos/04_segmentos.html` |
+| `dados/3.ouro/pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | volume de pagamentos por mês e meio, jul/24–set/26 |
+| `dados/3.ouro/segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | 4 segmentos k-means da base paga (31/07 e 30/09/26) com saída em 60 dias · `artefatos/05_segmentos_kmeans.html` |
+| `dados/3.ouro/recusas_cobranca.csv` (+ `.xlsx`) | `notebooks/recusas_cobranca_ouro.py` | histórico de cada cobrança recusada e seu desfecho (recuperada, perdida, em aberto), jul/24–set/26 · gráficos em `artefatos/06_recusas_cobranca.html` |
 
 As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de
 cada uma, com o efeito na contagem, está em [`decisoes.md`](decisoes.md).

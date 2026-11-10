@@ -1,0 +1,331 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memorial técnico | Vitaliza</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600;700&family=Platypi:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<style>
+  :root { --roxo:#2e2640; --coral:#ff4545; --verde:#066d73; --cinza-medio:#caced6; --cinza-claro:#e6eaeb;
+          --branco:#fff; --codigo:#1f1b2b; --titulo:'Platypi', Georgia, serif; --texto:'Manrope', Arial, sans-serif; }
+  * { box-sizing:border-box; border-radius:0; }
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:var(--branco); color:var(--roxo); font-family:var(--texto); font-size:16px; font-weight:300; line-height:1.55; }
+  .page { width:min(100%, 1280px); margin:0 auto; padding:28px 30px 64px; }
+  h1, h2 { font-family:var(--titulo); font-weight:700; line-height:1.15; }
+  h1 { font-size:40px; margin:10px 0; } h2 { font-size:28px; margin:0 0 12px; }
+  h3 { font-size:18px; font-weight:700; margin:0 0 8px; }
+  p { margin:0 0 10px; } ul { margin:0 0 10px; padding-left:20px; } li { margin:4px 0; }
+  strong { font-weight:700; }
+  code { font-family:ui-monospace, Menlo, Consolas, 'Courier New', monospace; font-size:.92em; overflow-wrap:anywhere; }
+  .eyebrow, .section-kicker { font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; margin:0 0 6px; }
+  header { padding-bottom:22px; border-bottom:1px solid var(--cinza-medio); }
+  .sub { font-size:18px; max-width:80ch; }
+  .meta { font-size:13px; margin-top:12px; }
+  nav { margin:22px 0 0; padding:16px 18px; background:var(--cinza-claro); border-left:4px solid var(--roxo); }
+  nav ol { margin:6px 0 0; padding-left:22px; columns:2; column-gap:32px; }
+  nav a { color:var(--roxo); }
+  section { padding:36px 0; border-bottom:1px solid var(--cinza-medio); }
+  .intro { max-width:90ch; margin-bottom:18px; }
+  .pair { display:grid; grid-template-columns:minmax(0, 5fr) minmax(0, 7fr); gap:22px; margin:18px 0; padding-top:18px; border-top:1px solid var(--cinza-claro); align-items:start; }
+  .pair:first-of-type { border-top:0; }
+  .explain { font-size:15px; }
+  .code { margin:0; background:var(--codigo); position:sticky; top:12px; }
+  .code figcaption { padding:8px 12px; font-size:12px; color:#d9d4e8; border-bottom:1px solid #3a3450; }
+  .code pre { margin:0; padding:12px; overflow:auto; max-height:560px; font-size:12.5px; line-height:1.5; }
+  .code pre code { background:transparent; color:#e8e6f0; padding:0; }
+  .hljs { background:transparent; }
+  footer { padding-top:22px; font-size:13px; }
+  @media (max-width:900px) {
+    .page { padding:20px 16px 48px; } h1 { font-size:32px; } h2 { font-size:24px; }
+    .pair { grid-template-columns:1fr; } .code { position:static; } nav ol { columns:1; }
+  }
+  @media print { .code { position:static; } .code pre { max-height:none; white-space:pre-wrap; } .pair { break-inside:avoid; } }
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+  <p class="eyebrow">Case Vitaliza · MBA em IA e Dados para Negócios · Módulo 2 · Grupo 07</p>
+  <h1>Memorial técnico</h1>
+  <p class="sub">Como cada número da EDA e do Customer Segmentation Report é produzido: a explicação de cada etapa, à esquerda, e o código que a executa, à direita.</p>
+  <p class="meta">Gerado em 07/11/2026 21:30 por <code>notebooks/memorial_tecnico.py</code> · 20 trechos lidos dos notebooks no momento da geração · números do texto lidos de <code>dados/3.ouro</code> · base de 14.753 pagantes ativos em 30/09/2026</p>
+  <nav aria-label="Sumário"><strong>Sumário</strong><ol><li><a href="#arquitetura">Arquitetura e regras do repositório</a></li><li><a href="#prata">Prata: limpeza que muda os números</a></li><li><a href="#churn">Churn mensal (regra G1)</a></li><li><a href="#eda">EDA: por que saem e quem já decidiu</a></li><li><a href="#personas">Personas: k-means de quatro variáveis (L1–L8)</a></li><li><a href="#nove">Segunda segmentação: k-means de nove variáveis (N1–N7)</a></li><li><a href="#conciliacao">Conciliação das duas segmentações (X1)</a></li><li><a href="#conferencias">Conferências: como saber que os números estão certos</a></li><li><a href="#ambiente">Execução, ambiente e limites</a></li></ol></nav>
+</header>
+<section id="arquitetura"><p class="section-kicker">01</p><h2>Arquitetura e regras do repositório</h2><div class="intro"><p>O case roda num pipeline de três camadas, todas recriadas por código a partir dos arquivos originais do curso. Nenhum número das entregas é digitado à mão: cada um sai de um notebook que qualquer pessoa do grupo roda do zero e chega ao mesmo resultado.</p><p>- <strong>Bronze</strong> (<code>dados/1.bronze</code>): os arquivos como vieram do curso. Imutáveis; o <code>.claude/settings.json</code> bloqueia edição.</p><p>- <strong>Prata</strong> (<code>dados/2.prata</code>): uma tabela por arquivo de origem, mesmo grão, formatos e fusos corrigidos, duplicatas comprovadas removidas e suspeitas marcadas com colunas <code>flag_*</code>.</p><p>- <strong>Ouro</strong> (<code>dados/3.ouro</code>): tabelas de análise, que cruzam a prata por <code>user_id</code> e agregam.</p><p>- <strong>Páginas</strong> (<code>artefatos/</code>): HTML gerado pelo ouro, com só agregados; vão para o git.</p><p>- <strong>Relatório</strong> (<code>estudos-analises/</code>): o Customer Segmentation Report, conferido contra o ouro por <code>notebooks/confere_relatorio.py</code>.</p><p>Toda decisão que muda um número tem um ID no <code>decisoes.md</code> (prefixo da seção + número): G churn mensal, K quem saiu, W por que saem, L personas, N k-means de nove variáveis, R recusas de cobrança, X conciliação.</p></div><div class="pair"><div class="explain"><h3>Leitura conferida da prata</h3><p>Todo notebook de ouro novo lê a prata por <code>ler_prata</code>, que para a execução com uma mensagem clara em três casos: o arquivo não existe (diz qual notebook rodar), falta uma coluna usada (a prata mudou de formato) ou o notebook de prata é mais novo que o arquivo (a prata está velha). Isso protege o ouro quando um colega muda uma regra de limpeza: ou ele roda sobre a prata certa, ou não roda.</p></div><figure class="code"><figcaption><code>notebooks/_ouro.py</code> · linhas 29–55</figcaption><pre><code class="language-python">def ler_prata(arquivo, colunas, datas=()):
+    &quot;&quot;&quot;Lê `dados/2.prata/&lt;arquivo&gt;` (csv ou parquet) só com `colunas`, já conferido.&quot;&quot;&quot;
+    caminho = PRATA / arquivo
+    nb = _notebook_de(arquivo)
+    rodar = f&quot;.venv/bin/python {nb.relative_to(RAIZ)}&quot;
+    if not caminho.exists():
+        sys.exit(f&quot;falta {caminho.relative_to(RAIZ)}: rode {rodar}&quot;)
+    if nb.exists() and nb.stat().st_mtime &gt; caminho.stat().st_mtime:
+        print(f&quot;aviso: {nb.name} mudou depois de {arquivo} ser gerado; rode {rodar}&quot;)
+
+    if caminho.suffix == &quot;.parquet&quot;:
+        import pyarrow.parquet as pq
+        existentes = pq.read_schema(caminho).names
+    else:
+        existentes = pd.read_csv(caminho, nrows=0).columns.tolist()
+    faltam = [c for c in colunas if c not in existentes]
+    if faltam:
+        sys.exit(f&quot;{caminho.relative_to(RAIZ)} não tem as colunas {faltam}. &quot;
+                 f&quot;A prata mudou de formato: ajuste o notebook de ouro ou rode {rodar}&quot;)
+
+    if caminho.suffix == &quot;.parquet&quot;:
+        df = pd.read_parquet(caminho, columns=list(colunas))
+    else:
+        df = pd.read_csv(caminho, usecols=list(colunas), parse_dates=list(datas))
+    if df.empty:
+        sys.exit(f&quot;{caminho.relative_to(RAIZ)} está vazio: rode {rodar}&quot;)
+    return df</code></pre></figure></div></section><section id="prata"><p class="section-kicker">02</p><h2>Prata: limpeza que muda os números</h2><div class="intro"><p>A prata corrige o que o dicionário avisa (ninguém limpou os dados) e o que o perfil dos arquivos revelou. As correções abaixo são as que mais afetam churn, faturamento e segmentação; as demais estão na docstring de cada <code>notebooks/&lt;arquivo&gt;_prata.py</code>.</p></div><div class="pair"><div class="explain"><h3>Fusos: tudo em horário de Brasília</h3><p>As lojas (App Store e Google Play) gravam em UTC com o sufixo <code>Z</code>; o site grava em horário de Brasília. Sem converter, eventos perto da meia-noite caem no dia (ou mês) errado. A função reconhece o formato pelo sufixo, subtrai 3 horas do UTC (Brasília não tem horário de verão desde 2019) e guarda a origem do fuso. O relógio Garmin, em <code>atividades</code>, também grava em UTC, mas sem o <code>Z</code>: lá a origem do treino decide a conversão.</p></div><figure class="code"><figcaption><code>notebooks/eventos_assinatura_prata.py</code> · linhas 67–70</figcaption><pre><code class="language-python">def parse_data(s):
+    if s.endswith(&quot;Z&quot;):
+        return datetime.strptime(s, &quot;%Y-%m-%dT%H:%M:%SZ&quot;) - timedelta(hours=3), &quot;utc&quot;
+    return datetime.strptime(s, &quot;%Y-%m-%d %H:%M:%S&quot;), &quot;brt&quot;</code></pre></figure></div><div class="pair"><div class="explain"><h3>Pagamentos: duplicatas, retentativas, devoluções e recusas</h3><p>O laço percorre as cobranças de cada usuário em ordem de tempo e aplica quatro regras:</p><p>- <strong>Duplicata</strong>: mesma chave (usuário, segundo, valor, status) conta uma vez (1.941 removidas).</p><p>- <strong>Retentativa</strong>: a coluna <code>tentativa</code> da bronze não registra retentativa. Uma cobrança até 16 dias depois de uma recusa do mesmo usuário é retentativa (<code>tentativa_real</code> 2, 3…).</p><p>- <strong>Devolução</strong>: estorno e chargeback vêm lançados pelo preço de tabela. Passam a valer o negativo da última cobrança aprovada do usuário (quem pagou 34,90 devolve 34,90).</p><p>- <strong>Recusa</strong>: não entra dinheiro, então <code>valor</code> = 0; o valor tentado fica em <code>valor_bronze</code>.</p><p>Com isso, somar <code>valor</code> sem filtro dá o faturamento: set/2026 = R$ 489.873,50 bruto, número de referência que <code>conferencias.py</code> confere a cada execução.</p></div><figure class="code"><figcaption><code>notebooks/pagamentos_prata.py</code> · linhas 65–107</figcaption><pre><code class="language-python">    vistos, linhas, duplicatas = set(), [], 0
+    with open(ENTRADA, newline=&quot;&quot;) as f:
+        for r in csv.DictReader(f):
+            chave = (r[&quot;user_id&quot;], r[&quot;data_hora&quot;], r[&quot;valor&quot;], r[&quot;status&quot;])
+            if chave in vistos:
+                duplicatas += 1
+                continue
+            vistos.add(chave)
+            t, fuso = parse_data(r[&quot;data_hora&quot;])
+            linhas.append({**r, &quot;t&quot;: t, &quot;fuso&quot;: fuso, &quot;v&quot;: parse_valor(r[&quot;valor&quot;])})
+
+    por_usuario = defaultdict(list)
+    for r in linhas:
+        por_usuario[r[&quot;user_id&quot;]].append(r)
+
+    saida = []
+    for lista in por_usuario.values():
+        lista.sort(key=lambda r: (r[&quot;t&quot;], r[&quot;pagamento_id&quot;]))
+        ultima_aprovada = None
+        ultima_cobranca = None  # aprovado ou recusado
+        tentativa = 0
+        for r in lista:
+            valor, original = r[&quot;v&quot;], &quot;&quot;
+            curto = antigo = False
+            if r[&quot;status&quot;] in (&quot;estornado&quot;, &quot;chargeback&quot;):
+                if ultima_aprovada:
+                    valor, original = -ultima_aprovada[&quot;v&quot;], ultima_aprovada[&quot;pagamento_id&quot;]
+                tentativa_real = &quot;&quot;
+            else:
+                retentativa = (
+                    ultima_cobranca is not None
+                    and ultima_cobranca[&quot;status&quot;] == &quot;recusado&quot;
+                    and r[&quot;t&quot;] - ultima_cobranca[&quot;t&quot;] &lt;= JANELA_RETENTATIVA
+                )
+                tentativa = tentativa + 1 if retentativa else 1
+                tentativa_real = tentativa
+                if r[&quot;status&quot;] == &quot;aprovado&quot;:
+                    curto = ultima_aprovada is not None and r[&quot;t&quot;] - ultima_aprovada[&quot;t&quot;] &lt; INTERVALO_CURTO
+                    antigo = r[&quot;v&quot;] == 34.90 and r[&quot;t&quot;] &gt;= REAJUSTE
+                    ultima_aprovada = r
+                ultima_cobranca = r
+            if r[&quot;status&quot;] == &quot;recusado&quot;:
+                valor = 0.0</code></pre></figure></div></section><section id="churn"><p class="section-kicker">03</p><h2>Churn mensal (regra G1)</h2><div class="intro"><p>O enunciado dá o churn de 5,6% em 2025 e 6,6% em jan–set/2026, mas não a regra. A regra que reproduz os números dele é: <strong>perdas no mês ÷ assinantes pagantes ativos no dia 1 do mês</strong>, sem as 60 cortesias internas, e quem assina e sai no mesmo mês não entra em nenhum dos dois lados. Com ela, a média mensal dá 5,62% em 2025 e 6,62% em jan–set/2026.</p></div><div class="pair"><div class="explain"><h3>O cálculo, mês a mês</h3><p>Para cada mês, <code>ativo</code> marca quem começou antes do dia 1 e não tinha terminado até ele; <code>perda</code> é quem estava ativo e terminou dentro do mês. O mesmo cálculo é agregado por recorte (total, plano, canal, plano × canal e método) numa única passada. <code>ativos_inicio</code> e <code>perdas</code> ficam na tabela, para qualquer pessoa refazer a divisão.</p></div><figure class="code"><figcaption><code>notebooks/churn_mensal_ouro.py</code> · linhas 46–57</figcaption><pre><code class="language-python">for m in MESES:
+    d0 = m.start_time
+    ativo = (a.inicio &lt; d0) &amp; (a.data_fim.isna() | (a.data_fim &gt;= d0))
+    perda = ativo &amp; (a.mes_fim_p == m)
+    entrou = (a.inicio.dt.to_period(&quot;M&quot;) == m)
+    for recorte, col in RECORTES.items():
+        g = pd.DataFrame({&quot;seg&quot;: a[col], &quot;ativo&quot;: ativo, &quot;perda&quot;: perda, &quot;entrou&quot;: entrou})
+        agg = g.groupby(&quot;seg&quot;)[[&quot;ativo&quot;, &quot;perda&quot;, &quot;entrou&quot;]].sum()
+        for seg, r in agg.iterrows():
+            linhas.append({&quot;mes&quot;: str(m), &quot;recorte&quot;: recorte, &quot;segmento&quot;: seg,
+                           &quot;ativos_inicio&quot;: int(r.ativo), &quot;perdas&quot;: int(r.perda),
+                           &quot;novas&quot;: int(r.entrou)})</code></pre></figure></div><div class="pair"><div class="explain"><h3>A conferência com o enunciado</h3><p>O notebook para (<code>assert</code>) se qualquer número publicado no enunciado não for reproduzido: ativos no início de jan/25, abr/26 e set/26, perdas e churn de abr/26, churn de ago e set/26 e as duas médias anuais. Uma mudança na prata que desloque um desses números quebra o notebook na hora, em vez de passar despercebida até o relatório.</p></div><figure class="code"><figcaption><code>notebooks/churn_mensal_ouro.py</code> · linhas 67–79</figcaption><pre><code class="language-python">confere = [
+    (&quot;ativos início jan/25&quot;, 8540, tot.loc[&quot;2025-01&quot;, &quot;ativos_inicio&quot;]),
+    (&quot;ativos início abr/26&quot;, 14237, tot.loc[&quot;2026-04&quot;, &quot;ativos_inicio&quot;]),
+    (&quot;perdas abr/26&quot;, 1154, tot.loc[&quot;2026-04&quot;, &quot;perdas&quot;]),
+    (&quot;churn abr/26 (%)&quot;, 8.1, round(tot.loc[&quot;2026-04&quot;, &quot;churn_pct&quot;], 1)),
+    (&quot;ativos início set/26&quot;, 14319, tot.loc[&quot;2026-09&quot;, &quot;ativos_inicio&quot;]),
+    (&quot;churn ago/26 (%)&quot;, 5.9, round(tot.loc[&quot;2026-08&quot;, &quot;churn_pct&quot;], 1)),
+    (&quot;churn set/26 (%)&quot;, 5.0, round(tot.loc[&quot;2026-09&quot;, &quot;churn_pct&quot;], 1)),
+    (&quot;média mensal 2025 (%)&quot;, 5.6, round(media(&quot;2025&quot;), 1)),
+    (&quot;média mensal jan–set/26 (%)&quot;, 6.6, round(media(&quot;2026&quot;), 1)),
+]
+for nome, esperado, obtido in confere:
+    assert esperado == obtido, f&quot;{nome}: esperado {esperado}, obtido {obtido}&quot;</code></pre></figure></div></section><section id="eda"><p class="section-kicker">04</p><h2>EDA: por que saem e quem já decidiu</h2><div class="intro"><p>As etapas 02 e 03 da EDA (notebooks <code>assinantes_30jun26_ouro.py</code> e <code>saidas_ouro.py</code>, da Douglas) explicam a subida: ela é de saída voluntária, concentrada no mensal, e quem sai avisa antes. A tabela <code>saidas.csv</code> tem as 17.830 assinaturas pagas encerradas desde jul/2024.</p></div><div class="pair"><div class="explain"><h3>Tipo de saída</h3><p>O <code>motivo_fim</code> da prata diz como a assinatura terminou. O mapa agrupa em três tipos: voluntária (o assinante desligou a renovação), involuntária (falha de pagamento) e devolução (chargeback ou reembolso). O <code>assert</code> garante que nenhum motivo novo passe sem classificação. Somando os três tipos mês a mês, o resultado é igual ao churn da regra G1 (W3).</p></div><figure class="code"><figcaption><code>notebooks/saidas_ouro.py</code> · linhas 39–40</figcaption><pre><code class="language-python">TIPO = {&quot;renovacao_desligada&quot;: &quot;voluntária&quot;, &quot;falha_pagamento&quot;: &quot;involuntária&quot;,
+        &quot;chargeback&quot;: &quot;devolução&quot;, &quot;reembolso&quot;: &quot;devolução&quot;}</code></pre></figure></div><div class="pair"><div class="explain"><h3>Antecedência do aviso</h3><p>Para cada saída voluntária, a antecedência é a distância em dias entre o <strong>último</strong> desligamento da renovação e o fim. Quem desliga segue assinante até o fim do período pago: no mensal são cerca de duas semanas; no anual, meses. Aviso de loja que chega depois do fim conta como zero dia (<code>clip(lower=0)</code>).</p></div><figure class="code"><figcaption><code>notebooks/saidas_ouro.py</code> · linhas 58–66</figcaption><pre><code class="language-python">des = (ev[ev.evento == &quot;renovacao_automatica_desligada&quot;].sort_values([&quot;user_id&quot;, &quot;seq_usuario&quot;])
+       .groupby(&quot;user_id&quot;).tail(1)[[&quot;user_id&quot;, &quot;data_hora_brt&quot;, &quot;flag_apos_fim&quot;]]
+       .rename(columns={&quot;data_hora_brt&quot;: &quot;desligou_em&quot;, &quot;flag_apos_fim&quot;: &quot;flag_aviso_apos_fim&quot;}))
+s = s.merge(des, on=&quot;user_id&quot;, how=&quot;left&quot;, validate=&quot;one_to_one&quot;)
+vol = s.tipo_saida == &quot;voluntária&quot;
+s.loc[~vol, [&quot;desligou_em&quot;, &quot;flag_aviso_apos_fim&quot;]] = np.nan
+s[&quot;antecedencia_dias&quot;] = np.where(
+    vol, (s.data_fim - s.desligou_em.dt.normalize()).dt.days.clip(lower=0), np.nan)
+assert s.loc[vol, &quot;antecedencia_dias&quot;].notna().all(), &quot;voluntária sem desligamento no log&quot;</code></pre></figure></div><div class="pair"><div class="explain"><h3>Situação da renovação numa data passada (K7)</h3><p><code>assinaturas.csv</code> é um retrato de 01/10/2026; para saber se a renovação estava ligada numa data passada, é preciso reconstruir pelos eventos. O último evento de assinatura antes da data define o estado: iniciada, renovada ou religada = ligada; desligada ou cancelada no site = desligada; carência = em carência. Avisos que chegaram depois do fim (<code>flag_apos_fim</code>) não mudam o estado. Essa reconstrução mostrou que parte do &quot;parou de treinar e saiu&quot; é o contrário: a pessoa decidiu sair e depois parou (causalidade reversa).</p></div><figure class="code"><figcaption><code>notebooks/assinantes_30jun26_ouro.py</code> · linhas 179–193</figcaption><pre><code class="language-python">MUDA_RENOVACAO = {
+    &quot;assinatura_iniciada&quot;: &quot;ligada&quot;, &quot;renovacao&quot;: &quot;ligada&quot;,
+    &quot;renovacao_automatica_religada&quot;: &quot;ligada&quot;, &quot;renovacao_automatica_desligada&quot;: &quot;desligada&quot;,
+    &quot;cancelamento_web&quot;: &quot;desligada&quot;, &quot;periodo_carencia&quot;: &quot;em carência&quot;,
+}
+ev = pd.read_csv(PRATA / &quot;eventos_assinatura.csv&quot;, parse_dates=[&quot;data_hora_brt&quot;],
+                 usecols=[&quot;user_id&quot;, &quot;seq_usuario&quot;, &quot;data_hora_brt&quot;, &quot;evento&quot;, &quot;fase&quot;, &quot;flag_apos_fim&quot;])
+ev = ev[(ev.fase == &quot;assinatura&quot;) &amp; (ev.data_hora_brt &lt; FIM_REF) &amp; (ev.flag_apos_fim == 0)
+        &amp; ev.evento.isin(list(MUDA_RENOVACAO))]
+ult = ev.sort_values([&quot;user_id&quot;, &quot;seq_usuario&quot;]).groupby(&quot;user_id&quot;).tail(1)
+ren = pd.DataFrame({&quot;user_id&quot;: ult.user_id, &quot;renovacao_30jun&quot;: ult.evento.map(MUDA_RENOVACAO),
+                    &quot;dias_desde_desligamento&quot;: np.where(
+                        ult.evento.map(MUDA_RENOVACAO) == &quot;desligada&quot;,
+                        (FIM_REF - ult.data_hora_brt).dt.days, np.nan)})
+base = junta(base, ren, &quot;situação da renovação em 30/06&quot;)</code></pre></figure></div></section><section id="personas"><p class="section-kicker">05</p><h2>Personas: k-means de quatro variáveis (L1–L8)</h2><div class="intro"><p>As personas do relatório vêm de <code>segmentos_ouro.py</code>. Base: 14.032 pagantes ativos em 31/07/2026; desses, 11.688 estavam com a renovação ligada e entram no agrupamento; os 2.344 que já tinham desligado ficam numa lista à parte (&quot;Já desligou&quot;), porque para eles a decisão já foi tomada. 31/07 é a última data com 60 dias observados antes do corte (30/09/2026).</p></div><div class="pair"><div class="explain"><h3>As quatro variáveis, medidas só até a data</h3><p><code>monta(ref)</code> monta a base de uma data e calcula as variáveis com informação até ela: treinos por semana (12 semanas antes da data ÷ 12), dias sem treino, tempo de casa e % dos treinos ao ar livre (corrida, caminhada, pedal). A situação da renovação usa a mesma reconstrução pelos eventos da etapa anterior. A mesma função serve para 31/07 (ajuste) e 30/09 (base atual), o que garante variáveis com a mesma definição nas duas datas.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_ouro.py</code> · linhas 79–115</figcaption><pre><code class="language-python">def monta(ref):
+    &quot;&quot;&quot;Pagantes ativos no dia ref (data, inclusive) com as variáveis medidas até ref.&quot;&quot;&quot;
+    d = ref + pd.Timedelta(days=1)                         # dia 1 da janela (01/08 ou 01/10)
+    b = a[(a.inicio &lt; d) &amp; (a.data_fim.isna() | (a.data_fim &gt;= d))][
+        [&quot;user_id&quot;, &quot;plano&quot;, &quot;canal&quot;, &quot;metodo&quot;, &quot;inicio&quot;]].copy()
+    b = b.merge(u, on=&quot;user_id&quot;, how=&quot;left&quot;, validate=&quot;one_to_one&quot;)
+
+    e = ev[(ev.fase == &quot;assinatura&quot;) &amp; (ev.data_hora_brt &lt; d) &amp; (ev.flag_apos_fim == 0)
+           &amp; ev.evento.isin(list(MUDA_RENOVACAO))]
+    ult = e.sort_values([&quot;user_id&quot;, &quot;seq_usuario&quot;]).groupby(&quot;user_id&quot;).tail(1)
+    b = b.merge(pd.DataFrame({&quot;user_id&quot;: ult.user_id, &quot;renovacao&quot;: ult.evento.map(MUDA_RENOVACAO)}),
+                on=&quot;user_id&quot;, how=&quot;left&quot;, validate=&quot;one_to_one&quot;)
+    assert b.renovacao.notna().all(), &quot;assinante sem evento de renovação&quot;
+
+    tt = t[t.inicio_brt &lt; d]
+    j = tt[tt.inicio_brt &gt;= d - pd.Timedelta(days=84)]
+    fora = j[j.tipo.isin(AR_LIVRE)]
+    g = j.groupby(&quot;user_id&quot;).agg(treinos_12s=(&quot;tipo&quot;, &quot;size&quot;),
+                                 ar_livre_12s=(&quot;tipo&quot;, lambda s: int(s.isin(AR_LIVRE).sum())))
+    gf = fora.groupby(&quot;user_id&quot;).agg(gps_falho_12s=(&quot;gps_ok&quot;, lambda s: int((~s).sum())),
+                                     km_treino=(&quot;distancia_km&quot;, &quot;median&quot;))
+    ult_treino = tt.groupby(&quot;user_id&quot;).inicio_brt.max().dt.normalize().rename(&quot;ultimo_treino&quot;)
+    con = am[am.desde &lt;= ref].groupby(&quot;seguidor_id&quot;).size().rename(&quot;conexoes&quot;)
+    for novo in [g, gf, ult_treino, con]:
+        b = b.merge(novo, left_on=&quot;user_id&quot;, right_index=True, how=&quot;left&quot;, validate=&quot;one_to_one&quot;)
+    for c in [&quot;treinos_12s&quot;, &quot;ar_livre_12s&quot;, &quot;gps_falho_12s&quot;, &quot;km_treino&quot;, &quot;conexoes&quot;]:
+        b[c] = b[c].fillna(0)
+
+    b[&quot;treinos_semana&quot;] = b.treinos_12s / 12
+    desde = b.inicio.clip(lower=INICIO_ARQUIVO)
+    b[&quot;dias_sem_treino&quot;] = np.where(b.ultimo_treino.notna(), (ref - b.ultimo_treino).dt.days,
+                                    (ref - desde).dt.days).astype(int)
+    b[&quot;tempo_casa_dias&quot;] = (ref - b.inicio).dt.days
+    b[&quot;pct_ar_livre&quot;] = np.where(b.treinos_12s &gt; 0, 100 * b.ar_livre_12s / b.treinos_12s, 0.0)
+    b[&quot;pct_gps_falho&quot;] = np.where(b.ar_livre_12s &gt; 0, 100 * b.gps_falho_12s / b.ar_livre_12s, 0.0)
+    b.insert(0, &quot;data_ref&quot;, ref.date().isoformat())
+    return b.drop(columns=[&quot;ar_livre_12s&quot;, &quot;gps_falho_12s&quot;, &quot;ultimo_treino&quot;])</code></pre></figure></div><div class="pair"><div class="explain"><h3>A saída em 60 dias, fora do agrupamento</h3><p>A saída é a <strong>decisão de sair</strong> entre 01/08 e 29/09: desligou a renovação, cancelou no site ou expirou. Mede o momento em que a pessoa decide, não a data em que a assinatura acaba (no anual são meses de diferença). Ela não entra no k-means: serve só para descrever os grupos depois. Média da base com renovação ligada: 12,9%. O <code>assert</code> confere os 14.753 pagantes de 30/09 do enunciado.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_ouro.py</code> · linhas 119–128</figcaption><pre><code class="language-python">b = monta(REF)
+JAN_INI = REF + pd.Timedelta(days=1)                       # 01/08
+JAN_FIM = JAN_INI + pd.Timedelta(days=60)                  # 30/09, exclusive: até 29/09
+w = ev[(ev.data_hora_brt &gt;= JAN_INI) &amp; (ev.data_hora_brt &lt; JAN_FIM) &amp; ev.evento.isin(SAIDA_EVENTOS)]
+b[&quot;saiu_60d&quot;] = b.user_id.isin(w.user_id).astype(int)
+atual = monta(REF_ATUAL)
+assert len(atual) == 14753, &quot;pagantes ativos em 30/09 diferem do enunciado (14.753)&quot;
+
+ag = b[b.renovacao != &quot;desligada&quot;].reset_index(drop=True)   # base do agrupamento (L1)
+ag_atual = atual[atual.renovacao != &quot;desligada&quot;].reset_index(drop=True)</code></pre></figure></div><div class="pair"><div class="explain"><h3>Padronização, escolha de k e estabilidade</h3><p>As variáveis são padronizadas (<code>StandardScaler</code>): sem isso, o tempo de casa, em dias, dominaria a distância. O k-means roda de k = 2 a 8 e a escolha usa quatro lentes da aula 3:</p><p>- <strong>inércia</strong> (cotovelo): a queda fica pequena depois de k = 4;</p><p>- <strong>silhueta</strong>: 0,43 em k = 4, estrutura fraca (os grupos são regiões de um contínuo);</p><p>- <strong>estabilidade</strong>: 10 reamostras com reposição classificam a base inteira e são comparadas com o agrupamento original pelo índice de Rand ajustado (0,999 em k = 4);</p><p>- <strong>leitura de negócio</strong>: quatro grupos que se descrevem numa frase e pedem ações diferentes.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_ouro.py</code> · linhas 133–151</figcaption><pre><code class="language-python">esc = StandardScaler().fit(ag[VARS])
+X = esc.transform(ag[VARS])
+curvas = []
+for k in K_FAIXA:
+    km = KMeans(k, n_init=N_INIT, random_state=SEMENTE).fit(X)
+    curvas.append({&quot;k&quot;: k, &quot;inércia&quot;: km.inertia_, &quot;silhueta&quot;: silhouette_score(X, km.labels_)})
+curvas = pd.DataFrame(curvas)
+
+rng = np.random.default_rng(SEMENTE)
+amostras = [rng.integers(0, len(X), len(X)) for _ in range(10)]
+estab = []
+for k in range(3, 7):
+    ref_lab = KMeans(k, n_init=N_INIT, random_state=SEMENTE).fit_predict(X)
+    aris = [adjusted_rand_score(ref_lab, KMeans(k, n_init=N_INIT, random_state=SEMENTE)
+                                .fit(X[i]).predict(X)) for i in amostras]
+    outra = adjusted_rand_score(ref_lab, KMeans(k, n_init=N_INIT, random_state=1).fit_predict(X))
+    estab.append({&quot;k&quot;: k, &quot;Rand médio&quot;: np.mean(aris), &quot;Rand mínimo&quot;: np.min(aris),
+                  &quot;outra semente&quot;: outra})
+estab = pd.DataFrame(estab)</code></pre></figure></div><div class="pair"><div class="explain"><h3>Nome dos grupos por regra</h3><p>O k-means devolve números (0 a 3) que mudam de ordem entre execuções. Os nomes saem de uma regra sobre as medianas: maior &quot;dias sem treino&quot; = Parados; entre os demais, maior tempo de casa = Veteranos; dos dois restantes, maior % ao ar livre = Ativos ao ar livre e o outro = Ativos em ambiente fechado. O <code>assert</code> para se a regra não separar os quatro. A base de 30/09 recebe o grupo do centro mais próximo com o <strong>mesmo</strong> padronizador e os <strong>mesmos</strong> centros de 31/07 (<code>predict</code>), sem reajustar.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_ouro.py</code> · linhas 154–168</figcaption><pre><code class="language-python">km = KMeans(K, n_init=N_INIT, random_state=SEMENTE).fit(X)
+ag[&quot;grupo&quot;] = km.labels_
+med = ag.groupby(&quot;grupo&quot;)[VARS].median()
+nomes = {}
+nomes[med.dias_sem_treino.idxmax()] = &quot;Parados&quot;
+resto = med.drop(index=list(nomes))
+nomes[resto.tempo_casa_dias.idxmax()] = &quot;Veteranos&quot;
+resto = med.drop(index=list(nomes))
+nomes[resto.pct_ar_livre.idxmax()] = &quot;Ativos ao ar livre&quot;
+nomes[resto.pct_ar_livre.idxmin()] = &quot;Ativos em ambiente fechado&quot;
+assert len(set(nomes.values())) == K, &quot;regra de nomes não separou os quatro grupos&quot;
+ORDEM = [&quot;Parados&quot;, &quot;Ativos ao ar livre&quot;, &quot;Ativos em ambiente fechado&quot;, &quot;Veteranos&quot;]
+COR_SEG = dict(zip(ORDEM, [CORES[7], CORES[3], CORES[0], CORES[2]]))
+ag[&quot;segmento&quot;] = ag.grupo.map(nomes)
+ag_atual[&quot;segmento&quot;] = pd.Series(km.predict(esc.transform(ag_atual[VARS]))).map(nomes)</code></pre></figure></div><div class="pair"><div class="explain"><h3>Intervalo de confiança da taxa de cada grupo</h3><p>A taxa de saída de cada persona vem com o intervalo de Wilson de 95%, que se comporta bem em grupos pequenos e taxas longe de 50% (caso dos Parados, com ~560 assinantes). O relatório mostra o intervalo ao lado de cada barra.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_ouro.py</code> · linhas 203–207</figcaption><pre><code class="language-python">def wilson(k, n, z=1.96):
+    p = k / n
+    c = (p + z * z / (2 * n)) / (1 + z * z / n)
+    m = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / (1 + z * z / n)
+    return c - m, c + m</code></pre></figure></div></section><section id="nove"><p class="section-kicker">06</p><h2>Segunda segmentação: k-means de nove variáveis (N1–N7)</h2><div class="intro"><p><code>segmentos_kmeans_ouro.py</code> agrupa <strong>todos</strong> os pagantes de 31/07 em nove variáveis de comportamento, cobrança e tempo de casa. A saída aqui é o <strong>fim da assinatura</strong> em 60 dias (média 10,5%). Ela entra no relatório como cruzamento e como origem da lista &quot;Cobrança falhando&quot;.</p></div><div class="pair"><div class="explain"><h3>Uma entrada por variável</h3><p>Cada variável é uma entrada do dicionário <code>VARIAVEIS</code>: como calcular (<code>calc</code>), se entra em log e como resumir no perfil. Todas usam só informação até a data de referência: treinos em 30 dias, tendência (30 dias contra os 60 anteriores), dias sem treinar (teto 120), sessões no app, conexões recíprocas, posts, chamados + treinos com GPS falho, recusas de cobrança em 180 dias e meses de assinatura. Acrescentar uma variável é acrescentar uma entrada.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_kmeans_ouro.py</code> · linhas 126–144</figcaption><pre><code class="language-python">VARIAVEIS = {
+    &quot;treinos_30d&quot;: dict(log=True, nome=&quot;treinos em 30 dias&quot;, resumo=&quot;median&quot;,
+                        calc=lambda ref, b: conta(atv, &quot;dia&quot;, janela(ref, 30), ref)),
+    &quot;tendencia_treino&quot;: dict(log=False, nome=&quot;tendência de treino&quot;, resumo=&quot;median&quot;,
+                             calc=tendencia),
+    &quot;dias_sem_treino&quot;: dict(log=False, nome=&quot;dias sem treinar&quot;, resumo=&quot;median&quot;,
+                            calc=dias_sem_treino),
+    &quot;sessoes_app&quot;: dict(log=True, nome=&quot;sessões no app/mês&quot;, resumo=&quot;median&quot;, calc=sessoes),
+    &quot;conexoes&quot;: dict(log=True, nome=&quot;conexões&quot;, resumo=&quot;median&quot;,
+                     calc=lambda ref, b: ami[ami.desde &lt;= ref].groupby(&quot;seguidor_id&quot;).size()),
+    &quot;posts_90d&quot;: dict(log=True, nome=&quot;posts em 90 dias&quot;, resumo=&quot;median&quot;,
+                      calc=lambda ref, b: conta(feed, &quot;data_hora&quot;, janela(ref, 90), ref)),
+    &quot;problemas_90d&quot;: dict(log=True, nome=&quot;chamados + GPS falho em 90 dias&quot;, resumo=&quot;mean&quot;,
+                          calc=problemas),
+    &quot;recusas_180d&quot;: dict(log=True, nome=&quot;recusas em 180 dias&quot;, resumo=&quot;mean&quot;,
+                         calc=lambda ref, b: conta(pag, &quot;data_hora_brt&quot;, janela(ref, 180), ref)),
+    &quot;meses_assinatura&quot;: dict(log=True, nome=&quot;meses de assinatura&quot;, resumo=&quot;median&quot;,
+                             calc=lambda ref, b: ((ref - b.inicio).dt.days / 30.44).round(1)),
+}</code></pre></figure></div><div class="pair"><div class="explain"><h3>Log, padronização e base atual</h3><p>Contagens têm cauda longa (poucos assinantes com muitos posts ou chamados), então entram em <code>log1p</code>. Tudo é padronizado com a média e o desvio de 31/07; a base de 30/09 usa <strong>os mesmos</strong> média e desvio, para cair no mesmo espaço dos centros.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_kmeans_ouro.py</code> · linhas 198–210</figcaption><pre><code class="language-python">def matriz(f):
+    x = f[VARS].astype(float).copy()
+    log = [c for c in VARS if VARIAVEIS[c][&quot;log&quot;]]
+    x[log] = np.log1p(x[log].clip(lower=0))
+    return x
+
+
+treino = base(REF_TREINO)
+corte = base(REF_CORTE)
+x_tr = matriz(treino)
+mu, sd = x_tr.mean(), x_tr.std().replace(0, 1)  # variável constante não divide por zero
+z_tr = ((x_tr - mu) / sd).values
+z_co = ((matriz(corte) - mu) / sd).values</code></pre></figure></div><div class="pair"><div class="explain"><h3>Escolha de k e rótulos</h3><p>k é o de maior silhueta entre 3 e 4 (faixa pedida pelo guia), medida numa amostra de 5.000. Os rótulos saem dos centros, em ordem: maior recusa = Cobrança falhando; mais dias sem treino = Parados; menos meses de assinatura = Recém-chegados; o grupo restante que mais treina = Engajados. Um rótulo só é dado se o centro estiver a pelo menos 1 desvio da média naquela variável; senão o grupo vira &quot;Grupo n&quot; e a página mostra isso.</p></div><figure class="code"><figcaption><code>notebooks/segmentos_kmeans_ouro.py</code> · linhas 227–239</figcaption><pre><code class="language-python">rot = {}
+for rotulo, var, lado in ROTULOS:
+    livres = centros.drop(index=list(rot))
+    if var not in VARS or len(livres) &lt; 2:
+        continue
+    i = livres[var].idxmax() if lado == &quot;max&quot; else livres[var].idxmin()
+    if abs(livres.loc[i, var]) &gt;= 1:
+        rot[i] = rotulo
+livres = centros.drop(index=list(rot))
+if len(livres):
+    rot[livres.treinos_30d.idxmax() if &quot;treinos_30d&quot; in VARS else livres.index[0]] = &quot;Engajados&quot;
+for n, i in enumerate(centros.drop(index=list(rot)).index, start=1):
+    rot[i] = f&quot;Grupo {n}&quot;</code></pre></figure></div></section><section id="conciliacao"><p class="section-kicker">07</p><h2>Conciliação das duas segmentações (X1)</h2><div class="intro"><p><code>conciliacao_segmentos.py</code> cruza as duas tabelas assinante por assinante, nas duas datas, sem recalcular nada. Ele não termina em <code>_ouro</code> de propósito: lê os dois k-means e por isso roda depois do laço dos notebooks de ouro. A decisão X1 usa o cruzamento para definir o relatório: os quatro grupos de quatro variáveis viram personas; &quot;Já desligou&quot; e &quot;Cobrança falhando&quot; viram listas operacionais; &quot;Recém-chegados&quot; vira recorte (mensal com até 90 dias) dentro dos Ativos.</p></div><div class="pair"><div class="explain"><h3>Junção completa e tabela do cruzamento</h3><p>A junção é <code>outer</code> com <code>indicator</code>: se algum assinante estiver numa tabela e não na outra, o notebook para, porque o cruzamento só faz sentido sobre a mesma base. A tabela final tem uma linha por par (persona, segmento de nove variáveis, data), com os assinantes e a saída pelas duas réguas: decisão (L) e fim da assinatura (N).</p></div><figure class="code"><figcaption><code>notebooks/conciliacao_segmentos.py</code> · linhas 58–71</figcaption><pre><code class="language-python">j = L.merge(N, on=[&quot;data_ref&quot;, &quot;user_id&quot;], how=&quot;outer&quot;, suffixes=(&quot;_l&quot;, &quot;_n&quot;), indicator=True)
+sobra = j[j._merge != &quot;both&quot;]
+if len(sobra):
+    sys.exit(f&quot;as duas tabelas não cobrem os mesmos assinantes: {sobra._merge.value_counts().to_dict()}&quot;)
+
+tab = (j.groupby([&quot;data_ref&quot;, &quot;segmento_l&quot;, &quot;segmento_n&quot;])
+         .agg(assinantes=(&quot;user_id&quot;, &quot;size&quot;),
+              saida_decisao_pct=(&quot;saiu_60d_l&quot;, &quot;mean&quot;),
+              saida_fim_pct=(&quot;saiu_60d_n&quot;, &quot;mean&quot;))
+         .reset_index())
+for c in [&quot;saida_decisao_pct&quot;, &quot;saida_fim_pct&quot;]:
+    tab[c] = (100 * tab[c]).round(1)
+OURO.mkdir(parents=True, exist_ok=True)
+tab.to_csv(SAIDA, index=False)</code></pre></figure></div><div class="pair"><div class="explain"><h3>Quanto as duas partições concordam</h3><p>O índice de Rand ajustado compara as duas partições (1 = mesmos grupos; 0 = acaso). Ele fica perto de zero: as duas segmentações cortam a base por eixos diferentes. Uma olha o que e há quanto tempo a pessoa treina; a outra, engajamento recente, cobrança e novidade. Por isso o relatório usa uma para as personas e a outra para listas e recortes, em vez de escolher uma e descartar a outra.</p></div><figure class="code"><figcaption><code>notebooks/conciliacao_segmentos.py</code> · linhas 74–77</figcaption><pre><code class="language-python">t = j[j.data_ref == REF_TREINO]
+ag = t[t.segmento_l != &quot;Já desligou&quot;]
+print(f&quot;{REF_TREINO}: {len(t)} assinantes nas duas tabelas&quot;)
+print(f&quot;Rand ajustado (sem &#x27;Já desligou&#x27;): {adjusted_rand_score(ag.segmento_l, ag.segmento_n):.3f}&quot;)</code></pre></figure></div></section><section id="conferencias"><p class="section-kicker">08</p><h2>Conferências: como saber que os números estão certos</h2><div class="intro"><p>Duas camadas de conferência rodam depois do ouro e saem com erro se algo quebrar: <code>conferencias.py</code> (dados) e <code>confere_relatorio.py</code> (relatório).</p></div><div class="pair"><div class="explain"><h3>Conferência dos dados</h3><p><code>conferencias.py</code> confere contagens de linhas da bronze (contra o dicionário) e da prata (contra o <code>decisoes.md</code>), números de referência (faturamento de set/26, 14.753 ativos, expirações), cruzamentos entre tabelas (nenhum <code>user_id</code> órfão, cobrança sempre dentro da vida da assinatura, só os preços do enunciado) e o ouro (churn de 5,6% e 6,6%, recusas). A função <code>confere</code> imprime OK/FALHOU por item e acumula as falhas.</p></div><figure class="code"><figcaption><code>notebooks/conferencias.py</code> · linhas 39–43</figcaption><pre><code class="language-python">def confere(nome, esperado, obtido):
+    ok = esperado == obtido
+    print(f&quot;{&#x27;OK    &#x27; if ok else &#x27;FALHOU&#x27;} {nome}: esperado {esperado}, obtido {obtido}&quot;)
+    if not ok:
+        falhas.append(nome)</code></pre></figure></div><div class="pair"><div class="explain"><h3>Conferência do relatório</h3><p><code>confere_relatorio.py</code> recalcula a partir do ouro cada número citado no Customer Segmentation Report (tamanho, saída, intervalo e medianas de cada persona, as duas listas e as células do cruzamento) e procura o valor no texto da página, no formato brasileiro. Se um número do relatório não bater com o ouro, o script lista qual e sai com erro.</p></div><figure class="code"><figcaption><code>notebooks/confere_relatorio.py</code> · linhas 55–60</figcaption><pre><code class="language-python">def confere(rotulo, trecho):
+    global achados
+    if trecho in texto:
+        achados += 1
+    else:
+        faltam.append(f&quot;{rotulo}: &#x27;{trecho}&#x27;&quot;)</code></pre></figure></div></section>
+<section id="ambiente"><p class="section-kicker">09</p><h2>Execução, ambiente e limites</h2><div class="intro"><p>- <strong>Ordem de execução</strong> (da raiz do repositório): toda a prata; <code>churn_mensal_ouro.py</code> (o <code>assinantes_30jun26_ouro.py</code> lê o churn); o laço <code>notebooks/*_ouro.py</code>; <code>conciliacao_segmentos.py</code>; <code>eda_historia.py</code>; <code>conferencias.py</code>; <code>confere_relatorio.py</code>; e este <code>memorial_tecnico.py</code>.</p><p>- <strong>Versões</strong>: <code>requirements.txt</code> fixa pandas 3.1.1, scikit-learn 1.9.1, plotly 7.1.0, pyarrow, scipy e openpyxl (Python 3.11 ou mais novo). As segmentações usam semente fixa (<code>random_state</code>), então repetem os grupos a cada execução.</p><p>- <strong>Sem informação depois do corte</strong>: toda variável é medida até a data de referência; as datas posteriores a 30/09/2026 que aparecem em alguns arquivos ficam marcadas na prata (<code>flag_*</code>) e fora das variáveis.</p><p>- <strong>Limites</strong>: as taxas de saída são históricas (ago–set/2026) e descrevem grupos; não são previsão nem efeito de ação. A campanha de 10/08/2026 tratou parte da base de 31/07.</p></div></section>
+<footer>Fontes: <code>documentos/</code> (enunciado, dicionário, guia), <code>decisoes.md</code> (decisões por ID), <code>memorial.md</code> (conceitos e debate de método por etapa), <code>notebooks/</code>. Os trechos de código mostram as linhas exatas dos arquivos no momento da geração; a numeração de linhas acompanha o arquivo.</footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script>if (window.hljs) hljs.highlightAll();</script>
+</body>
+</html>
