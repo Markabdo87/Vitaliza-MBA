@@ -28,7 +28,7 @@ e completa no guia em `documentos/`.
 ```
 ├── documentos/          # PDFs oficiais: enunciado, dicionário de dados, guia de entregas do M2
 ├── estudos-analises/    # estudos e relatórios do grupo (não oficiais)
-├── artefatos/           # páginas HTML com os gráficos do ouro; comece por 00_historia_da_eda.html
+├── artefatos/           # relatório e páginas da EDA; analises/ contém páginas de apoio
 ├── dados/
 │   ├── 1.bronze/   # arquivos originais do curso (não editar)
 │   ├── 2.prata/    # bronze limpo — gerado pelos notebooks, fora do git
@@ -44,18 +44,44 @@ Requer Python 3.11 ou mais novo e as bibliotecas de `requirements.txt` (pyarrow,
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
-for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # gera toda a prata
+
+# prata: um notebook por arquivo; visao_prata.py fica de fora do laço (precisa da prata e do ouro)
+for n in notebooks/*_prata.py; do
+  case "$n" in */visao_prata.py) continue ;; esac
+  .venv/bin/python "$n"
+done
+
 .venv/bin/python notebooks/churn_mensal_ouro.py                       # antes do laço: assinantes_30jun26 lê o churn_mensal
-for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # gera o ouro e os artefatos
+
+# ouro: um notebook por tabela; _ouro.py é helper (ler_prata), não notebook
+for n in notebooks/*_ouro.py; do
+  case "$n" in */_ouro.py) continue ;; esac
+  .venv/bin/python "$n"
+done
+
 .venv/bin/python notebooks/conciliacao_segmentos.py                   # cruza os dois k-means (lê o ouro)
 .venv/bin/python notebooks/eda_historia.py                            # página-resumo da EDA (00)
+.venv/bin/python notebooks/relatorio_segmentacao.py                    # gera o relatório a partir do ouro
+
+# visões: bronze só lê a bronze; prata só depois do ouro, porque compara com o churn_mensal
+.venv/bin/python notebooks/visao_bronze.py                            # opcional: perfil da bronze (00a)
+.venv/bin/python notebooks/visao_prata.py                             # primeiro olhar da prata (00b)
+
 .venv/bin/python notebooks/conferencias.py                             # confere contagens e números de referência
 .venv/bin/python notebooks/confere_relatorio.py                       # confere o relatório contra o ouro
 .venv/bin/python notebooks/memorial_tecnico.py                        # memorial técnico (estudos-analises/)
 ```
 
+A ordem importa: `visao_prata.py` compara a prata com `dados/3.ouro/churn_mensal.csv`, então roda
+fora do laço da prata e só depois do ouro completo; `visao_bronze.py` lê apenas a bronze e pode
+rodar a qualquer momento. Os laços pulam esses dois arquivos (`visao_prata.py` e o helper
+`_ouro.py`) para não rodar notebook de apoio no lugar errado.
+
 Prata e ouro não são versionados: depois de clonar ou de atualizar um notebook, rode os notebooks
-para gerar as tabelas.
+para gerar as tabelas. Para editar a redação do relatório, altere o modelo
+`estudos-analises/customer_segmentation_report.template.html`, não o HTML gerado; depois execute
+`notebooks/relatorio_segmentacao.py`. O resultado fica em `artefatos/customer_segmentation_report.html`;
+algumas afirmações exigem revisão humana quando os dados mudam; consulte `estudos-analises/README.md`.
 
 ## Tabelas
 
@@ -66,7 +92,7 @@ para gerar as tabelas.
 | `dados/2.prata/eventos_assinatura.csv` | `notebooks/eventos_assinatura_prata.py` | log de eventos em horário de Brasília, ordenado por usuário, com fase trial/assinatura e sequências estranhas marcadas |
 | `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | cobranças sem duplicatas, em horário de Brasília, valor numérico, devoluções pelo valor cobrado, recusados com valor zero, tentativa reconstruída, taxa e valor líquido |
 | `dados/2.prata/uso_mensal.csv` | `notebooks/uso_mensal_prata.py` | uso por usuário e mês, valores intactos, com flags para mês sem treino e mudança de contagem de sessões |
-| `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | treinos em horário de Brasília (Garmin corrigido), tipo em português, sem cópias relógio+app, distância e duração corrigidas |
+| `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | treinos em horário de Brasília (Garmin corrigido), tipo em português, sem cópias relógio+app e um só registro por minuto de início, distância e duração corrigidas |
 | `dados/2.prata/amizades.csv` | `notebooks/amizades_prata.py` | relações de seguir com `reciproco` e relações depois do corte marcadas |
 | `dados/2.prata/campanha_ago26.csv` | `notebooks/campanha_ago26_prata.py` | experimento de ago/26 com `tratado` (1/0) e booleanos em 1/0 |
 | `dados/2.prata/onboarding.csv` | `notebooks/onboarding_prata.py` | respostas do onboarding com `dias_por_semana` inteiro e respostas sem conteúdo marcadas |
@@ -79,6 +105,7 @@ para gerar as tabelas.
 | `dados/3.ouro/segmentos.csv` | `notebooks/segmentos_ouro.py` | um assinante pagante ativo em 31/07 ou 30/09/2026, com as variáveis do k-means e o segmento · gráficos e personas em `artefatos/04_segmentos.html` |
 | `dados/3.ouro/pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | volume de pagamentos por mês e meio, jul/24–set/26 |
 | `dados/3.ouro/segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | 4 segmentos k-means da base paga (31/07 e 30/09/26) com saída em 60 dias · `artefatos/05_segmentos_kmeans.html` |
+| `dados/3.ouro/segmentos_plano.csv` | `notebooks/segmentos_plano_ouro.py` | personas L × plano; sinal de saída e término na mesma base · `artefatos/07_segmentos_por_plano.html` |
 | `dados/3.ouro/recusas_cobranca.csv` (+ `.xlsx`) | `notebooks/recusas_cobranca_ouro.py` | histórico de cada cobrança recusada e seu desfecho (recuperada, perdida, em aberto), jul/24–set/26 · gráficos em `artefatos/06_recusas_cobranca.html` |
 
 As regras de limpeza de cada tabela estão no cabeçalho do notebook correspondente. O porquê de

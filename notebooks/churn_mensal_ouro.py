@@ -11,8 +11,8 @@ Regras (decisão G1 no decisoes.md):
   5. Plano e canal são fixos por assinatura (ninguém troca de plano ou canal no log, E4),
      então o recorte usa plano_atual e canal da prata.
   6. Meses: ago/2024 a set/2026 (corte). Jul/2024 fica de fora: o log de fins começa em
-     07/07/2024, então o mês sai incompleto (2,0%). Antes de jul/2024 as assinaturas
-     encerradas não estão na base (A5).
+     07/07/2024, então o mês sai incompleto (só as perdas a partir do dia 7 entram). Antes
+     de jul/2024 as assinaturas encerradas não estão na base (A5).
   7. Recortes: total, plano, canal, plano_canal, metodo.
 
 Conferência com o enunciado (o notebook para se não bater): 8.540 ativos no início de
@@ -32,8 +32,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 PRATA = RAIZ / "dados" / "2.prata"
 SAIDA = RAIZ / "dados" / "3.ouro" / "churn_mensal.csv"
 
-a = pd.read_csv(PRATA / "assinaturas.csv", parse_dates=["inicio", "data_fim"])
-a = a[a.flag_cortesia == 0].copy()
+bruto = pd.read_csv(PRATA / "assinaturas.csv", parse_dates=["inicio", "data_fim"])
+n_cortesia = int(bruto.flag_cortesia.sum())
+a = bruto[bruto.flag_cortesia == 0].copy()
 a["plano_canal"] = a.plano_atual + " · " + a.canal
 a["total"] = "total"
 a["mes_fim_p"] = a.data_fim.dt.to_period("M")
@@ -100,17 +101,63 @@ for rc in ["plano", "canal", "plano_canal", "metodo"]:
     print(resumo(rc).round(2).to_string(index=False))
 
 # --- artefato HTML ------------------------------------------------------------------------
+def br(x, d=1):
+    return f"{x:,.{d}f}".replace(",", "X").replace(".", ",").replace("X", ".")
+
+
+# valores citados no texto, todos derivados de `tot` / `pl`
+plano = df[df.recorte == "plano"]
+pm = plano[plano.segmento == "mensal"].set_index("mes")
+pa = plano[plano.segmento == "anual"].set_index("mes")
+
+abr26 = tot.loc["2026-04"]
+jan_mai = tot.loc["2026-01":"2026-05", "churn_pct"]
+ago_set = tot.loc["2026-08":"2026-09", "churn_pct"]
+jun_set = tot.loc["2026-06":"2026-09", "churn_pct"]
+ano26 = tot.loc["2026-01":"2026-09", "churn_pct"]
+base24 = tot.loc["2024-08":"2024-12", "churn_pct"]
+sobe_jan = (tot.loc["2025-01", "churn_pct"] > tot.loc["2024-12", "churn_pct"]
+            and tot.loc["2026-01", "churn_pct"] > tot.loc["2025-12", "churn_pct"])
+MES_ABREV = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out",
+             "nov", "dez"]
+rotulo_mes = lambda m: f"{MES_ABREV[int(m[5:7]) - 1]}/{m[2:4]}"
+pico26 = rotulo_mes(ano26.idxmax())
+jan_mai_mais_alto = jan_mai.mean() > jun_set.mean()
+# o mensal cai nos dois últimos meses? o anual muda de patamar em jul/25?
+caiu_fim = (pm.loc["2026-08", "churn_pct"] < pm.loc["2026-07", "churn_pct"]
+            and pm.loc["2026-09", "churn_pct"] < pm.loc["2026-08", "churn_pct"])
+degrau_jul25 = (pa.loc["2025-07", "churn_pct"]
+                > pa.loc["2025-01":"2025-06", "churn_pct"].max())
+
+m25 = pm.loc["2025-01":"2025-12", "churn_pct"]
+NOMES = {"2026-03": "mar", "2026-04": "abr", "2026-05": "mai", "2026-06": "jun",
+         "2026-07": "jul"}
+pico_mensal = ", ".join(f"{br(pm.loc[m, 'churn_pct'])}% em {n}" for m, n in NOMES.items())
+a25 = pa.loc["2025-01":"2025-12", "churn_pct"]
+a_desde_jul25 = pa.loc["2025-07":, "churn_pct"]
+menor_serie = pm.churn_pct.idxmin() == "2026-09"
+r25_mensal, r25_anual = m25.mean(), a25.mean()
+r26_mensal = pm.loc["2026-01":"2026-09", "churn_pct"].mean()
+r26_anual = pa.loc["2026-01":"2026-09", "churn_pct"].mean()
+delta_plano = {"mensal": r26_mensal - r25_mensal, "anual": r26_anual - r25_anual}
+plano_que_mais_sobe = max(delta_plano, key=delta_plano.get)
+frase_sobe_plano = (f"**O plano que mais sobe é o {plano_que_mais_sobe}**"
+                   if delta_plano[plano_que_mais_sobe] > 0 else
+                   "**Nenhum plano sobe na média de 2026**")
+
 p = Pagina(
     "01 · Churn mensal",
     "Quantos assinantes pagantes a Vitaliza perde por mês, e como isso muda por plano e canal.",
     "fonte: `dados/3.ouro/churn_mensal.csv`, gerada por `notebooks/churn_mensal_ouro.py` "
     "(decisão G1)",
 )
-p.texto("""
+p.texto(f"""
 **Regra.** Churn do mês = assinaturas pagas que terminaram no mês ÷ assinantes pagantes
-ativos no dia 1 do mês. Quem assina e sai dentro do mesmo mês não entra na conta. Fora as 60
-cortesias internas. Com essa regra os números batem com o enunciado: 8.540 ativos em jan/25,
-8,1% em abr/26 (1.154 ÷ 14.237), média de 5,6% em 2025 e 6,6% em jan–set/26.
+ativos no dia 1 do mês. Quem assina e sai dentro do mesmo mês não entra na conta. Fora as
+{br(n_cortesia, 0)} cortesias internas. Com essa regra os números batem com o enunciado:
+{br(tot.loc['2025-01', 'ativos_inicio'], 0)} ativos em jan/25, {br(abr26.churn_pct)}% em abr/26
+({br(abr26.perdas, 0)} ÷ {br(abr26.ativos_inicio, 0)}), média de {br(media('2025'))}% em 2025 e
+{br(media('2026'))}% em jan–set/26.
 """)
 
 meses_dt = pd.PeriodIndex(tot.index, freq="M").to_timestamp()
@@ -139,12 +186,20 @@ f.update_layout(showlegend=False, margin=dict(t=40))
 p.figura(f, "Churn mensal da base paga, ago/24–set/26. Tracejado: média do ano. "
             "Faixa vermelha: pico de chamados de GPS (mai–jun/26).")
 
-p.texto("""
-- **A subida de 2026 se concentra em jan–mai** (7,4%, 6,1%, 7,1%, 8,1%, 7,4%) e perde força
-  a partir de jun. Ago e set voltam ao nível de 2025.
-- **Janeiro sobe nos dois anos** (6,4% em 2025, 7,4% em 2026), e vem do mensal (ver abaixo).
-- Ago/24 a dez/24 ficam abaixo de 5%, mas a base de 2024 só contém quem estava vivo em
-  jul/24 (A5): não usar como referência de "normal".
+p.texto(f"""
+- Em 2026 o churn total vai de {br(ano26.min())}% a {br(ano26.max())}%, com o mês mais alto em
+  {pico26}; os meses de jan–mai ficam entre {br(jan_mai.min())}% e {br(jan_mai.max())}% (média
+  {br(jan_mai.mean())}%) e os de jun–set entre {br(jun_set.min())}% e {br(jun_set.max())}% (média
+  {br(jun_set.mean())}%){', ou seja, o churn de jan–mai é o mais alto do ano' if jan_mai_mais_alto else ''}.
+  Ago e set/26 ficam em {br(ago_set.iloc[0])}% e {br(ago_set.iloc[1])}%, perto da média de 2025
+  ({br(media('2025'))}%).
+- {('**Janeiro sobe nos dois anos**' if sobe_jan else '**Janeiro**')}: {br(tot.loc['2025-01', 'churn_pct'])}%
+  em jan/25 ({br(tot.loc['2024-12', 'churn_pct'])}% em dez/24) e {br(tot.loc['2026-01', 'churn_pct'])}%
+  em jan/26 ({br(tot.loc['2025-12', 'churn_pct'])}% em dez/25). No mês, o mensal é o plano com o
+  churn mais alto ({br(pm.loc['2026-01', 'churn_pct'])}% contra {br(pa.loc['2026-01', 'churn_pct'])}%
+  do anual em jan/26).
+- Ago/24 a dez/24 ficam entre {br(base24.min())}% e {br(base24.max())}%, mas a base de 2024 só
+  contém quem estava vivo em jul/24 (A5): não usar como referência de "normal".
 """)
 
 
@@ -160,15 +215,21 @@ layout_padrao(f, "churn no mês (%)"); eixo_meses(f, "2024-08-01", "2026-09-01")
 f.update_layout(margin=dict(t=48))
 p.figura(f, "Churn mensal por plano. O anual só perde na renovação (ou por devolução), então "
             "a taxa mensal do anual depende de quantos vencem no mês.")
-p.texto("""
-- **O mensal explica a subida de 2026.** Ficou entre 8% e 10% durante 2025 e saltou depois do
-  reajuste de 01/03/26: 11,2% em mar, 14,5% em abr, 13,2% em mai, 11,1% em jun e 11,7% em jul.
-  Caiu para 9,2% em ago e 6,4% em set, o menor valor da série.
-- **Janeiro é do mensal**: 10,7% em jan/25 e 11,0% em jan/26, contra cerca de 2% a 4% no
-  anual.
-- **O anual sobe em degrau em jul/25** (1,8% → 3,1%) e fica em 3% a 4% desde então: é quando
-  começam a vencer as anuais que entraram a partir de jul/24, com a base em expansão. É
-  efeito do calendário de renovações, não necessariamente piora.
+p.texto(f"""
+- {frase_sobe_plano}: a média mensal do plano foi de {br(r25_mensal)}% em 2025 para
+  {br(r26_mensal)}% em jan–set/26 ({br(r26_mensal - r25_mensal, 2)} p.p.), e a do anual de
+  {br(r25_anual)}% para {br(r26_anual)}% ({br(r26_anual - r25_anual, 2)} p.p.). Em 2025 o mensal
+  ficou entre {br(m25.min())}% e {br(m25.max())}%; mês a mês, de mar a jul/26: {pico_mensal}.
+- {('O mensal recua em ago e set/26: ' if caiu_fim else 'Fechando 2026, o mensal fica em ')}
+  {br(pm.loc['2026-08', 'churn_pct'])}% em ago e {br(pm.loc['2026-09', 'churn_pct'])}% em
+  set{', o menor valor da série' if menor_serie else ''}.
+- **Janeiro é do mensal**: {br(pm.loc['2025-01', 'churn_pct'])}% em jan/25 e
+  {br(pm.loc['2026-01', 'churn_pct'])}% em jan/26, contra {br(a25.min())}% a {br(a25.max())}%
+  no anual em 2025.
+- {('**Em jul/25 o anual muda de patamar** (' + br(pa.loc['2025-06', 'churn_pct']) + '% → ' + br(pa.loc['2025-07', 'churn_pct']) + '%)' if degrau_jul25 else '**O anual não tem degrau claro** (de ' + br(pa.loc['2025-06', 'churn_pct']) + '% em jun/25 para ' + br(pa.loc['2025-07', 'churn_pct']) + '% em jul/25)')}
+  e fica entre {br(a_desde_jul25.min())}% e {br(a_desde_jul25.max())}% desde então. Jul/25 é
+  quando começam a vencer as anuais que entraram a partir de jul/24, com a base em expansão:
+  descrição do calendário de renovações, não medida de piora.
 """)
 p.tabela(resumo("plano"), "Média mensal por plano",
          {c: "{:.2f}" for c in ["churn 2025 (%)", "churn 2026 (%)", "variação (p.p.)"]} |

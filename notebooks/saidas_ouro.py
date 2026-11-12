@@ -121,6 +121,34 @@ def br(x, d=1):
 
 
 r = res.set_index(["plano", "tipo"])
+
+# valores citados no texto, derivados de `r`, `ct` e `s`
+dev_max = ct.loc[ct.plano == "total", "churn_devolução"].max()
+var_tipo = r.loc["total"]["variação (p.p.)"]
+lider = var_tipo.idxmax()
+titulo_lider = (f"**A subida é de saída {lider}** ({br(var_tipo[lider], 2)} p.p. na média mensal)"
+                if var_tipo[lider] > 0 else
+                "**Nenhum tipo de saída sobe na média mensal de 2026**")
+
+
+def variacao(plano, tipo):
+    """Formato "de X% para Y% (Z p.p.)" do tipo no plano, tudo vindo de `r`."""
+    a25 = r.loc[(plano, tipo), "churn 2025 (%)"]
+    a26 = r.loc[(plano, tipo), "churn jan–set/26 (%)"]
+    return f"de {br(a25, 2)}% para {br(a26, 2)}% ({br(a26 - a25, 2)} p.p.)"
+
+
+de, ate = s.data_fim.min(), s.data_fim.max()
+periodo = f"{de:%d/%m/%Y} e {ate:%d/%m/%Y}"
+js = s[(s.data_fim >= "2026-06-01") & (s.data_fim <= "2026-09-30")]
+loja_pct = 100 * js.canal.eq("loja").mean()
+recem = s[(s.tipo_saida == "voluntária") & (s.plano == "mensal")
+          & (s.tempo_casa_meses <= 6) & (s.data_fim >= "2026-01-01")]
+n_recem = len(recem)
+med_recem = recem.antecedencia_dias.median()
+assert n_recem > 0, "recorte 'mensal até 6 meses' vazio: a hipótese do recém-chegado não se sustenta"
+assert pd.notna(med_recem), "mediana do aviso vazia no recorte de recém-chegados"
+
 p = Pagina(
     "03 · Por que saem",
     "De que tipo são as saídas, qual tipo explica a subida de 2026, com quanta antecedência o "
@@ -129,7 +157,7 @@ p = Pagina(
     "método em `memorial.md`, etapa 03",
 )
 p.texto(f"""
-**Regra.** {br(len(s), 0)} assinaturas pagas encerradas entre 07/07/2024 e 30/09/2026, pelo
+**Regra.** {br(len(s), 0)} assinaturas pagas encerradas entre {periodo}, pelo
 `motivo_fim` da prata: **voluntária** (desligou a renovação), **involuntária** (falha de
 pagamento) e **devolução** (chargeback ou reembolso). O churn por tipo usa a regra G1; somados,
 os três tipos dão o churn mensal do `01_churn_mensal` em todos os meses.
@@ -150,14 +178,12 @@ p.figura(f, "Churn mensal da base paga decomposto por tipo de saída (a soma é 
 p.tabela(res, "Média mensal por tipo de saída, 2025 × jan–set/2026",
          {c: "{:.2f}" for c in ["churn 2025 (%)", "churn jan–set/26 (%)", "variação (p.p.)"]})
 p.texto(f"""
-- **A subida é voluntária.** O churn voluntário foi de {br(r.loc[('total', 'voluntária'), 'churn 2025 (%)'], 2)}%
-  para {br(r.loc[('total', 'voluntária'), 'churn jan–set/26 (%)'], 2)}% ao mês
-  ({br(r.loc[('total', 'voluntária'), 'variação (p.p.)'], 2)} p.p.); o involuntário ficou em
-  {br(r.loc[('total', 'involuntária'), 'churn 2025 (%)'], 2)}% → {br(r.loc[('total', 'involuntária'), 'churn jan–set/26 (%)'], 2)}%
-  e a devolução abaixo de 0,2%.
-- No mensal, o voluntário foi de {br(r.loc[('mensal', 'voluntária'), 'churn 2025 (%)'], 2)}% para
-  {br(r.loc[('mensal', 'voluntária'), 'churn jan–set/26 (%)'], 2)}%. A falha de pagamento é um problema
-  de tamanho estável, não o que mudou.
+- {titulo_lider}. Na base total, a voluntária vai {variacao('total', 'voluntária')}, a
+  involuntária {variacao('total', 'involuntária')} e a devolução {variacao('total', 'devolução')};
+  no mês, a devolução nunca passou de {br(dev_max, 2)}% do total.
+- Por plano, a voluntária vai {variacao('mensal', 'voluntária')} no mensal e
+  {variacao('anual', 'voluntária')} no anual; a involuntária, {variacao('mensal', 'involuntária')}
+  no mensal e {variacao('anual', 'involuntária')} no anual.
 """)
 
 p.secao("Involuntária: onde a cobrança falha")
@@ -201,20 +227,24 @@ ant = (v26.groupby(["plano", "canal"]).antecedencia_dias
 p.tabela(ant, "Antecedência do aviso por plano e canal (voluntárias, jan–set/2026)",
          {"saídas": "{:,.0f}", "Q1 (dias)": "{:.0f}", "mediana (dias)": "{:.0f}", "Q3 (dias)": "{:.0f}"})
 med = v26.groupby("plano").antecedencia_dias.median()
-apos = int(v26.flag_aviso_apos_fim.eq(1).sum())
+apos = v26[v26.flag_aviso_apos_fim.eq(1)]
+apos_loja = int(apos.canal.eq("loja").sum())
+apos_site = int(apos.canal.eq("site").sum())
 an_ant = v26[v26.plano == "anual"].antecedencia_dias
 moda, n_moda = an_ant.mode().iloc[0], int((an_ant == an_ant.mode().iloc[0]).sum())
+viz = max(int((an_ant == moda + d).sum()) for d in (-14, -7, 7, 14))
 p.texto(f"""
 - **O anual avisa com meses de antecedência**: mediana de {br(med['anual'], 0)} dias entre desligar a
   renovação e o fim. Quem desliga no anual segue pagando (e usando) até o vencimento: é uma janela
   longa para tentar reverter.
 - No anual há um pico isolado: {n_moda} desligamentos ({br(100 * n_moda / len(an_ant))}%)
-  exatamente {moda:.0f} dias antes do fim, na loja e no site, com os dias vizinhos em menos de
-  10. Coincide com algum lembrete de renovação? O enunciado não descreve um; fica como pergunta.
+  exatamente {moda:.0f} dias antes do fim, na loja e no site, com os dias vizinhos (uma e duas
+  semanas antes e depois) em no máximo {br(viz, 0)}. Coincide com algum lembrete de renovação?
+  O enunciado não descreve um; fica como pergunta.
 - **O mensal avisa em semanas**: mediana de {br(med['mensal'], 0)} dias. A intervenção no mensal
   tem de chegar antes de ele desligar.
-- {apos} saídas voluntárias da loja têm o desligamento registrado depois do fim (aviso atrasado
-  da loja, E8) e contam como 0 dia.
+- {br(len(apos), 0)} saídas voluntárias ({br(apos_loja, 0)} na loja e {br(apos_site, 0)} no site)
+  têm o desligamento registrado depois do fim (`flag_aviso_apos_fim`, E8) e contam como 0 dia.
 """)
 
 p.secao("O que dizem na pesquisa de saída")
@@ -232,27 +262,51 @@ tema_pl = tema_pl.loc[[t for t in ordem if t in tema_pl.index]].reset_index().re
 p.tabela(tema_pl, "Tema do comentário por plano (% das respostas do plano)",
          {c: "{:.1f}" for c in tema_pl.columns if c != "tema do comentário"})
 com = ps[~ps.tema_comentario.isin(["sem comentário", "sem tema"])]
-obj = 100 * (com.tema_comentario == "objetivo_cumprido").mean()
 preco = ps[(ps.motivo_principal == "preco") & ps.comentario.notna()]
+top_tema = com.tema_comentario.value_counts()
+tema_top, n_top = top_tema.index[0], int(top_tema.iloc[0])
+pct_top = 100 * n_top / len(com)
+lista_fechada = set(ps.motivo_principal.dropna().unique())
+# o texto do comentário tem de descrever o tema que de fato lidera; não fixar exemplo de outro tema
+tema_txt = (f'**"Objetivo cumprido" é o tema dominante**: {br(pct_top)}% dos comentários com tema'
+            if tema_top == "objetivo_cumprido" else
+            f'**O tema dominante é `{tema_top}`**: {br(pct_top)}% dos comentários com tema'
+            f' ({br(n_top, 0)} de {br(len(com), 0)})')
+exemplos = (f' ("era só até a prova", "já fiz o casamento")'
+            if tema_top == "objetivo_cumprido" else "")
+fora_da_lista = ("Esse motivo não existe na lista fechada da pesquisa."
+                 if tema_top not in lista_fechada else
+                 f'Esse motivo existe na lista fechada da pesquisa (opção `{tema_top}`).')
+tp = tema_pl.set_index("tema do comentário")
+obj_anual = (tp["anual"].get("objetivo_cumprido", float("nan"))
+             if "anual" in tp.columns else float("nan"))
+obj_mensal = (tp["mensal"].get("objetivo_cumprido", float("nan"))
+              if "mensal" in tp.columns else float("nan"))
+dif_obj = abs(obj_anual - obj_mensal)
+mesma_fatia = bool(dif_obj <= 5)
+mistura = ('A fatia de "objetivo cumprido" é quase a mesma no anual e no mensal'
+           if mesma_fatia else
+           'A fatia de "objetivo cumprido" difere entre anual e mensal')
+conclusao_mistura = (": o plano muda quando a pessoa sai, não tanto por quê." if mesma_fatia else ".")
 p.texto(f"""
-- **"Objetivo cumprido" é o tema dominante**: {br(obj)}% dos comentários com tema ("era só até a
-  prova", "já fiz o casamento"). Esse motivo não existe na lista fechada da pesquisa.
-- A mistura de temas é quase a mesma no anual e no mensal ("objetivo cumprido" em
-  {br(tema_pl.set_index('tema do comentário').loc['objetivo_cumprido', 'anual'])}% e
-  {br(tema_pl.set_index('tema do comentário').loc['objetivo_cumprido', 'mensal'])}% das respostas):
-  o plano muda quando a pessoa sai, não tanto por quê.
+- {tema_txt}{exemplos}. {fora_da_lista}
+- {mistura} ("objetivo cumprido" em {br(obj_anual)}% das respostas do anual e
+  {br(obj_mensal)}% do mensal){conclusao_mistura}
 - **O motivo marcado engana**: dos {len(preco)} que marcaram `preco` e comentaram, só
   {int((preco.tema_comentario == 'cobranca').sum())} falam de cobrança (Q7). `preco` parece a
   primeira opção da lista, não a razão.
-- Limite: a pesquisa só existe no site (cartão e Pix) e em jun–set/2026; a loja, que é 67% das
-  saídas de jun–set, não responde. Amostra autosselecionada: indica temas, não proporções da base.
+- Limite: a pesquisa só existe no site (cartão e Pix) e em jun–set/2026; a loja, que é
+  {br(loja_pct)}% das saídas de jun–set/2026, não responde. Amostra autosselecionada: indica
+  temas, não proporções da base.
 """)
 
 p.secao("Hipóteses de driver por grupo (para o Segmentation Report)")
-p.texto("""
+p.texto(f"""
 Cruzamento das etapas 02 e 03. São hipóteses a testar, não causas.
 
-- **Mensal recém-chegado** (até 6 meses de casa): saída voluntária alta, aviso de duas semanas.
+- **Mensal recém-chegado** (até 6 meses de casa): saída voluntária alta, aviso de
+  {br(med_recem, 0)} dias na mediana do próprio grupo ({br(n_recem, 0)} saídas; no mensal
+  inteiro, {br(med['mensal'], 0)} dias).
   Driver suspeito: a primeira experiência não vira hábito; o reajuste de mar/26 coincide com a
   alta do voluntário no mensal.
 - **Anual desengajado perto do vencimento**: para de treinar e desliga a renovação meses antes.
@@ -265,11 +319,10 @@ Cruzamento das etapas 02 e 03. São hipóteses a testar, não causas.
 
 p.secao("Três frases")
 p.texto(f"""
-- **O que o dado diz.** A subida do churn de 2026 é de saída voluntária
-  ({br(r.loc[('total', 'voluntária'), 'variação (p.p.)'], 2)} p.p. ao mês), e quem sai avisa: duas
-  semanas no mensal, cerca de {br(med['anual'] / 30.4375, 0)} meses no anual.
+- **O que o dado diz.** {titulo_lider.replace('**', '')}, e quem sai avisa:
+  {br(med['mensal'], 0)} dias no mensal, cerca de {br(med['anual'] / 30.4375, 0)} meses no anual.
 - **O que ele não diz.** Por que desligam: a pesquisa só cobre o site e o motivo marcado diverge
-  do texto; "objetivo cumprido" aparece no texto, mas não sabemos o quanto pesa na loja.
+  do texto; o tema `{tema_top}` aparece no texto, mas não sabemos o quanto pesa na loja.
 - **A próxima pergunta.** Os grupos das hipóteses acima existem como segmentos distintos quando
   agrupamos os assinantes ativos, e quanto da base atual cai em cada um?
 """)

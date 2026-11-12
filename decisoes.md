@@ -44,7 +44,7 @@ Uma tabela de prata por arquivo da bronze, no mesmo grão. Todas são recriadas 
 | `eventos_assinatura` | 275.565 | 275.565 | 0 | E |
 | `pagamentos` | 165.548 | 163.607 | −1.941 cobranças duplicadas | P |
 | `uso_mensal` | 591.662 | 591.662 | 0 | M |
-| `atividades` | 1.254.475 | 1.252.575 | −1.900 treinos em dobro (relógio + app) | T |
+| `atividades` | 1.254.475 | 1.251.108 | −1.900 treinos em dobro (relógio + app, T3) · −1.467 um registro por minuto de início (T12) | T |
 | `amizades` | 113.480 | 113.480 | 0 | Z |
 | `campanha_ago26` | 14.120 | 14.120 | 0 | C |
 | `onboarding` | 63.929 | 63.929 | 0 | O |
@@ -171,7 +171,7 @@ Notebook: `notebooks/uso_mensal_prata.py`. Bronze: 591.662 linhas · prata: 591.
 
 ## Atividades (`1.bronze/atividades.parquet` → `2.prata/atividades.parquet`)
 
-Notebook: `notebooks/atividades_prata.py` (rodar com `.venv/bin/python`, exige pyarrow). Bronze: 1.254.475 linhas · prata: 1.252.575 linhas.
+Notebook: `notebooks/atividades_prata.py` (rodar com `.venv/bin/python`, exige pyarrow). Bronze: 1.254.475 linhas · prata: 1.251.108 linhas.
 
 | # | Problema | Decisão | Motivo | Efeito na contagem |
 |---|---|---|---|---|
@@ -179,13 +179,14 @@ Notebook: `notebooks/atividades_prata.py` (rodar com `.venv/bin/python`, exige p
 | T2 | Desde 15/04/2026 o app grava o tipo em inglês (`run`, `walk`, `ride`, `strength`, `hiit`); antes e nos relógios, em português | **Corrigir**: `run`→`corrida`, `walk`→`caminhada`, `ride`→`pedal`, `strength`→`forca`, `hiit`→`funcional`. Original em `tipo_bronze` | Mesmo treino com rótulo diferente: a troca é de um dia para o outro e duração, ritmo e FC de cada par batem (`hiit` e `funcional`: mediana 32,5 e 32,4 min, FC 141) | 486.864 linhas traduzidas · 6 tipos na prata (eram 11) |
 | T3 | O mesmo treino aparece duas vezes, uma pelo relógio e outra pelo app: mesmo `user_id`, `inicio_brt`, tipo, duração, distância e ritmo, com `atividade_id` diferente | **Remover** a cópia do app (fica a linha do relógio; no empate, o menor `atividade_id`) | Mesmo minuto e mesmas medidas não são dois treinos; é o relógio sincronizado também pelo app. A origem que fica é a de onde o treino veio | −1.900 linhas: 1.032 pares Garmin/app, 867 Apple Health/app, 1 app/app · bronze tinha 3.649 durações zero, 4 delas nas cópias removidas |
 | T4 | `distancia_km` 40 a 160 vezes maior que `duracao_min / ritmo_min_km` (ex.: caminhada de 81 min a 12,76 min/km com 512,86 km) | **Corrigir**: distância = duração ÷ ritmo, 2 casas. Original em `distancia_km_bronze` | Nos demais treinos com GPS a razão fica entre 0,99 e 1,01 e não há nenhuma entre 1,2 e 40: o erro é só da distância, duração e ritmo estão coerentes com o tipo | 998 linhas · soma dessas distâncias: 992.003 km → 9.933 km |
-| T5 | `gps_ok = False`: a distância gravada é um trecho do percurso e não há ritmo | **Corrigir**: `distancia_km` vira nulo. Original em `distancia_km_bronze` | A distância desses treinos não mede o treino (mediana de 0,60 km para uma mediana de 46 min de treino). Só acontece no app, em `run`/`walk`/`ride`, depois da troca de 15/04/2026 | 14.779 linhas com GPS falho · 7.455 tinham distância e viram nulo · 7.324 já vinham sem distância · o treino continua contando |
-| T6 | `duracao_min = 0` | **Corrigir**: com distância e ritmo, duração = distância × ritmo (1 casa). Sem eles, nulo. Se a distância também estiver inflada (duração recalculada acima do teto do tipo: caminhada 120, corrida 360, pedal 600 min), duração e distância ficam nulas. Original em `duracao_min_bronze`; todas marcadas com `flag_duracao_zero = 1` | Treino registrado com duração zero não existe; em treino com GPS a duração é recuperável pela relação distância × ritmo, válida nas demais linhas | 3.645 linhas: 1.966 recalculadas · 1.676 sem GPS ficam nulas · 3 com distância inflada ficam sem duração e sem distância · 1.679 durações nulas na prata · minutos somados: 58.269.442 (bronze) → 58.285.655 (prata) |
-| T7 | `treino_com` vazio gravado como texto `''` | **Corrigir** para nulo | Ausência de companhia, não um `user_id` | 14.112 treinos com companhia · nenhum aponta para o próprio usuário |
-| T8 | Dois treinos do mesmo usuário começando no mesmo minuto, com tipo ou duração diferentes | **Marcar** `flag_inicio_repetido = 1` | Não são cópia um do outro (as medidas diferem); pode ser registro em dobro com medidas divergentes ou dois treinos reais lançados juntos. Sem outra fonte não dá para afirmar erro | 2.934 linhas em 1.467 grupos · 671 grupos com o mesmo tipo · nenhuma removida |
+| T5 | `gps_ok = False`: a distância gravada é um trecho do percurso e não há ritmo | **Corrigir**: `distancia_km` vira nulo. Original em `distancia_km_bronze` | A distância desses treinos não mede o treino (mediana de 0,60 km para uma mediana de 46 min de treino). Só acontece no app, em `run`/`walk`/`ride`, depois da troca de 15/04/2026 | 14.779 linhas com GPS falho (14.761 depois da T12) · 7.455 tinham distância e viram nulo · 7.324 já vinham sem distância · o treino continua contando |
+| T6 | `duracao_min = 0` | **Corrigir**: com distância e ritmo, duração = distância × ritmo (1 casa). Sem eles, nulo. Se a distância também estiver inflada (duração recalculada acima do teto do tipo: caminhada 120, corrida 360, pedal 600 min), duração e distância ficam nulas. Original em `duracao_min_bronze`; todas marcadas com `flag_duracao_zero = 1` | Treino registrado com duração zero não existe; em treino com GPS a duração é recuperável pela relação distância × ritmo, válida nas demais linhas | 3.645 linhas: 1.966 recalculadas · 1.676 sem GPS ficam nulas · 3 com distância inflada ficam sem duração e sem distância · 1.679 durações nulas antes de T12, 1.674 depois · minutos somados: 58.269.442 (bronze) → 58.285.655 (prata) · depois da T12 a prata fica em 58.215.732 |
+| T7 | `treino_com` vazio gravado como texto `''` | **Corrigir** para nulo | Ausência de companhia, não um `user_id` | 14.112 treinos com companhia (14.092 depois da T12) · nenhum aponta para o próprio usuário |
+| T8 | ~~Dois treinos do mesmo usuário começando no mesmo minuto, com tipo ou duração diferentes~~ (revista pela T12) | ~~**Marcar** `flag_inicio_repetido = 1`~~ → **ver T12** | O diagnóstico continua valendo: não são cópia um do outro (as medidas diferem) e o arquivo não diz qual registro é fiel. A marcação, porém, deixou L e N lendo bases de treino diferentes, sem critério para escolher (Em aberto que a T12 resolve) | 2.934 linhas em 1.467 grupos · 671 grupos com o mesmo tipo · ~~nenhuma removida~~ na T8; 1.467 removidas pela T12 |
 | T9 | Treinos longos: corrida até 333 min, pedal até 544 min | **Manter** | Distância × ritmo bate com a duração (ex.: corridas de 42 km em 4–5h, maratona) | nenhuma |
 | T10 | `fc_media` só em parte dos treinos do app | **Manter** | Vem sempre do Garmin e do Apple Health e em 116.719 treinos do app (relógio conectado); faixa de 61 a 195 bpm, fisiológica | nenhuma |
 | T11 | `gps_ok = True` em treinos sem GPS (força, funcional, yoga) | **Manter** | O campo só tem significado em corrida, caminhada e pedal; nos demais é o valor padrão | nenhuma |
+| T12 | Dois treinos do mesmo usuário começando no mesmo minuto **depois** das correções T3–T6, com tipo, duração, distância ou ritmo diferentes (não é a cópia relógio + app da T3): o caso que a T8 marcava e deixava na tabela | **Manter um** registro por (`user_id`, `inicio_brt`): fica o do relógio (`garmin`/`apple_health`) e, no empate, o menor `atividade_id`. A escolha é feita depois das correções T4–T6, então a linha que fica já carrega os valores corrigidos | **Premissa explícita**, não erro comprovado: um usuário tem no máximo um treino começando em cada minuto. Os dois registros podem ser o mesmo treino gravado em dobro com medidas divergentes ou dois treinos reais lançados juntos, e o arquivo não tem como distinguir. A cópia que fica (relógio antes de app, menor `atividade_id` no empate) é arbitrária: dá um resultado estável e reproduzível, não prova qual registro é fiel. Não se deduplica por proximidade (1–2 min): o arquivo não sustenta esse limiar e ele apagaria treinos curtos sucessivos. Resolve o Em aberto em que L mantinha as linhas marcadas e N excluía as mesmas linhas (N9) | −1.467 linhas (prata 1.252.575 → 1.251.108) em 1.350 usuários · 796 dos pares com tipo diferente · set/2026: 150.946 → 150.742 treinos · minutos 58.285.655 → 58.215.732 · km 6.573.469 → 6.564.697 · `flag_inicio_repetido` sai da prata: 0 linhas marcadas |
 
 ## Amizades (`1.bronze/amizades.csv` → `2.prata/amizades.csv`)
 
@@ -369,7 +370,7 @@ Conceitos e debate de método: `memorial.md`, etapa 04. Segue o roteiro da aula 
 | L2 | Saída para descrever os grupos | **Definir**: `saiu_60d` = evento `renovacao_automatica_desligada`, `cancelamento_web` ou `assinatura_expirada` entre 01/08 e 29/09/2026. Não entra no agrupamento | Mede a decisão de sair, como na aula ("pelos eventos"): o anual desliga meses antes de expirar (W4). Carência sozinha não conta (pode pagar) | 1.502 de 11.688 (12,9%; a aula mostra 12,5%) · vazio para `Já desligou` e para 30/09 |
 | L3 | Variáveis do agrupamento | **Usar** as quatro da aula, medidas até 31/07 em `atividades`: treinos por semana (12 semanas, 09/05–31/07, ÷ 12); dias sem treino (sem treino no arquivo: desde 01/01/2026 ou desde o início, o que vier depois); tempo de casa em dias; % dos treinos das 12 semanas em corrida, caminhada ou pedal (0 sem treino) | Aula 3; `atividades` começa em 01/01/2026, daí o teto de dias sem treino | medianas: 1,9 treino por semana, 2 dias sem treino, 267 dias de casa, 69% ao ar livre · 562 sem treino nas 12 semanas |
 | L4 | Escala e algoritmo | **Padronizar** (StandardScaler) e rodar k-means de k = 2 a 8, `n_init = 10`, `random_state = 0` | Sem padronizar, o tempo de casa (dias) dominaria a distância; semente fixa para refazer | nenhuma linha alterada |
-| L5 | Número de grupos | **k = 4** pelas quatro lentes: inércia dobra entre 4 e 5 (−7.522 de 3 para 4, −4.252 de 4 para 5); silhueta 0,43 (fraca; a maior é 0,59 em k = 2); Rand ajustado em 10 reamostras médio 0,999, mínimo 0,998 (k = 6: mínimo 0,63); outra semente 1,000; quatro grupos com ação diferente | Nenhuma lente decide sozinha (aula 3) | Parados 560 · Ativos ao ar livre 5.837 · Ativos em ambiente fechado 4.219 · Veteranos 1.072 |
+| L5 | Número de grupos | **k = 4** pelas quatro lentes: a inércia cai (−7.522 de 3 para 4, −4.249 de 4 para 5, depois da T12), sem cotovelo que isole um k; silhueta 0,43 (fraca; a maior é 0,59 em k = 2); Rand ajustado em 10 reamostras médio 0,999, mínimo 0,998 (k = 6: mínimo 0,63); outra semente 1,000; quatro grupos com ação diferente | Nenhuma lente decide sozinha (aula 3) | Parados 560 · Ativos ao ar livre 5.837 · Ativos em ambiente fechado ~~4.219~~ 4.217 · Veteranos ~~1.072~~ 1.074 (T12) |
 | L6 | Variáveis do grupo (até duas, aula 3) | **Testar e deixar de fora**: % de treinos ao ar livre com GPS falho, km por treino ao ar livre e conexões recíprocas; plano, canal e método também fora | Nenhuma muda os grupos (Rand 0,986–0,998 com os quatro) e todas baixam a silhueta (0,32–0,37). Variável 0/1 padronizada pesa demais na distância (aula 3) | ficam no perfil (colunas da tabela), não no agrupamento |
 | L7 | Nome dos grupos | **Definir por regra** sobre as medianas: maior dias sem treino = Parados; maior tempo de casa = Veteranos; dos dois restantes, maior % ao ar livre = Ativos ao ar livre | O k-means devolve números; a regra fixa o nome se a ordem dos rótulos mudar | o notebook para se a regra não separar os quatro |
 | L8 | Tamanho atual | **Classificar** os pagantes de 30/09/2026 com o mesmo padronizador e os mesmos centros, variáveis medidas até 30/09 | O relatório prioriza a base de hoje; a de 31/07 só serve para ver a saída | 14.753 ativos (= enunciado) · Parados 514 · Ao ar livre 6.327 · Ambiente fechado 4.616 · Veteranos 1.046 · Já desligou 2.250 |
@@ -377,7 +378,7 @@ Conceitos e debate de método: `memorial.md`, etapa 04. Segue o roteiro da aula 
 ### Resultado de referência
 
 Saída em 60 dias (01/08–29/09/2026) por grupo: Parados 29,8% (todos anuais), Ativos ao ar livre
-14,0% (mensal 15,4%, anual 12,6%), Ativos em ambiente fechado 10,9% (12,8% e 8,7%), Veteranos 5,4%;
+14,0% (mensal 15,4%, anual 12,6%), Ativos em ambiente fechado 10,9% (12,8% e 8,6%), Veteranos 5,5%;
 média 12,9%. Mensal com até 90 dias de casa: 20,8% ao ar livre, 15,2% em ambiente fechado. Mensal
 no cartão: 17,2%. Já desligou: 32,3% expiraram em 60 dias, 6,9% religaram.
 ## Segmentos k-means (ouro) (prata → `3.ouro/segmentos_kmeans.csv`)
@@ -389,25 +390,27 @@ Notebook: `notebooks/segmentos_kmeans_ouro.py`. Grão: assinante × data de refe
 |---|---|---|---|---|
 | N1 | Quem segmentar | **Definir**: assinaturas pagas (`flag_cortesia = 0`) ativas no fim da data de referência (`inicio <= ref` e `data_fim` vazia ou depois de `ref`) | O relatório da semana 5 segmenta a base que pode sair | 14.032 em 31/07/26 · 14.753 em 30/09/26 |
 | N2 | Data de ajuste | **Ajustar** o k-means em 31/07/2026 e medir a saída nos 60 dias seguintes (`data_fim` de 01/08 a 29/09/26); em 30/09 só **atribuir** o centróide mais próximo, com a padronização de 31/07 | Em 30/09 o horizonte de 60 dias ainda não aconteceu; 31/07 é a última data com 60 dias observados até o corte | saída em 60 dias da base de 31/07: 10,5% |
-| N3 | Variáveis | **Usar** nove variáveis de comportamento até `ref`: treinos em 30 dias, tendência (30 dias contra os 60 anteriores), dias sem treinar (teto 120), sessões no app (média de 3 meses), conexões recíprocas, posts em 90 dias, chamados + treinos com GPS falho em 90 dias, recusas em 180 dias, meses de assinatura. Contagens em `log1p`, z-score com média e desvio de 31/07 | Só informação até a data de referência; treinos de `atividades` (sem `flag_inicio_repetido`), que conta o relógio que `uso_mensal` subconta (M9) | — |
+| N3 | Variáveis | **Usar** nove variáveis de comportamento até `ref`: treinos em 30 dias, tendência (30 dias contra os 60 anteriores), dias sem treinar (teto 120), sessões no app (média de 3 meses), conexões recíprocas, posts em 90 dias, chamados + treinos com GPS falho em 90 dias, recusas em 180 dias, meses de assinatura. Contagens em `log1p`, z-score com média e desvio de 31/07 | Só informação até a data de referência; treinos de `atividades` (~~sem `flag_inicio_repetido`~~ — hoje um registro por minuto, sem filtro, ver N9), que conta o relógio que `uso_mensal` subconta (M9) | — |
 | N4 | Plano, canal, sistema | **Não usar** no agrupamento; só para descrever os segmentos | O anual só sai na renovação: com plano no k-means o segmento repetiria o plano | — |
-| N5 | Número de segmentos | **k = 4** (k-means++, 20 inicializações, `random_state = 7`) | Guia pede 3–4 segmentos; entre 3 e 4, k = 4 tem o maior silhouette (0,237; k = 3: 0,203). k = 5 (0,253) separa Android com GPS falho, que sai 7,6%, abaixo da média | — |
+| N5 | Número de segmentos | **k = 4** (k-means++, 20 inicializações, `random_state = 7`) | Guia pede 3–4 segmentos; entre 3 e 4, k = 4 tem o maior silhouette (0,239 depois da T12; k = 3: 0,203). k = 5 (0,253) separa Android com GPS falho, que sai 7,6%, abaixo da média | — |
 | N6 | Nome dos segmentos | **Rotular** pelo traço do centróide: maior recusa = Cobrança falhando; mais dias sem treino = Parados; menos meses de assinatura = Recém-chegados; o restante = Engajados | Rótulo estável se a ordem dos clusters mudar | — |
-| N7 | Prioridade e rótulo quando a prata muda | **Definir**: prioridade "ação imediata" se o segmento sai em 60 dias ≥ 1,5 × a média da base, senão "monitorar". Rótulo de N6 só vale se o centróide está a ≥ 1 desvio da média na variável; grupo sem rótulo vira "Grupo n". k recalculado pela regra de N5 a cada execução | O ouro é refeito quando os colegas atualizam a prata: prioridade, rótulos, k e todo número da página saem do cálculo, não do código | Recém-chegados (9,4% contra limite de 15,7%) passa de "ação imediata" (escolha manual anterior) para "monitorar"; demais iguais |
+| N7 | Prioridade e rótulo quando a prata muda | **Definir**: prioridade "ação imediata" se o segmento sai em 60 dias ≥ 1,5 × a média da base, senão "monitorar". Rótulo de N6 só vale se o centróide está a ≥ 1 desvio da média na variável; grupo sem rótulo vira "Grupo n". k recalculado pela regra de N5 a cada execução | O ouro é refeito quando os colegas atualizam a prata: prioridade, rótulos, k e todo número da página saem do cálculo, não do código | Recém-chegados (9,5% contra limite de 15,7%) passa de "ação imediata" (escolha manual anterior) para "monitorar"; demais iguais |
+| N8 | Idade por data de referência | **Calcular** idade completa em `data_ref` a partir de `usuarios.data_nascimento`; exportar como `idade` em vez de `idade_corte` | U7 fixa `idade_corte` em 30/09; usá-la em 31/07 antecipa aniversários de agosto e setembro. A idade é descritiva e não entra no k-means | Em 31/07, 2.183 de 14.032 assinantes ficam um ano mais novos; mediana 47 → 46 anos. Em 30/09 a idade é igual à de U7. Segmentos e taxas de saída inalterados |
+| N9 | Base de treinos do k-means de nove variáveis | **Usar** a mesma `atividades.parquet` de L, sem filtro de flag: a T12 deixou um registro por (`user_id`, `inicio_brt`) e a coluna `flag_inicio_repetido` saiu da prata | Antes, L mantinha as linhas com início repetido e N excluía as mesmas linhas: cada segmentação via uma base de treino diferente, o que podia explicar diferença de segmento. Com a T12 as duas leem a mesma base | 193 linhas mudam de segmento, somando as duas datas de referência. Em 31/07: Engajados 8.218 → 8.298, Recém-chegados 2.614 → 2.523, Parados 2.755 → 2.766, Cobrança falhando 445 (inalterado). Em L, 2 linhas: Ativos em ambiente fechado 4.219 → 4.217 e Veteranos 1.072 → 1.074 |
 
 ### Resultado de referência
 
-Base de 31/07/2026, saída em 60 dias: Engajados 8.218 (58,6%) saem 6,8% · Recém-chegados
-2.614 (18,6%) saem 9,4% · Parados 2.755 (19,6%, 93% anual) saem 20,9% · Cobrança falhando
+Base de 31/07/2026, saída em 60 dias: Engajados 8.298 (59,1%) saem 6,8% · Recém-chegados
+2.523 (18,0%) saem 9,5% · Parados 2.766 (19,7%, 93% anual) saem 20,9% · Cobrança falhando
 445 (3,2%, 90% mensal, 64% site) saem 18,9%, 32% das saídas por falha de pagamento. No
-mensal, Parados saem 46,7% contra 12,6% dos Engajados. Base de 30/09: 8.368 · 3.477 · 2.446 ·
-462.
+mensal, Parados saem 47,0% contra 12,5% dos Engajados. Base de 30/09: 8.447 · 3.382 · 2.462 ·
+462. Tamanhos e taxas são os recalculados depois da T12 (N9); pequenas variações podem ficar ocultas pelo arredondamento.
 
 ## Conciliação dos segmentos (ouro) (`3.ouro/segmentos.csv` + `3.ouro/segmentos_kmeans.csv` → `3.ouro/conciliacao_segmentos.csv`)
 
 Notebook: `notebooks/conciliacao_segmentos.py`. Grão: segmento L × segmento N × data de
 referência (31/07 e 30/09/2026), 36 linhas. Cruza `segmentos.csv` (decisões L1–L8) com `segmentos_kmeans.csv` (N1–N7). Página:
-`estudos-analises/rascunho_customer_segmentation_report.html`, seção 04.
+`artefatos/customer_segmentation_report.html`, seção 04.
 
 | # | Problema | Decisão | Motivo | Efeito na contagem |
 |---|---|---|---|---|
@@ -416,10 +419,19 @@ referência (31/07 e 30/09/2026), 36 linhas. Cruza `segmentos.csv` (decisões L1
 ### Resultado de referência
 
 31/07/2026: 558 dos 560 Parados (L) estão nos Parados de N. Dos 1.422 mensais ativos (L) com
-até 90 dias de casa, 1.104 estão em Recém-chegados (N). Cobrança falhando (N): 54% no cartão;
+até 90 dias de casa, 1.091 estão em Recém-chegados (N). Cobrança falhando (N): 54% no cartão;
 193 nos Ativos ao ar livre e 189 nos de ambiente fechado. Dentro dos Ativos ao ar livre, quem
-está em Parados de N (pouco treino nos últimos 30 dias) sai 25,9% pela decisão, contra 11,7%
+está em Parados de N (pouco treino nos últimos 30 dias) sai 26,3% pela decisão, contra 11,7%
 dos Engajados.
+## Segmentos por plano (ouro) (`3.ouro/segmentos.csv` + `3.ouro/segmentos_kmeans.csv` → `3.ouro/segmentos_plano.csv`)
+
+Notebook: `notebooks/segmentos_plano_ouro.py`. Grão: persona L × plano em 31/07/2026;
+8 combinações. Página: `artefatos/07_segmentos_por_plano.html`.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| X2 | Comparar as réguas de saída por persona e plano | **Usar** a mesma base de pagantes com renovação não desligada em 31/07; agrupar pela persona L e pelo plano; comparar sinal L2 e término N2 em 01/08–29/09, cada um com o mesmo denominador do grupo. Grupo sem assinantes tem taxa vazia | Plano altera o calendário de renovação e as duas réguas medem eventos diferentes; não transformar associação em causalidade | 11.688 assinantes, 1.502 sinais e 711 términos; 8 combinações, sendo Parados mensal sem assinantes. Recontado no ouro depois da T12 (N9): mesmos totais; algumas taxas por persona e plano variam após a troca de grupo de dois assinantes |
+
 ## Recusas de cobrança (ouro) (`2.prata/pagamentos.csv` + `2.prata/assinaturas.csv` → `3.ouro/recusas_cobranca.csv`)
 
 Notebook: `notebooks/recusas_cobranca_ouro.py`. Grão: uma cobrança recusada; jul/2024–set/2026,
@@ -453,6 +465,15 @@ só os preços do enunciado; P12) e o ouro já gerado (5,6% e 6,6%; R3). Sai com
 quebrar. Rode depois de mexer em qualquer notebook.
 
 ## Em aberto
+
+### Segmentação: registros de treino repetidos
+
+- ~~L mantém as linhas com `flag_inicio_repetido = 1`; N exclui as linhas marcadas. Avaliar
+  casos de possível duplicata versus treinos distintos no mesmo minuto e decidir uma regra
+  comum antes de reclassificar assinantes. Não excluir nem escolher uma cópia sem evidência.~~
+  Resolvido pela T12 (12/11/2026): a prata fica com um registro por (`user_id`, `inicio_brt`),
+  relógio antes de app e menor `atividade_id` no empate — **premissa**, não erro comprovado. L
+  e N passam a ler a mesma base (N9); a flag saiu da prata.
 
 ### Usuários
 
@@ -493,7 +514,9 @@ quebrar. Rode depois de mexer em qualquer notebook.
   a menos; nunca conta mais. Todo usuário que bate em todos os meses só tem treinos de origem
   `app`: a divergência está em quem sincroniza Garmin ou Apple Health. Outros 2.205
   usuário-mês com treino no parquet (3.258 treinos) não têm linha aqui. Confirmar depois de
-  limpar o parquet e decidir a fonte de engajamento em 2026 (ouro).
+  limpar o parquet e decidir a fonte de engajamento em 2026 (ouro). **Contas medidas na prata
+  antes da T12**: com 1.467 treinos a menos no parquet, os números acima descem um pouco —
+  recontar quando M9 for analisado (a conta não é feita por nenhum notebook hoje).
 - M6: confirmar a causa da queda de `sessoes_app` em mar/2026 (versão do app em
   `usuarios.csv`, tickets de suporte). Coincide com o reajuste de 01/03/2026.
 - Quem entra na tabela em 2026 (assinante? conta ativa?) não está no dicionário: 63.830
@@ -504,8 +527,9 @@ quebrar. Rode depois de mexer em qualquer notebook.
 
 - `treino_com` não foi conferido contra `usuarios.csv` (prata não cruza): validar na ouro se toda companhia é uma conta existente.
 - GPS falho (T5) só aparece na versão do app que passou a gravar o tipo em inglês: provável defeito da versão de 15/04/2026. Candidato a variável de experiência ruim no modelo de churn; cruzar com a versão do app em `usuarios.csv`.
-- Duplicatas em que só uma das cópias tem distância inflada ou duração zero não casam na regra T3 e ficam como `flag_inicio_repetido`. Ao contar minutos ou km por usuário, decidir se esses grupos contam uma vez.
+- ~~Duplicatas em que só uma das cópias tem distância inflada ou duração zero não casam na regra T3 e ficam como `flag_inicio_repetido`. Ao contar minutos ou km por usuário, decidir se esses grupos contam uma vez.~~ Resolvido pela T12: esses grupos ficam com um registro só (relógio antes de app; empate no menor `atividade_id`), então minutos e km por usuário já contam uma vez. A premissa por trás disso (no máximo um treino por minuto) continua sendo premissa, não fato provado.
 - Minutos de treino: 1.679 treinos sem duração (T6). O treino conta na frequência; a métrica de minutos precisa dizer se ignora ou imputa.
+- T12: a premissa não é verificável no arquivo — ele não diz qual dos dois registros do mesmo minuto é fiel. Se aparecer fonte oficial (log de sincronização do app ou do relógio), conferir a escolha "relógio antes de app, menor `atividade_id` no empate". Efeito hoje: −1.467 linhas, 2 linhas de L e 193 de N (somando as duas datas) mudam de segmento.
 
 ### Campanha ago/26
 

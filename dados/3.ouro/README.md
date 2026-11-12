@@ -26,6 +26,7 @@ Tabelas:
 | `pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | mês × meio de pagamento |
 | `segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | um assinante pagante ativo × data de referência, com o segmento de nove variáveis (N1–N7) |
 | `conciliacao_segmentos.csv` | `notebooks/conciliacao_segmentos.py` | segmento L × segmento N × data de referência (X1) |
+| `segmentos_plano.csv` | `notebooks/segmentos_plano_ouro.py` | persona L × plano em 31/07/2026; sinal e término na mesma base (X2) |
 | `recusas_cobranca.csv` e `recusas_cobranca.xlsx` | `notebooks/recusas_cobranca_ouro.py` | uma cobrança recusada (R1–R5) |
 
 Detalhes de cada tabela: "Tabelas prontas" no `AGENTS.md`.

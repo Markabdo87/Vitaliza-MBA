@@ -118,6 +118,10 @@ Regras das camadas:
 - Ao criar uma tabela nova, registre-a em "Tabelas prontas" abaixo.
 - `artefatos/00_historia_da_eda.html` resume as páginas 01–04 (EDA da semana 5, no lugar do
   mini deck); é gerada por `notebooks/eda_historia.py`, que lê o ouro e não cria tabela.
+- `artefatos/customer_segmentation_report.html` é gerado por `notebooks/relatorio_segmentacao.py`
+  a partir do ouro e de `estudos-analises/customer_segmentation_report.template.html`. Edite o
+  template, não o HTML gerado; leia `estudos-analises/README.md` para as ressalvas e validações.
+  Páginas de apoio intermediárias ficam em `artefatos/analises/`.
 - Ouro lê a prata com `ler_prata` (`notebooks/_ouro.py`): para com mensagem clara se o
   arquivo ou uma coluna sumiu e avisa se a prata é mais velha que o notebook que a gera.
   Nenhum número da página fica fixo no código: texto e rótulos saem do cálculo, para o ouro
@@ -130,15 +134,37 @@ Regras das camadas:
 Rodar (a partir da raiz do repo):
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt   # uma vez
-for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done        # toda a prata
+
+# prata: um notebook por arquivo; visao_prata.py fica de fora do laço (precisa da prata e do ouro)
+for n in notebooks/*_prata.py; do
+  case "$n" in */visao_prata.py) continue ;; esac
+  .venv/bin/python "$n"
+done
+
 .venv/bin/python notebooks/churn_mensal_ouro.py                       # antes do laço: assinantes_30jun26 lê o churn_mensal
-for n in notebooks/*_ouro.py; do .venv/bin/python "$n"; done         # ouro + artefatos
+
+# ouro: um notebook por tabela; _ouro.py é helper (ler_prata), não notebook
+for n in notebooks/*_ouro.py; do
+  case "$n" in */_ouro.py) continue ;; esac
+  .venv/bin/python "$n"
+done
+
 .venv/bin/python notebooks/conciliacao_segmentos.py                   # cruza os dois k-means (lê o ouro)
 .venv/bin/python notebooks/eda_historia.py                            # página-resumo 00 (lê o ouro)
+.venv/bin/python notebooks/relatorio_segmentacao.py                    # gera relatório a partir do ouro
+
+# visões: bronze só lê a bronze; prata só depois do ouro, porque compara com o churn_mensal
+.venv/bin/python notebooks/visao_bronze.py                            # opcional: perfil da bronze (00a)
+.venv/bin/python notebooks/visao_prata.py                             # primeiro olhar da prata (00b)
+
 .venv/bin/python notebooks/conferencias.py                             # confere tudo
 .venv/bin/python notebooks/confere_relatorio.py                       # confere o relatório contra o ouro
 .venv/bin/python notebooks/memorial_tecnico.py                        # memorial técnico (estudos-analises/)
 ```
+Os dois laços pulam os notebooks de apoio: `visao_prata.py` lê a prata inteira e compara com o
+`churn_mensal` do ouro (roda fora do laço da prata, depois do ouro completo e antes das
+conferências); `_ouro.py` é helper e não é notebook. `visao_bronze.py` só lê a bronze, então pode
+rodar a qualquer momento.
 Os notebooks de prata usam a biblioteca padrão do Python 3, menos `atividades_prata.py`, que
 lê parquet e precisa do `pyarrow`. Os de ouro usam `pandas` e `plotly` e rodam com o venv
 (`.venv/bin/python notebooks/<tabela>_ouro.py`); planilha `.xlsx` usa `openpyxl`; todos em `requirements.txt`. Dependência nova entra no
@@ -188,8 +214,13 @@ Já confirmado:
   de escala em mar/2026 (−45% por treino). Em 2026 subconta treinos de relógio frente a
   `atividades`.
 - **atividades:** o arquivo só cobre 01/01–30/09/2026 (não há treino de 2024–2025); desde 15/04/2026 o app grava `tipo` em inglês (`run`, `walk`…); treino de
-  relógio chega duas vezes (relógio + app); GPS falho (`gps_ok = False`) só na versão nova do
-  app, com distância sem sentido.
+  relógio chega duas vezes (relógio + app, removido pela T3); GPS falho (`gps_ok = False`) só na
+  versão nova do app, com distância sem sentido.
+- **Dois treinos do mesmo usuário no mesmo minuto** (tipo ou medidas diferentes) não são a cópia
+  relógio + app da T3. A prata deixa **um** registro por (`user_id`, `inicio_brt`) — relógio antes
+  de app, menor `atividade_id` no empate —, o que é **premissa** (um treino por minuto), não erro
+  comprovado (T12): 1.467 linhas removidas, 1.350 usuários. Não existe mais
+  `flag_inicio_repetido`, e L e N leem a mesma base (N9).
 - **Incidente técnico em mai–jun/2026:** pico de tickets de GPS/percurso não gravado
   (~1.200 chamados), coerente com o GPS falho de `atividades`. Candidato a causa do churn.
 - **Categorias preenchidas por pessoas divergem do texto livre**: `pesquisa_saida.motivo_principal`
@@ -209,7 +240,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/2.prata/eventos_assinatura.csv` | `notebooks/eventos_assinatura_prata.py` | um evento | ordenada por `user_id` e `seq_usuario`; horários em Brasília (`data_hora_brt`, `mes`); fim de assinatura = `assinatura_expirada`, fim de trial = `trial_expirado`; linhas com `flag_apos_fim = 1` não mudam o estado (contam como causa do fim, não como evento novo) e conte cancelamento por `renovacao_automatica_desligada` (não some `cancelamento_web`) |
 | `dados/2.prata/pagamentos.csv` | `notebooks/pagamentos_prata.py` | uma cobrança | inclui recusados com `valor` e `valor_liquido` zerados (P12; valor tentado em `valor_bronze`); para faturamento some `valor` (bruto) ou `valor_liquido` (após taxas) |
 | `dados/2.prata/uso_mensal.csv` | `notebooks/uso_mensal_prata.py` | um usuário e mês | jan/25–set/26; valores da bronze intactos. Para comparar 2025 com 2026 filtre `flag_sem_treino = 0`; não compare `sessoes_app` antes e depois de mar/26 (`flag_sessoes_nova_contagem`); em 2026 subconta treinos de relógio |
-| `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | um treino | `inicio_brt` em Brasília, `tipo` em português (6 tipos). Para minutos e km, ignore nulos em `duracao_min`/`distancia_km`; `flag_inicio_repetido` marca possíveis registros em dobro. Set/2026: 150.946 treinos; 36.551 usuários no arquivo |
+| `dados/2.prata/atividades.parquet` | `notebooks/atividades_prata.py` | um treino, e no máximo um por (`user_id`, `inicio_brt`) | 1.251.108 treinos (T3 e T12); `inicio_brt` em Brasília, `tipo` em português (6 tipos). Para minutos e km, ignore nulos em `duracao_min`/`distancia_km`; a base já conta uma vez os registros repetidos (premissa da T12, relógio antes de app). Set/2026: 150.742 treinos; 36.551 usuários no arquivo |
 | `dados/2.prata/amizades.csv` | `notebooks/amizades_prata.py` | uma relação de seguir (mão única) | `seguidor_id` segue `seguido_id` desde `desde` (data, sem hora); `reciproco` marca conexão mútua; para variável de modelo filtre `flag_apos_corte = 0` |
 | `dados/2.prata/campanha_ago26.csv` | `notebooks/campanha_ago26_prata.py` | um assinante sorteado em 10/08/2026 | `tratado` (1/0) é o tratamento do uplift; booleanos em 1/0; controle tem envio, canal, título e oferta vazios; abertura e clique medem atenção, não retenção |
 | `dados/2.prata/onboarding.csv` | `notebooks/onboarding_prata.py` | uma conta (`user_id` único) | texto livre com original em `*_bronze`; para extração use `objetivo_texto` não nulo e `flag_objetivo_sem_conteudo = 0`; `dias_por_semana` já é inteiro 1–7 |
@@ -223,6 +254,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/3.ouro/pagamentos_mensal.csv` | `notebooks/pagamentos_mensal_ouro.py` | mês × meio de pagamento | jul/24–set/26; aprovadas, devoluções (no mês do lançamento) e recusadas; `valor_bruto` = aprovado − devolvido; soma set/26 = referência abaixo |
 | `dados/3.ouro/segmentos_kmeans.csv` | `notebooks/segmentos_kmeans_ouro.py` | assinante × data de referência (31/07 e 30/09/26) | k-means k = 4 em 9 variáveis de comportamento (N1–N7); `segmento`, variáveis, plano/canal/sistema e `saiu_60d` (só em 31/07); gera `artefatos/05_segmentos_kmeans.html` |
 | `dados/3.ouro/conciliacao_segmentos.csv` | `notebooks/conciliacao_segmentos.py` | segmento L × segmento N × data de referência | cruza `segmentos.csv` (L1–L8) com `segmentos_kmeans.csv` (N1–N7); assinantes e saída em 60 dias pelas duas réguas (decisão e fim); alimenta o Customer Segmentation Report (X1) |
+| `dados/3.ouro/segmentos_plano.csv` | `notebooks/segmentos_plano_ouro.py` | persona L × plano em 31/07/2026 | base comum de 11.688 assinantes com renovação não desligada; sinal L e término N em 60 dias, sem priorização (X2); gera `artefatos/07_segmentos_por_plano.html` |
 
 | `dados/3.ouro/recusas_cobranca.csv` | `notebooks/recusas_cobranca_ouro.py` | uma cobrança recusada | jul/24–set/26, 3.250 recusas com desfecho `recuperada`/`perdida`/`em_aberto` (R1–R5); gera também `recusas_cobranca.xlsx` e `artefatos/06_recusas_cobranca.html` |
 

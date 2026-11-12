@@ -104,8 +104,10 @@ que qualquer pessoa do grupo roda do zero e chega ao mesmo resultado.
   corrigidos, duplicatas comprovadas removidas e suspeitas marcadas com colunas `flag_*`.
 - **Ouro** (`dados/3.ouro`): tabelas de análise, que cruzam a prata por `user_id` e agregam.
 - **Páginas** (`artefatos/`): HTML gerado pelo ouro, com só agregados; vão para o git.
-- **Relatório** (`estudos-analises/`): o Customer Segmentation Report, conferido contra o
-  ouro por `notebooks/confere_relatorio.py`.
+- **Relatório**: o Customer Segmentation Report é gerado por `notebooks/relatorio_segmentacao.py`
+  a partir do ouro e do template de `estudos-analises/`, sai em
+  `artefatos/customer_segmentation_report.html` e é conferido número por número contra o ouro
+  por `notebooks/confere_relatorio.py`.
 
 Toda decisão que muda um número tem um ID no `decisoes.md` (prefixo da seção + número): G
 churn mensal, K quem saiu, W por que saem, L personas, N k-means de nove variáveis, R recusas
@@ -217,14 +219,21 @@ Média da base com renovação ligada: {V['saidaL']}%. O `assert` confere os 14.
 """, trecho("segmentos_ouro.py", "b = monta(REF)", "ag_atual = atual[atual.renovacao")),
 ("Padronização, escolha de k e estabilidade", """
 As variáveis são padronizadas (`StandardScaler`): sem isso, o tempo de casa, em dias, dominaria
-a distância. O k-means roda de k = 2 a 8 e a escolha usa quatro lentes da aula 3:
+a distância. O k-means roda de k = 2 a 8. A silhueta e a estabilidade em reamostras vêm de uma
+implementação única, `notebooks/_metricas_segmentacao.py`, que o relatório usa também: o número
+publicado é exatamente o que o ouro calculou, e não uma cópia que envelhece sozinha. Ela
+devolve os rótulos recalculados, e o notebook confere o Rand ajustado contra a coluna
+`segmento` da tabela de ouro — se divergir, a métrica não vale para aquele agrupamento.
+
+A escolha de k usa quatro lentes da aula 3:
 
 - **inércia** (cotovelo): a queda fica pequena depois de k = 4;
-- **silhueta**: 0,43 em k = 4, estrutura fraca (os grupos são regiões de um contínuo);
-- **estabilidade**: 10 reamostras com reposição classificam a base inteira e são comparadas
-  com o agrupamento original pelo índice de Rand ajustado (0,999 em k = 4);
+- **silhueta**: estrutura fraca em k = 4 (os grupos são regiões de um contínuo);
+- **estabilidade**: as reamostras com reposição classificam a base inteira e são comparadas com
+  o agrupamento original pelo índice de Rand ajustado; o limiar está declarado em
+  `LIMIAR_RAND`, e a série de Rand mínimo por k sai impressa a cada execução;
 - **leitura de negócio**: quatro grupos que se descrevem numa frase e pedem ações diferentes.
-""", trecho("segmentos_ouro.py", "esc = StandardScaler().fit(ag[VARS])", "estab = pd.DataFrame(estab)")),
+""", trecho("segmentos_ouro.py", "esc = StandardScaler().fit(ag[VARS])", "estab = estabilidade_por_k(X, range(3, 7), SEMENTE, N_INIT)")),
 ("Nome dos grupos por regra", """
 O k-means devolve números (0 a 3) que mudam de ordem entre execuções. Os nomes saem de uma
 regra sobre as medianas: maior "dias sem treino" = Parados; entre os demais, maior tempo de
@@ -232,7 +241,7 @@ casa = Veteranos; dos dois restantes, maior % ao ar livre = Ativos ao ar livre e
 Ativos em ambiente fechado. O `assert` para se a regra não separar os quatro. A base de 30/09
 recebe o grupo do centro mais próximo com o **mesmo** padronizador e os **mesmos** centros
 de 31/07 (`predict`), sem reajustar.
-""", trecho("segmentos_ouro.py", "km = KMeans(K, n_init=N_INIT", 'ag_atual["segmento"] =')),
+""", trecho("segmentos_ouro.py", "km = agrupa(X)", 'ag_atual["segmento"] =')),
 ("Intervalo de confiança da taxa de cada grupo", """
 A taxa de saída de cada persona vem com o intervalo de Wilson de 95%, que se comporta bem em
 grupos pequenos e taxas longe de 50% (caso dos Parados, com ~560 assinantes). O relatório
@@ -251,15 +260,21 @@ Cada variável é uma entrada do dicionário `VARIAVEIS`: como calcular (`calc`)
 e como resumir no perfil. Todas usam só informação até a data de referência: treinos em 30
 dias, tendência (30 dias contra os 60 anteriores), dias sem treinar (teto 120), sessões no app,
 conexões recíprocas, posts, chamados + treinos com GPS falho, recusas de cobrança em 180 dias e
-meses de assinatura. Acrescentar uma variável é acrescentar uma entrada.
+meses de assinatura. Acrescentar uma variável é acrescentar uma entrada. Plano, canal, sistema e
+idade não entram no agrupamento: descrevem o perfil. A idade é a completa na data de referência,
+calculada de `data_nascimento` — `idade_corte` da prata é fixa em 30/09/2026 e, na base de 31/07,
+contaria meses de idade que ainda não existiam.
 """, trecho("segmentos_kmeans_ouro.py", "VARIAVEIS = {", "calc=lambda ref, b: ((ref - b.inicio)", extra=1)),
 ("Log, padronização e base atual", """
 Contagens têm cauda longa (poucos assinantes com muitos posts ou chamados), então entram em
 `log1p`. Tudo é padronizado com a média e o desvio de 31/07; a base de 30/09 usa **os mesmos**
-média e desvio, para cair no mesmo espaço dos centros.
+média e desvio, para cair no mesmo espaço dos centros. A lista de variáveis em log é conferida
+contra `LOG_N` de `notebooks/_metricas_segmentacao.py`: se divergir, o notebook para, porque o
+relatório recalcularia outra matriz e a métrica publicada não valeria.
 """, trecho("segmentos_kmeans_ouro.py", "def matriz(f):", "z_co = ((matriz(corte) - mu) / sd).values")),
 ("Escolha de k e rótulos", """
-k é o de maior silhueta entre 3 e 4 (faixa pedida pelo guia), medida numa amostra de 5.000.
+k é o de maior silhueta entre 3 e 4 (faixa pedida pelo guia), medida numa amostra de 5.000 por
+`silhueta`, a função da implementação única que o relatório também usa.
 Os rótulos saem dos centros, em ordem: maior recusa = Cobrança falhando; mais dias sem treino
 = Parados; menos meses de assinatura = Recém-chegados; o grupo restante que mais treina =
 Engajados. Um rótulo só é dado se o centro estiver a pelo menos 1 desvio da média naquela
@@ -303,8 +318,13 @@ função `confere` imprime OK/FALHOU por item e acumula as falhas.
 ("Conferência do relatório", """
 `confere_relatorio.py` recalcula a partir do ouro cada número citado no Customer Segmentation
 Report (tamanho, saída, intervalo e medianas de cada persona, as duas listas e as células do
-cruzamento) e procura o valor no texto da página, no formato brasileiro. Se um número do
-relatório não bater com o ouro, o script lista qual e sai com erro.
+cruzamento) e procura o valor no texto da página, no formato brasileiro. Antes dos números, ele
+confere a ligação das duas segmentações (X1): as duas tabelas de ouro têm de ter os mesmos pares
+`(user_id, data_ref)`, uma linha por par, e o cruzamento não pode mudar o tamanho da base nem a
+taxa de decisão de L. Número que só faz sentido preso a uma frase (decisão de L contra fim da
+assinatura de N, que também existe na base inteira) é conferido por âncora de texto: âncora
+ausente sai como PENDENTE com o valor do ouro, âncora presente com outro valor reprova. Se algo
+não bater, o script lista o que e sai com erro.
 """, trecho("confere_relatorio.py", "def confere(rotulo, trecho):", "        faltam.append(")),
 ]),
 ]
@@ -312,8 +332,8 @@ relatório não bater com o ouro, o script lista qual e sai com erro.
 AMBIENTE = """
 - **Ordem de execução** (da raiz do repositório): toda a prata; `churn_mensal_ouro.py` (o
   `assinantes_30jun26_ouro.py` lê o churn); o laço `notebooks/*_ouro.py`;
-  `conciliacao_segmentos.py`; `eda_historia.py`; `conferencias.py`; `confere_relatorio.py`;
-  e este `memorial_tecnico.py`.
+  `conciliacao_segmentos.py`; `eda_historia.py`; `relatorio_segmentacao.py` (o relatório que a
+  conferência lê); `conferencias.py`; `confere_relatorio.py`; e este `memorial_tecnico.py`.
 - **Versões**: `requirements.txt` fixa pandas 3.1.1, scikit-learn 1.9.1, plotly 7.1.0, pyarrow,
   scipy e openpyxl (Python 3.11 ou mais novo). As segmentações usam semente fixa
   (`random_state`), então repetem os grupos a cada execução.

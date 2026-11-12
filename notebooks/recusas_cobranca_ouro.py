@@ -158,7 +158,7 @@ print(res_canal.to_string(index=False))
 
 # --- artefato -----------------------------------------------------------------------------
 pg = Pagina(
-    "02 · Cobranças recusadas",
+    "06 · Cobranças recusadas",
     "Quantas cobranças são recusadas por mês e quantas a retentativa recupera.",
     "fonte: `dados/3.ouro/recusas_cobranca.csv`, gerada por "
     "`notebooks/recusas_cobranca_ouro.py` (decisões P12, R1–R5)",

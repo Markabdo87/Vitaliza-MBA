@@ -8,13 +8,18 @@ Os CSVs desta pasta não vão para o git. Eles são gerados pelos notebooks em `
 (`<arquivo>_prata.py`) e recriados rodando o notebook de novo:
 
 ```bash
-for n in notebooks/*_prata.py; do .venv/bin/python "$n"; done
+for n in notebooks/*_prata.py; do
+  case "$n" in notebooks/visao_prata.py) continue ;; esac
+  .venv/bin/python "$n"
+done
 ```
 (`atividades_prata.py` precisa do venv com `pyarrow`; ver `requirements.txt`.)
 
 O que a prata faz:
 - padroniza formato: datas em horário de Brasília, valores numéricos, nomes de categoria;
-- remove o que é erro comprovado, como duplicatas;
+- remove o que é erro comprovado, como duplicatas; em `atividades`, deixa **um** treino por
+  (`user_id`, minuto de início) — premissa da T12, não erro comprovado (fica o relógio; no
+  empate, o menor `atividade_id`);
 - corrige valores errados, guardando o original numa coluna `<coluna>_bronze`;
 - **marca** o que é suspeito com colunas `flag_*`, sem apagar a linha.
 

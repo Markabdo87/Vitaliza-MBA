@@ -326,10 +326,10 @@ dividem, o que distingue cada grupo e o que a Vitaliza faria diferente com cada 
 ### O que a etapa mostrou
 
 - **A estrutura da aula se reproduz.** k = 4 dá Parados (560), Ativos ao ar livre (5.837), Ativos
-  em ambiente fechado (4.219) e Veteranos (1.072), com silhueta 0,43 e Rand 0,999, perto da
+  em ambiente fechado (4.217) e Veteranos (1.074), com silhueta 0,43 e Rand 0,999, perto da
   referência da aula (472, 5.927, 4.215 e 1.074; silhueta 0,44).
 - **A saída ordena os grupos.** Parados 29,8%, ao ar livre 14,0%, ambiente fechado 10,9%, veteranos
-  5,4% (média 12,9%). Os parados são todos anuais: nenhum mensal com a renovação ligada estava sem
+  5,5% (média 12,9%). Os parados são todos anuais: nenhum mensal com a renovação ligada estava sem
   treinar.
 - **Taxa × volume.** O grupo com a maior taxa é pequeno (514 em 30/09); o com mais saídas é o ao ar
   livre (6.327 em 30/09, acima da média). A priorização olha as duas coisas.
@@ -353,6 +353,13 @@ fronteira: o segmento orienta a mensagem; quem recebe a ação é decidido pelo 
 | D04.3 | k | 2 (maior silhueta) · 4 · 5 (dobra da inércia) | 4: estável e acionável; k = 2 só separa quem parou | **proposto** (aplicado em L5) |
 | D04.4 | Variáveis do grupo | somar até duas (aula) · ficar com as quatro | ficar com as quatro: as candidatas não mudam os grupos e pioram a silhueta | **proposto** (aplicado em L6) |
 | D04.5 | Plano no segmento | eixo do k-means · corte depois do grupo · segmento por plano | corte depois do grupo: as ofertas do CRM são por plano, mas como 0/1 o plano dominaria a distância | **proposto** |
+| D04.6 | Treinos com início repetido | manter todas as linhas · excluir as marcadas · identificar sessões comprovadamente duplicadas | ~~Investigar antes de harmonizar: L mantém as linhas marcadas, N exclui ambas; início no mesmo minuto, sozinho, não prova duplicata~~ → o minuto de início deixa de ser marcação e vira **premissa**: um usuário tem no máximo um treino por minuto, fica o do relógio e, no empate, o menor `atividade_id` (T12). A cópia escolhida é arbitrária; o que ela garante é base única e reproduzível, não fidelidade ao treino | **decidido** (12/11/2026, T12 e N9) |
+
+**Comparação por plano (X2).** `artefatos/07_segmentos_por_plano.html` cruza as duas réguas
+na mesma população: personas L com renovação não desligada em 31/07, por plano. Na janela
+01/08–29/09, sinal de saída inclui desligamento/cancelamento/expiração; término mede o fim da
+assinatura. São medidas diferentes, não causalidade nem previsão. Parados não tem assinantes
+mensais nessa base, portanto não há taxa mensal a comparar.
 
 ### Referências da etapa
 

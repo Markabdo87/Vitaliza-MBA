@@ -18,11 +18,23 @@ Correções aplicadas:
      Sem distância e ritmo (ou com distância também inflada: duração recalculada acima do
      teto do tipo), duracao_min vira nulo. Original em duracao_min_bronze.
   7. treino_com: texto vazio vira nulo.
+  8. um treino por (user_id, inicio_brt): a regra 3 exige tipo, duração, distância e ritmo
+     iguais, então dois registros diferentes no mesmo minuto sobram. Fica **um** por
+     (user_id, inicio_brt): prefere o relógio (garmin/apple_health) ao app, como na regra 3;
+     no empate, o menor atividade_id. A escolha é feita depois das correções 4–6, então a
+     linha que fica já carrega os valores corrigidos.
 
-Não remove nada além das duplicatas. Suspeitas viram flag:
+Premissa da regra 8 (T12 no decisoes.md): um usuário tem no máximo um treino começando em
+cada minuto. Os dois registros podem ser o mesmo treino gravado em dobro com medidas
+divergentes ou dois treinos reais lançados juntos, e o arquivo não tem como distinguir. A
+cópia escolhida (relógio antes de app, menor atividade_id no empate) é **arbitrária**: ela dá
+um resultado estável e reproduzível, não prova qual registro é fiel. Não se deduplica por
+proximidade (1–2 min): o arquivo não sustenta esse limiar e ele apagaria treinos curtos
+sucessivos. Com isso a prata não marca nada sobre essa dúvida e as duas segmentações que
+consomem `atividades.parquet` usam a mesma base, sem filtro divergente.
+
+Remove duplicatas comprovadas e registros repetidos pela premissa da regra 8. A flag restante:
   flag_duracao_zero     duração 0 na bronze (recalculada ou nula, ver regra 6)
-  flag_inicio_repetido  outro treino do mesmo usuário começa no mesmo minuto (tipo ou
-                        duração diferentes, por isso não é duplicata)
 
 Uso: .venv/bin/python notebooks/atividades_prata.py  (a partir da raiz do repo)
 """
@@ -47,7 +59,7 @@ COLUNAS = [
     "atividade_id", "user_id", "inicio_brt", "mes", "inicio_bronze", "fuso_origem",
     "tipo", "tipo_bronze", "duracao_min", "duracao_min_bronze", "distancia_km",
     "distancia_km_bronze", "ritmo_min_km", "fc_media", "origem", "gps_ok", "treino_com",
-    "flag_duracao_zero", "flag_inicio_repetido",
+    "flag_duracao_zero",
 ]
 
 
@@ -65,6 +77,13 @@ def main():
     ts = pc.strptime(t["inicio"], format="%Y-%m-%d %H:%M:%S", unit="s")
     tres_h = pa.scalar(3 * 3600, pa.duration("s"))
     brt = pc.if_else(garmin, pc.subtract(ts, tres_h), ts)
+    if t.num_rows == 0 or t["user_id"].null_count or brt.null_count:
+        raise ValueError("atividades: bronze vazia ou user_id/inicio ausente; não é possível aplicar T12")
+    if n(pc.not_equal(pc.strftime(brt, "%S"), "00")):
+        raise ValueError("atividades: há inícios com segundos diferentes de 00; revisar a premissa de minuto da T12")
+    origens = set(pc.unique(t["origem"]).to_pylist())
+    if not origens <= {"app", "garmin", "apple_health"}:
+        raise ValueError(f"atividades: origem desconhecida ou nula {origens}; revisar prioridade da T12")
     dia_mudou = pc.not_equal(pc.strftime(ts, "%Y-%m-%d"), pc.strftime(brt, "%Y-%m-%d"))
     mes_mudou = pc.not_equal(pc.strftime(ts, "%Y-%m"), pc.strftime(brt, "%Y-%m"))
     print(f"[1] fuso: {n(garmin)} linhas Garmin -3h · {n(dia_mudou)} mudam de dia · "
@@ -138,17 +157,6 @@ def main():
                      t["treino_com"])
     print(f"[7] treinos com companhia: {n(pc.is_valid(com))}")
 
-    # flags
-    g = pa.table({"user_id": t["user_id"], "inicio_brt": t["inicio_brt"],
-                  "um": pa.array([1] * t.num_rows, pa.int64())})
-    cont = g.group_by(["user_id", "inicio_brt"]).aggregate([("um", "sum")])
-    cont = cont.filter(pc.greater(cont["um_sum"], 1))
-    # join não preserva ordem: re-ancora por posição
-    g = g.append_column("pos", pa.array(range(t.num_rows), pa.int64()))
-    marca = g.join(cont, ["user_id", "inicio_brt"], join_type="left outer").sort_by("pos")
-    repetido = pc.is_valid(marca["um_sum"])
-    print(f"flags: inicio_repetido {n(repetido)} · duracao_zero {n(zero)}")
-
     def flag(m):
         return pc.cast(pc.fill_null(m, False), pa.int8())
 
@@ -171,9 +179,31 @@ def main():
         "gps_ok": gps_ok,
         "treino_com": com,
         "flag_duracao_zero": flag(zero),
-        "flag_inicio_repetido": flag(repetido),
     }).select(COLUNAS)
+
+    # 8. um treino por (user_id, inicio_brt): relógio antes de app, empate no menor atividade_id
+    cont = s.group_by(["user_id", "inicio_brt"]).aggregate([("atividade_id", "count")])
+    varios = cont.filter(pc.greater(cont["atividade_id_count"], 1))
+    linhas_varios = pc.sum(varios["atividade_id_count"]).as_py() or 0
+    print(f"[8] mesmo minuto do mesmo usuário: {varios.num_rows} grupos com mais de um registro · "
+          f"{linhas_varios} linhas · {linhas_varios - varios.num_rows} a remover")
+    s = s.append_column("_prio", pc.if_else(pc.is_in(s["origem"], pa.array(RELOGIO)), 0, 1))
+    s = s.sort_by([("user_id", "ascending"), ("inicio_brt", "ascending"),
+                   ("_prio", "ascending"), ("atividade_id", "ascending")])
+    usuario, inicio = s["user_id"].combine_chunks(), s["inicio_brt"].combine_chunks()
+    mesmo = pc.and_(pc.equal(usuario.slice(1), usuario.slice(0, len(usuario) - 1)),
+                    pc.equal(inicio.slice(1), inicio.slice(0, len(inicio) - 1)))
+    escolhida = pa.concat_arrays([pa.array([True]), pc.invert(mesmo)])
+    descartadas = s.filter(pc.invert(escolhida))
+    print(f"[8] removidas: {descartadas.num_rows} · origem das removidas: "
+          f"{dict((r['values'], r['counts']) for r in pc.value_counts(descartadas['origem']).to_pylist())}"
+          f" · relógio entre as mantidas: "
+          f"{n(pc.is_in(s.filter(escolhida)['origem'], pa.array(RELOGIO)))}")
+    s = s.filter(escolhida).drop_columns("_prio")
     s = s.sort_by([("inicio_brt", "ascending"), ("atividade_id", "ascending")])
+    print(f"flag: duracao_zero {n(pc.equal(s['flag_duracao_zero'], 1))} linhas na prata "
+          f"({n(pc.equal(descartadas['flag_duracao_zero'], 1))} descartadas pela regra 8 também "
+          f"tinham a flag)")
 
     SAIDA.parent.mkdir(parents=True, exist_ok=True)
     pq.write_table(s, SAIDA)

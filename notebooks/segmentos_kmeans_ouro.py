@@ -15,7 +15,10 @@ Regras (decisões N1–N7 no decisoes.md):
      entrada por variável: como calcular, se entra em log e o texto da página). Contagens
      entram em log1p; tudo é padronizado (z-score) com a média e o desvio da base de treino.
   4. Plano, canal, sistema e idade não entram no k-means: servem para descrever os
-     segmentos. O plano mudaria o agrupamento pelo calendário de saída do anual.
+     segmentos. O plano mudaria o agrupamento pelo calendário de saída do anual. A idade é a
+     completa em `data_ref`, calculada de `usuarios.data_nascimento` (mesma regra de U7):
+     `idade_corte` da prata é fixa em 30/09/2026 e, na base de 31/07, somaria dois meses de
+     idade que ainda não existiam na data de referência.
   5. k = o de maior silhouette (amostra de 5.000) dentro de K_FAIXA (3–4, pedida do guia);
      k-means++ com 20 inicializações, random_state = 7.
   6. Rótulos pelo centróide, na ordem de ROTULOS: maior recusa = Cobrança falhando; mais
@@ -35,6 +38,10 @@ colega (ex.: variáveis da extração com IA): uma entrada em EXTRAS com o arqui
 a tabela precisa ter `user_id` e, se tiver `data_ref`, é casada pela data também. Só use
 colunas calculadas com informação até a data de referência.
 
+Treinos: `atividades.parquet` já traz um treino por (user_id, inicio_brt) — a prata resolve os
+registros no mesmo minuto (T12) —, então esta segmentação usa a tabela inteira, sem filtro de
+flag que a distinga da segmentação de quatro variáveis (L).
+
 Limites: atividades.parquet só cobre 2026, então as variáveis de treino não existem antes de
 jan/26. A campanha de 10/08/2026 tratou parte da base de treino; o churn de 60 dias de cada
 segmento inclui esse efeito.
@@ -46,11 +53,10 @@ import sys
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-from sklearn.metrics import silhouette_score
 
 from _artefato import CORES, Pagina, layout_padrao
+from _metricas_segmentacao import LOG_N, N_INIT_N, SEMENTE_N, agrupa, silhueta
 from _ouro import OURO, RAIZ, ler_prata
 
 SAIDA = OURO / "segmentos_kmeans.csv"
@@ -70,9 +76,9 @@ ass = ler_prata("assinaturas.csv", ["user_id", "plano_atual", "canal", "metodo",
                                     "data_fim", "motivo_fim", "flag_cortesia"],
                 datas=["inicio", "data_fim"])
 ass = ass[ass.flag_cortesia == 0]
-usu = ler_prata("usuarios.csv", ["user_id", "sistema", "idade_corte", "relogio_conectado"])
-atv = ler_prata("atividades.parquet", ["user_id", "inicio_brt", "gps_ok", "flag_inicio_repetido"])
-atv = atv[atv.flag_inicio_repetido == 0].copy()
+usu = ler_prata("usuarios.csv", ["user_id", "sistema", "data_nascimento", "relogio_conectado"],
+                datas=["data_nascimento"])
+atv = ler_prata("atividades.parquet", ["user_id", "inicio_brt", "gps_ok"])
 atv["dia"] = atv.inicio_brt.dt.normalize()
 uso = ler_prata("uso_mensal.csv", ["user_id", "mes", "sessoes_app"])
 ami = ler_prata("amizades.csv", ["seguidor_id", "desde", "reciproco", "flag_id_invalido"],
@@ -97,6 +103,14 @@ def conta(df, col, ini, fim):
 def janela(ref, n):
     """Primeiro dia da janela de n dias que termina em ref."""
     return ref - pd.Timedelta(days=n - 1)
+
+
+def idade_em(ref, b):
+    """Idade completa em ref (mesma regra de `usuarios_prata.py`, U7); vazia sem nascimento."""
+    nasc = b.data_nascimento
+    ainda_nao_fez = (nasc.dt.month > ref.month) | \
+                    ((nasc.dt.month == ref.month) & (nasc.dt.day > ref.day))
+    return (ref.year - nasc.dt.year - ainda_nao_fez).astype("Int64")
 
 
 def sessoes(ref, b):
@@ -188,7 +202,9 @@ def base(ref):
     fim = b.data_fim
     f["saiu_60d"] = (fim.notna() & (fim <= ref + HORIZONTE)).astype(int)
     f["motivo_fim_60d"] = b.motivo_fim.where(f.saiu_60d == 1)
-    f = f.join(usu.set_index("user_id")[["sistema", "idade_corte", "relogio_conectado"]])
+    f = f.join(usu.set_index("user_id")[["sistema", "data_nascimento", "relogio_conectado"]])
+    f["idade"] = idade_em(ref, f)
+    f = f.drop(columns="data_nascimento")
     vazias = [c for c in VARS if f[c].isna().any()]
     if vazias:
         sys.exit(f"variáveis sem valor em {ref:%d/%m/%Y}: {vazias} (EXTRAS sem a conta toda?)")
@@ -212,10 +228,17 @@ z_co = ((matriz(corte) - mu) / sd).values
 # --- escolha de k (regra 5) ---------------------------------------------------------------
 rng = np.random.default_rng(SEED)
 amostra = rng.choice(len(z_tr), size=min(5000, len(z_tr)), replace=False)
+# A silhueta sai da implementação comum (`_metricas_segmentacao`), a mesma que o relatório de
+# segmentação usa. `LOG_N` é a lista de variáveis em log: se divergir das flags abaixo, o relatório
+# recalcularia outra matriz e pararia — por isso a conferência aqui.
+if tuple(c for c, v in VARIAVEIS.items() if v["log"]) != LOG_N:
+    sys.exit("as variáveis com log=True em VARIAVEIS diferem de LOG_N em "
+             "notebooks/_metricas_segmentacao.py: ajuste a lista antes de gerar o ouro")
+assert (SEED, 20, 4) == (SEMENTE_N, N_INIT_N, 4), "parâmetros do k-means fora do helper"
 modelos, escolha = {}, []
 for k in sorted(set(K_TESTE) | set(range(K_FAIXA[0], K_FAIXA[1] + 1))):
-    modelos[k] = KMeans(n_clusters=k, n_init=20, random_state=SEED).fit(z_tr)
-    sil = silhouette_score(z_tr[amostra], modelos[k].labels_[amostra])
+    modelos[k] = agrupa(z_tr, k, SEED, 20)
+    sil = silhueta(z_tr, modelos[k].labels_, amostra)
     escolha.append({"k": k, "inercia": modelos[k].inertia_, "silhouette": sil})
 escolha = pd.DataFrame(escolha).set_index("k")
 K = escolha.loc[K_FAIXA[0]:K_FAIXA[1], "silhouette"].idxmax()
@@ -248,7 +271,7 @@ corte["motivo_fim_60d"] = np.nan
 
 saida = pd.concat([treino, corte]).reset_index()
 saida = saida[["user_id", "data_ref", "segmento"] + VARS + [
-    "plano", "canal", "metodo", "sistema", "idade_corte", "relogio_conectado",
+    "plano", "canal", "metodo", "sistema", "idade", "relogio_conectado",
     "saiu_60d", "motivo_fim_60d"]]
 SAIDA.parent.mkdir(parents=True, exist_ok=True)
 saida.to_csv(SAIDA, index=False)
@@ -280,6 +303,7 @@ perfil = pd.DataFrame({f"assinantes {D_TR}": g.size(),
                        "saída em 60 dias (%)": 100 * g.saiu_60d.mean()})
 for c in VARS:
     perfil[VARIAVEIS[c]["nome"]] = g[c].agg(VARIAVEIS[c]["resumo"])
+perfil[f"idade em {D_TR} (anos)"] = g.idade.median()
 perfil["% mensal"] = g.plano.apply(pct, valor="mensal")
 perfil["% loja"] = g.canal.apply(pct, valor="loja")
 perfil["% android"] = g.sistema.apply(pct, valor="android")
@@ -304,7 +328,7 @@ POR_EXTENSO = {2: "Dois", 3: "Três", 4: "Quatro", 5: "Cinco", 6: "Seis", 7: "Se
 sil_k = escolha.loc[K, "silhouette"]
 
 p = Pagina(
-    "02 · Segmentos (k-means)",
+    "05 · Segmentos (k-means)",
     f"{POR_EXTENSO.get(K, K)} grupos de assinantes pelo comportamento no app, e quanto cada um "
     "sai em 60 dias.",
     "fonte: `dados/3.ouro/segmentos_kmeans.csv`, gerada por `notebooks/segmentos_kmeans_ouro.py` "

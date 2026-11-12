@@ -58,7 +58,7 @@ print("\n1. Contagem de linhas (bronze = dicionário · prata = decisoes.md)")
 CONTAGENS = {  # arquivo: (bronze, prata)
     "usuarios.csv": (64948, 63989), "assinaturas.csv": (32643, 32643),
     "eventos_assinatura.csv": (275565, 275565), "pagamentos.csv": (165548, 163607),
-    "uso_mensal.csv": (591662, 591662), "atividades.parquet": (1254475, 1252575),
+    "uso_mensal.csv": (591662, 591662), "atividades.parquet": (1254475, 1251108),
     "amizades.csv": (113480, 113480), "campanha_ago26.csv": (14120, 14120),
     "onboarding.csv": (63929, 63929), "feed_posts.csv": (119309, 119309),
     "pesquisa_saida.csv": (643, 643), "tickets_suporte.csv": (4422, 4422),
@@ -99,6 +99,11 @@ for arq in ["assinaturas.csv", "eventos_assinatura.csv", "pagamentos.csv", "uso_
     confere(f"{arq}: user_id fora de usuarios", 0, int((~u.isin(ids)).sum()))
 u = pd.read_parquet(PRATA / "atividades.parquet", columns=["user_id"]).user_id
 confere("atividades.parquet: user_id fora de usuarios", 0, int((~u.isin(ids)).sum()))
+at = pd.read_parquet(PRATA / "atividades.parquet", columns=["user_id", "inicio_brt", "origem"])
+confere("atividades.parquet: um treino por user_id + inicio_brt (T12)", 0,
+        int(at.duplicated(["user_id", "inicio_brt"]).sum()))
+confere("atividades.parquet: nenhuma coluna de flag sobre registro no mesmo minuto", 0,
+        sum("inicio_repetido" in c for c in at.columns))
 am = ler("amizades.csv", usecols=["seguidor_id", "seguido_id", "flag_id_invalido"])
 am = am[am.flag_id_invalido == 0]
 confere("amizades.csv: ids fora de usuarios", 0,
