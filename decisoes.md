@@ -12,7 +12,7 @@ Como funciona:
   mudam juntos, no mesmo commit.
 - IDs: prefixo da seção + número, nunca reaproveitado. Em uso: `U` usuários · `A` assinaturas ·
   `E` eventos de assinatura · `P` pagamentos · `M` uso mensal · `T` atividades · `Z` amizades · `C` campanha ago/26 · `O` onboarding ·
-  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro) · `L` segmentação (ouro) · `N` segmentos k-means de nove variáveis (ouro) · `R` recusas de cobrança (ouro) · `X` conciliação dos segmentos (ouro).
+  `F` feed · `Q` pesquisa de saída · `S` tickets de suporte · `G` churn mensal (ouro) · `K` quem saiu em jul–set/26 (ouro) · `W` por que saem (ouro) · `L` segmentação (ouro) · `N` segmentos k-means de nove variáveis (ouro) · `R` recusas de cobrança (ouro) · `X` conciliação dos segmentos (ouro) · `H` validação com árvore de decisão (ouro).
 - Decisão revista não se apaga: risque a antiga e aponte para a nova.
 - "Em aberto", no fim, é a lista de pendências: toda sessão que termina com algo pela
   metade deixa uma linha lá.
@@ -464,6 +464,29 @@ aprovada com início/renovação no mesmo dia; nenhuma cobrança fora da vida da
 só os preços do enunciado; P12) e o ouro já gerado (5,6% e 6,6%; R3). Sai com erro se algo
 quebrar. Rode depois de mexer em qualquer notebook.
 
+## Validação com árvore de decisão (ouro) (`3.ouro/segmentos.csv` + `segmentos_kmeans.csv` + prata da campanha → `3.ouro/validacao_arvore.csv`)
+
+Notebook: `notebooks/validacao_arvore_ouro.py`. Grão: um corte de score da árvore. Artefato:
+`artefatos/08_validacao_arvore.html`. Serve para formular a hipótese de precisão × recall levada
+à Tecnologia (Aula 7, 24/11/2026); não é o modelo final.
+
+| # | Problema | Decisão | Motivo | Efeito na contagem |
+|---|---|---|---|---|
+| H1 | Persona da validação | **Usar** Ativos ao ar livre · mensal em 31/07/2026; rótulo `saiu_60d` (L2) | Maior volume de saídas, aviso curto (≈ 14 dias) e efeito do contato medido na campanha | 2.877 assinantes · 15,4% de decisão de sair |
+| H2 | Variáveis | **Usar** só o que foi medido até 31/07 nas duas segmentações (16 variáveis); **tirar** `tratado` da campanha | O sorteio de 10/08 é posterior à data de referência (vazamento) | — |
+| H3 | Modelo | **Árvore** de profundidade 3, ≥ 80 por folha, `class_weight="balanced"`, 70/30 estratificado, `random_state = 0` | Regras legíveis para o Conselho; classe rara (15%) | AUC 0,64 no teste e no treino |
+| H4 | Taxa de reversão | **Medir** na campanha de ago/26, mensais das personas Ativos: 1 − decisão no grupo da oferta ÷ no controle (10/08–30/09) | Premissa do ROI com dado do próprio grupo (passo a passo do Artefato 2) | desafio 42% · cupom 54% |
+| H5 | Custo do falso positivo | **Premissa do grupo**: contato = R$ 0,01 (e-mail, enunciado seção 03) + R$ 0,02 de IA (Claude Sonnet 5.5, ~800/200 tokens, câmbio R$ 5,50); cupom = R$ 35,91 (enunciado) para quem usa, em dois casos: aceite = clique (16%) e aceite total | O aceite real do cupom não está nos dados | — |
+| H6 | Cortes | **Arredondar** score e cortes em 2 casas e marcar os mais próximos de 0,40, 0,55 e 0,70 (opções da Aula 7) | Folhas com score quase igual viram o mesmo corte; o score balanceado não é probabilidade | cortes 0,38 · 0,54 · 0,69 |
+
+### Resultado de referência
+
+Folha de maior risco: tempo de casa ≤ 234,5 dias, mais de 2,5 dias sem treino e mais de 6 km por
+treino ao ar livre: 29,8% de decisão de sair no teste e 33,3% no grupo controle da campanha (n = 90),
+contra 15,4% na persona. Com o desafio (falso positivo quase sem custo) e com o cupom aceito só por
+quem clica, o maior valor está em contatar quase toda a persona (recall alto); com o cupom usado por
+todos, o único corte com valor positivo é o mais alto (0,69, precisão 30%).
+
 ## Em aberto
 
 ### Segmentação: registros de treino repetidos
@@ -665,3 +688,9 @@ quebrar. Rode depois de mexer em qualquer notebook.
 - ~~`segmentos_ouro.py` quebra no pandas 2.x (`np.maximum` entre data e `Timestamp`).~~
   Trocado por `b.inicio.clip(lower=INICIO_ARQUIVO)` na integração; mesmo resultado.
 - Validar X1 com o grupo (Camila, Douglas) antes de fechar o relatório de 15/11.
+
+### Validação com árvore de decisão (ouro)
+
+- H5: o aceite real do cupom decide se o corte do mensal deve ser baixo (recall) ou alto (precisão).
+  Medir no próximo teste (uso do cupom, não só clique).
+- Comparar com o modelo da Tecnologia em 26/11: recall na folha de maior risco e AUC acima de 0,64.

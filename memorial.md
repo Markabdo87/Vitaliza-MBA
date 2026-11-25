@@ -423,6 +423,27 @@ responde.
 
 ---
 
+## Etapa 08 · Validação com árvore de decisão (`artefatos/08_validacao_arvore.html`)
+
+Pergunta: na persona Ativos ao ar livre · mensal, quanto um modelo simples acerta (precisão) e
+vê (recall) em cada corte, e quanto vale contatar conforme a oferta? Decisões H1–H6.
+
+### Conceitos
+
+- **Precisão**: dos marcados como risco, quantos saíram. O erro que ela mede é o falso positivo
+  (contato em quem ficaria), que custa a oferta.
+- **Recall**: dos que saíram, quantos foram marcados. O erro é o falso negativo (churner não
+  visto), que custa o LTV (R$ 287 no case v2).
+- **Threshold**: o corte de score que separa agir de ignorar. É decisão de negócio: o corte que
+  maximiza o valor depende do custo do falso positivo, isto é, da oferta.
+
+### Pontos em debate
+
+| # | Ponto | Opções | Proposta | Status |
+|---|---|---|---|---|
+| D08.1 | Oferta do mensal | desafio (sem custo) · cupom 30% | desafio até medir o uso real do cupom | em debate |
+| D08.2 | Corte | 0,40 · 0,55 · 0,70 | corte baixo com o desafio (recall); alto só com oferta cara | em debate · calibrar com a Tecnologia em 26/11 |
+
 ## Referências gerais
 
 - CHAPMAN, P. et al. **CRISP-DM 1.0**: step-by-step data mining guide. SPSS, 2000.

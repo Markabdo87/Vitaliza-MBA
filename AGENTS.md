@@ -257,6 +257,7 @@ Ao descobrir uma armadilha nova, acrescente aqui.
 | `dados/3.ouro/segmentos_plano.csv` | `notebooks/segmentos_plano_ouro.py` | persona L × plano em 31/07/2026 | base comum de 11.688 assinantes com renovação não desligada; sinal L e término N em 60 dias, sem priorização (X2); gera `artefatos/07_segmentos_por_plano.html` |
 
 | `dados/3.ouro/recusas_cobranca.csv` | `notebooks/recusas_cobranca_ouro.py` | uma cobrança recusada | jul/24–set/26, 3.250 recusas com desfecho `recuperada`/`perdida`/`em_aberto` (R1–R5); gera também `recusas_cobranca.xlsx` e `artefatos/06_recusas_cobranca.html` |
+| `dados/3.ouro/validacao_arvore.csv` | `notebooks/validacao_arvore_ouro.py` | um corte de score | árvore de decisão na persona Ativos ao ar livre · mensal (31/07/26, H1–H6): precisão, recall, VP/FP/FN e valor líquido por oferta (desafio, cupom com dois aceites); reversão medida na campanha de ago/26; gera `artefatos/08_validacao_arvore.html` |
 
 Número de referência para conferir a prata: faturamento de set/2026 = R$ 489.873,50 bruto,
 R$ 434.056,93 líquido de taxas. `notebooks/conferencias.py` confere esse e os demais números
